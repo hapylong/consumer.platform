@@ -1,0 +1,893 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+    Apache License, Version 2.0 (the "License"); you may not use this file except 
+    in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+    Unless required by applicable law or agreed to in writing, software distributed 
+    under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+    OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+    the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.afterLoan.AfterLoanDao">
+
+
+    <!-- 贷后客户跟踪列表-->
+    <select id="afterLoanList" parameterType="java.util.Map" resultType="com.iqb.consumer.data.layer.bean.afterLoan.AfterLoanBean">
+        select 
+            b.merchantshortname AS merchantShortName,
+            a.orderId,
+            c.realName as realName,
+            c.smsMobile,
+            a.regId as regId,
+            a.orderAmt,
+            a.orderItems,
+            d.PLANFULLNAME,
+            a.monthInterest,
+            e.gpsStatus,
+            a.riskStatus
+            from inst_orderinfo a
+            left join inst_merchantinfo b on a.merchantno = b.merchantno
+            left join inst_user c on a.userId = c.id
+            left join inst_plan d on a.planId = d.id
+            LEFT JOIN (SELECT AA.* from (SELECT * FROM inst_gpsinfo ORDER BY id DESC) AA GROUP BY AA.orderid) e on A.orderId = E.orderId
+        where  a.riskstatus in (0,3,7)
+         AND a.status != 2 
+    <if test="orderId !=null and orderId != ''">
+            AND a.orderId = #{orderId}
+        </if>
+        <if test="realName !=null and realName != ''">
+            AND c.realName = #{realName}
+        </if>
+        <if test="regId !=null and regId != ''">
+            AND a.regId = #{regId}
+        </if>
+        <if test="merList != null and merList.size() > 0">
+                AND a.merchantno in
+                <foreach item="item" index="index" collection="merList" open="("
+                    separator="," close=")">
+                    #{item.merchantNo}
+                </foreach>
+         </if>
+         <if test="gpsStatus != null and gpsStatus != '' and gpsStatus == '0'.toString()">
+                AND (e.gpsStatus = #{gpsStatus} or e.gpsStatus IS NULL)
+         </if>
+         <if test="gpsStatus != null and gpsStatus != '' and gpsStatus != '0'.toString()">
+                AND e.gpsStatus = #{gpsStatus} 
+         </if>
+    </select>
+    
+     <!--FINANCE-3043 新增贷后客户跟踪及查询页面；FINANCE-3070贷后客户信息补充接口 -->
+     <insert id="saveAfterLoanCustomer" parameterType="com.alibaba.fastjson.JSONObject" keyProperty="id"
+        useGeneratedKeys="true">
+        INSERT INTO 
+            inst_customer_info
+            (orderId,remark,optName,createTime)
+        VALUES
+            (#{orderId},#{remark},#{optName},NOW())
+    </insert>
+    
+     <!-- FINANCE-3043 新增贷后客户跟踪及查询页面；FINANCE-3071客户信息补充分页展示接口 -->
+    <select id="selectCustomerInfoListByOrderId" parameterType="com.alibaba.fastjson.JSONObject" resultType="com.iqb.consumer.data.layer.bean.afterLoan.AfterLoanCustomerInfoBean">
+        SELECT
+            A.id,
+            A.orderId,
+            A.createTime AS createTime,
+            A.remark,
+            A.optName,
+            C.smsMobile
+        FROM
+            inst_customer_info A
+        LEFT JOIN inst_orderinfo B ON A.orderId = B.orderId
+        LEFT JOIN inst_user C ON B.userId = C.id
+        <where>
+            <if test="orderId != null and orderId != ''">
+                AND A.orderId = #{orderId}
+            </if>
+        </where>
+        ORDER BY ID DESC
+    </select>
+    <select id="selectPayMoneyListByOrderId" parameterType="com.alibaba.fastjson.JSONObject" resultType="java.util.Map">
+        select DICT_CODE as id,DICT_VALUE AS text from iqb_sys_dict_item where DICT_TYPE_CODE = 'stage_number'
+    </select>
+    <!-- 根据订单号查询剩余期数 -->
+    <select id="selectNumberByOrderId" parameterType="com.alibaba.fastjson.JSONObject" resultType="java.util.Map">
+        select leftInstIMonth as month,leftInstIDay as day from inst_orderinfo where orderId =  #{orderId} LIMIT 1
+    </select>
+    <!-- FINANCE-3048 新增资产赎回页面；FINANCE-30824.5分配详情页 字典列表 -->
+    <select id="selectBreachContractList" parameterType="com.alibaba.fastjson.JSONObject" resultType="com.iqb.consumer.data.layer.bean.afterLoan.BreachOfContractBean">
+        select a.orderId,b.realName,a.regId,a.orderAmt,a.orderItems,c.gpsStatus,d.PLANFULLNAME,a.bizType,e.MERCHANTSHORTNAME FROM
+            inst_orderinfo a 
+            LEFT JOIN inst_user b ON a.userId = b.id
+            LEFT JOIN inst_gpsinfo c ON c.orderId = a.orderId
+            LEFT JOIN inst_plan d ON a.planId = d.id
+            LEFT JOIN inst_merchantinfo e ON a.merchantNo = e.MERCHANTNO
+            where (a.riskStatus =3 or a.riskStatus =7)
+            and (a.bizType = 2300 or a.bizType = 2002 or a.bizType = 2001)
+            and a.status != 2
+            and NOT EXISTS(SELECT 1 FROM inst_gpsinfo g WHERE g.orderId=c.orderId AND g.id>c.id)
+            and d.MARGINRATIO is not NULL and d.MARGINRATIO > 0
+            and NOT  EXISTS  ( SELECT 1 FROM inst_overdueinfo o WHERE o.orderId = a.orderId)
+            <if test="merList != null and merList.size() > 0">
+                AND a.merchantno in
+                <foreach item="item" index="index" collection="merList" open="("
+                    separator="," close=")">
+                    #{item.merchantNo}
+                </foreach>
+            </if>
+            <if test="orderId != null and orderId != ''">
+                AND a.orderid = #{orderId}
+            </if>
+            <if test="realName !=null and realName != ''">
+            AND b.realName = #{realName}
+            </if>
+            <if test="regId !=null and regId != ''">
+            AND a.regId = #{regId}
+            </if>   
+            <if test="gpsStatus != null and gpsStatus != '' and gpsStatus == '0'.toString()">
+                AND (c.gpsStatus = #{gpsStatus} or c.gpsStatus IS NULL)
+             </if>
+            <if test="gpsStatus != null and gpsStatus != '' and gpsStatus != '0'.toString()">
+                AND c.gpsStatus = #{gpsStatus} 
+            </if>  
+            <if test="bizType !=null and bizType != ''">
+            AND a.bizType = #{bizType}
+            </if> 
+            <if test="startTime !=null and startTime != ''">
+            AND a.createTime &gt;= #{startTime}
+            </if>
+            <if test="endTime !=null and endTime != ''">
+            AND a.createTime &lt;= #{endTime}
+            </if>
+            <if test="margin !=null and margin != ''">
+            AND d.MARGINRATIO = #{margin}
+            </if>
+            <if test="downPayment !=null and downPayment != ''">
+            AND d.DOWNPAYMENTRATIO = #{downPayment}
+            </if>
+            <if test="serviceFee !=null and serviceFee != ''">
+            AND d.SERVICEFEERATIO = #{serviceFee}
+            </if>
+            <if test="feeAmount !=null and feeAmount != ''">
+            AND d.FEEYEAR = #{feeAmount}
+            </if>
+            <if test="takePayment !=null and takePayment != ''">
+            AND a.takePayment = #{takePayment}
+            </if>
+        ORDER BY a.createTime DESC
+    </select>
+    <!-- FINANCE-3106 新增客户违约保证金结算查询页面；FINANCE-3136批量违约标记接口 -->
+    <insert id="batchListToMark" parameterType="com.alibaba.fastjson.JSONObject" keyProperty="id"
+        useGeneratedKeys="true">
+        INSERT INTO 
+            inst_overdueInfo
+            (orderId,overdueDate,overdueRemark,status,version,createTime)
+        VALUES
+            (#{orderId},#{overdueDate},#{overdueRemark},1,1,NOW())
+    </insert>
+    
+    <select id="selectOverdueByOrderId" parameterType="com.alibaba.fastjson.JSONObject" resultType="java.util.Map">
+        select * from inst_overdueinfo where orderId = #{orderId} LIMIT 1
+    </select>
+    
+    <select id="getReportList" parameterType="com.alibaba.fastjson.JSONObject" resultType="com.iqb.consumer.data.layer.bean.riskinfo.LocalRiskInfoBean">
+        select * from inst_localriskinfo where orderId = #{orderId} and effect = '1'
+    </select>
+    
+    <select id="getReportByReprotNo" parameterType="com.alibaba.fastjson.JSONObject" resultType="com.iqb.consumer.data.layer.bean.riskinfo.LocalRiskInfoBean">
+        select * from inst_localriskinfo where orderId = #{orderId} and effect = '1' and reportType = #{reportType}
+    </select>
+    <select id="getReportStateByOrderId" parameterType="com.alibaba.fastjson.JSONObject" resultType="com.iqb.consumer.data.layer.bean.riskinfo.LocalRiskInfoBean">
+         SELECT
+                   A.reportState,
+                A.errCode
+                FROM
+                    inst_localriskinfo A
+                LEFT JOIN inst_orderinfo B ON A.orderId = b.orderId
+                LEFT JOIN inst_user C ON B.userId = C.id
+                WHERE
+                    A.effect = 1
+                AND B.bizType = #{bizType}
+                AND C.regId = #{regId}
+                ORDER BY
+                    A.createTime DESC
+                    limit 2 
+    </select>
+    <select id="getPersonDetail" parameterType="com.alibaba.fastjson.JSONObject" resultType="com.iqb.consumer.data.layer.bean.riskinfo.LocalRiskInfoBean">
+        select personDetail from inst_localriskinfo where orderId = #{orderId} and effect = '1' and reportType = '1'
+    </select>
+    
+    <update id="savePersonDetail" parameterType="com.alibaba.fastjson.JSONObject">
+        update
+        inst_localriskinfo
+        <set>
+            <if test="personDetail != null and personDetail != ''">
+                personDetail = #{personDetail},
+            </if>
+        </set>
+        where orderId = #{orderId} and effect = '1' and reportType = '1'
+    </update>
+    <!-- 查询电话提醒记录列表 -->
+    <select id="getAfterLoanInfoByOrderId" parameterType="java.lang.String" resultType="com.iqb.consumer.data.layer.bean.afterLoan.AfterLoanBean">
+        SELECT
+            C.MERCHANTSHORTNAME AS merchantName,
+            C.merchantNo,
+            D.realName,
+            D.regId,
+            A.orderId,
+            B.orderAmt,
+            B.monthInterest,
+            B.orderItems,
+            B.orderName,
+            E.plate,
+            E.carNo,            
+            F.gpsStatus,
+            F.remark,
+            F.disposalScheme,
+            A.afterLoanOpinion,
+            A.lost_contact_reason as lostContactReason,
+            A.lostContactFlag,
+            A.collectFlag,
+            A.into_garage_date as intoGarageDate,
+            A.into_garage_name as intoGarageName,
+            A.trailer_reason as trailerReason,
+            A.checkOpinion,
+            A.gpsArea,
+            A.repaymentFlag,
+            A.collectOpinion,
+            A.collectOpinionConfirm,
+            A.riskRemark,
+            A.processMethod,
+            E.carColor,
+            E.mileage,
+            E.carKeyFlag,
+            E.engine,
+            G.should_receivedAmt as shouldReceivedAmt,
+            DATE_FORMAT(G.should_receivedDate,'%Y-%m-%d') as shouldReceivedDate,
+            G.commision,
+            G.trailerAmt,
+            G.stopAmt,
+            G.otherAmt,
+            G.totalAmt,
+            G.receivedAmt,
+            G.receivedRemark,
+            DATE_FORMAT(G.receivedDate,'%Y-%m-%d') as receivedDate,
+            G.receivedFlag
+        FROM
+            inst_managecar_info A
+        LEFT JOIN inst_orderinfo B ON A.orderId = B.orderId
+        LEFT JOIN inst_merchantinfo C ON B.merchantNo = C.merchantNo
+        LEFT JOIN inst_user D ON B.userId = D.id
+        LEFT JOIN inst_authoritycard E ON A.orderId = E.orderId
+        LEFT JOIN (
+            SELECT
+                p.*
+            FROM
+                (
+                    SELECT
+                        *
+                    FROM
+                        inst_gpsinfo
+                    ORDER BY
+                        id DESC
+                ) p
+            GROUP BY
+                p.orderId
+        ) F ON F.orderId = A.orderId 
+        LEFT JOIN (SELECT * from inst_managercar_receive_info ORDER BY id DESC limit 1) G on A.orderId = G.orderId and G.processMethod = 1
+        where
+        A.orderid = #{orderId}  
+    </select>
+    <update id="saveGpsInfo" parameterType="java.util.Map">
+        insert into inst_gpsinfo(`orderId`, `gpsStatus`, `remark`, `disposalScheme`, `version`, `createTime`) 
+        values (#{orderId},#{gpsStatus},#{remark},#{disposalScheme},1,now())
+    </update>
+    <select id="getGpsInfoByOrderId" parameterType="java.lang.String" resultType="com.iqb.consumer.data.layer.bean.afterLoan.InstGpsInfo">
+       SELECT
+            A.orderId,
+            A.gpsStatus,
+            A.disposalScheme,
+            A.remark,
+            DATE_FORMAT(A.createTime,'%Y-%m-%d %T') as createTime
+        FROM
+            inst_gpsinfo A  
+        where A.orderid = #{orderId} 
+        ORDER BY A.id DESC 
+    </select>
+    <!-- 根据手机号码获取用户最新的风控报告 -->
+    <select id="getReportListByRegId" parameterType="com.alibaba.fastjson.JSONObject" resultType="com.iqb.consumer.data.layer.bean.riskinfo.LocalRiskInfoBean">
+        SELECT
+            A.orderId,
+            A.reportName,
+            A.reportType,
+            A.reportNo,
+            A.createTime as contentCreateTime1
+        FROM
+            inst_localriskinfo A
+        LEFT JOIN inst_orderinfo B ON A.orderId = b.orderId
+        LEFT JOIN inst_user C ON B.userId = C.id
+        WHERE
+            A.effect = 1
+        AND B.bizType=#{bizType}
+        AND C.regId = #{regId}
+        ORDER BY
+            A.createTime DESC
+            limit 2
+    </select>
+    <!-- 根据手机号码,风控类型获取用户最新的风控报告 -->
+    <select id="getReportByRegId" parameterType="com.alibaba.fastjson.JSONObject" resultType="com.iqb.consumer.data.layer.bean.riskinfo.LocalRiskInfoBean">
+          SELECT
+            A.*
+        FROM
+            inst_localriskinfo A
+        LEFT JOIN inst_orderinfo B ON A.orderId = b.orderId
+        LEFT JOIN inst_user C ON B.userId = C.id
+        WHERE
+            A.effect = 1
+        AND C.regId = #{regId}
+        AND A.reportType = #{reportType}
+        ORDER BY
+            A.createTime DESC
+            limit 1
+    </select>
+    <!-- 外包受理分页查询 -->
+    <select id="selectOutSourcetList" parameterType="com.alibaba.fastjson.JSONObject" resultType="com.iqb.consumer.data.layer.bean.afterLoan.OutSourceOrderBean">
+          SELECT
+            A.orderId,
+            B.orderName,
+            C.realName,
+            C.regId,
+            D.ID as merchantId,
+            D.MERCHANTSHORTNAME as merchantName,
+            B.orderAmt,
+            B.monthInterest,
+            E.carNo,
+            E.plate,
+            E.`engine`,
+            G.operatorRemark,
+            DATE_FORMAT(A.processTime,'%Y年%m月%d日') as processTime,
+            H.gpsStatus
+            FROM
+                inst_managecar_info A
+                LEFT JOIN inst_orderinfo B ON A.orderId = B.orderId
+                LEFT JOIN inst_user C ON B.userId = C.id
+                LEFT JOIN inst_merchantinfo D ON B.merchantNo = D.MERCHANTNO
+                LEFT JOIN inst_authoritycard E on A.orderId = E.orderId
+                LEFT JOIN inst_outsource_order G on A.orderId = G.orderId
+                LEFT JOIN inst_gpsinfo H on A.orderId = H.orderId          
+            WHERE A.processMethod = 1   and A.processStatus= 15
+                and NOT EXISTS(SELECT 1 FROM inst_gpsinfo intB WHERE intB.orderId=H.orderId AND intB.id>H.id)
+                and NOT EXISTS(SELECT 1 FROM inst_outsource_order intA WHERE intA.orderId=G.orderId AND intA.id>G.id)
+            <if test="merList != null and merList.size() > 0">
+                AND d.merchantno in
+                <foreach item="item" index="index" collection="merList" open="("
+                    separator="," close=")">
+                    #{item.merchantNo}
+                </foreach>
+            </if>
+            <if test="orderId != null and orderId != ''">
+                AND a.orderid = #{orderId}
+            </if>
+            <if test="realName !=null and realName != ''">
+                AND c.realName = #{realName}
+            </if>
+            <if test="regId !=null and regId != ''">
+                AND c.regId = #{regId}
+            </if>
+            <if test="carNo != null and carNo != ''">
+                AND e.carNo = #{carNo}
+            </if>
+            <if test="plate !=null and plate != ''">
+                AND e.plate = #{plate}
+            </if>
+            <if test="engine !=null and engine != ''">
+                AND e.engine = #{engine}
+            </if>             
+            <if test="orderName !=null and orderName != ''">
+                AND b.orderName = #{orderName}
+            </if>             
+            <if test="gpsStatus !=null and gpsStatus != ''">
+                AND h.gpsStatus = #{gpsStatus}
+            </if>    
+    </select>
+    <!-- 外包处理分页查询 -->
+    <select id="selectOutSourceProcesstList" parameterType="com.alibaba.fastjson.JSONObject" resultType="com.iqb.consumer.data.layer.bean.afterLoan.OutSourceOrderBean">
+          SELECT
+            A.orderId,
+            B.realName as operator,
+            A.operateFlag,
+            A.operatorRemark,
+            DATE_FORMAT(A.createTime,'%Y-%m-%d %T') AS processTime
+        FROM
+            inst_outsource_order A
+        LEFT JOIN inst_user B on A.operator = B.regId
+        WHERE
+            A.orderId = #{orderId} 
+        ORDER BY A.createTime DESC  
+    </select>
+    <!-- 保存外包处理信息 -->
+    <insert id="saveOutSourceOrder" parameterType="com.alibaba.fastjson.JSONObject" keyProperty="id"
+        useGeneratedKeys="true">
+        INSERT INTO 
+            inst_outsource_order
+            (orderId,operator,operatorRemark,operateFlag,createTime)
+        VALUES
+            (#{orderId},#{operator},#{operatorRemark},#{operateFlag},NOW())
+    </insert>
+    <!-- 委案受理分页查询 -->
+    <select id="selectCasetList" parameterType="com.alibaba.fastjson.JSONObject" resultType="com.iqb.consumer.data.layer.bean.afterLoan.OutSourceOrderBean">
+         SELECT
+            A.caseId,
+            A.orderId,
+            E.`status`,
+            B.orderItems,
+            C.realName,
+            C.regId,
+            D.ID AS merchantId,
+            D.MERCHANTSHORTNAME AS merchantName,
+            B.orderAmt,
+            B.monthInterest,
+            DATE_FORMAT(
+                A.createTime,
+                '%Y年%m月%d日'
+            ) AS processTime,
+            A.accuserFlag,
+            A.caseSource
+        FROM
+            inst_order_law  A
+        LEFT JOIN inst_orderinfo B ON A.orderId = B.orderId
+        LEFT JOIN inst_user C ON B.userId = C.id
+        LEFT JOIN inst_merchantinfo D ON B.merchantNo = D.MERCHANTNO
+        LEFT JOIN inst_managecar_info E on A.orderId = E.orderId
+        WHERE
+            <choose>  
+                <when test="flag !=null and flag == 1 ">  
+                    A.caseStatus in (5,10)
+                </when >  
+                <otherwise>  
+                    A.registerFlag = 1
+                   AND A.caseStatus = 15
+                </otherwise>  
+            </choose>  
+            <if test="merList != null and merList.size() > 0">
+                AND d.merchantno in
+                <foreach item="item" index="index" collection="merList" open="("
+                    separator="," close=")">
+                    #{item.merchantNo}
+                </foreach>
+            </if>
+            <if test="orderId != null and orderId != ''">
+                AND a.orderid = #{orderId}
+            </if>
+            <if test="realName !=null and realName != ''">
+                AND c.realName = #{realName}
+            </if>
+            <if test="regId !=null and regId != ''">
+                AND c.regId = #{regId}
+            </if>           
+            <if test="status !=null and status != ''">
+                AND E.status = #{status}
+            </if> 
+            <choose>  
+                <when test="flag !=null and flag == 1 ">  
+                    ORDER BY A.createTime  DESC
+                </when >  
+                <otherwise>  
+                   ORDER BY A.updateTime  DESC
+                </otherwise>  
+            </choose>  
+            
+    </select>        
+    <!-- 根据订单号查询立案申请信息 -->
+    <select id="getCaseInfoByCaseId" parameterType="java.lang.String" resultType="com.iqb.consumer.data.layer.bean.afterLoan.OutSourceOrderBean">
+            SELECT
+                A.caseId,
+                A.orderId,
+                E.`status`,
+                B.orderName,
+                C.realName,
+                C.regId,
+                D.ID AS merchantId,
+                D.MERCHANTSHORTNAME AS merchantName,
+                B.orderAmt,
+                B.monthInterest,
+                B.orderItems,
+                A.register,
+                A.associatedAgency,
+                A.mandatoryLawyer,
+                A.acceptOrg,
+                A.legalCost,
+                A.barFee,
+                DATE_FORMAT(
+                    A.registerDate,
+                    '%Y年%m月%d日'
+                ) AS registerDate,
+                A.composeFlag,
+                A.compromiseFlag,
+                A.composeRemark,
+                A.registerRemark,
+                F.receivedAmt,
+                DATE_FORMAT(
+		            F.receivedDate,
+		            '%Y-%m-%d'
+		        ) as receivedDate,
+		        A.caseNo
+            FROM
+                inst_order_law  A
+            LEFT JOIN inst_orderinfo B ON A.orderId = B.orderId
+            LEFT JOIN inst_user C ON B.userId = C.id
+            LEFT JOIN inst_merchantinfo D ON B.merchantNo = D.MERCHANTNO
+            LEFT JOIN inst_managecar_info E ON A.orderId = E.orderId 
+            LEFT JOIN inst_managercar_receive_info F on A.caseId = F.caseId
+            where A.caseId = #{caseId} limit 1            
+    </select>
+    <!-- 庭审登记信息查询 -->
+    <select id="selectTrialRegistList" parameterType="com.alibaba.fastjson.JSONObject" resultType="com.iqb.consumer.data.layer.bean.afterLoan.OutSourceOrderBean">
+           SELECT
+            A.caseId,
+            A.orderId,
+            E.`status`,
+            B.orderItems,
+            C.realName,
+            C.regId,
+            D.ID AS merchantId,
+            D.MERCHANTSHORTNAME AS merchantName,
+            B.orderAmt,
+            B.monthInterest,
+            DATE_FORMAT(
+                A.createTime,
+                '%Y年%m月%d日'
+            ) AS processTime,
+             A.register,
+             DATE_FORMAT(
+                A.registerDate,
+                '%Y年%m月%d日'
+            ) AS registerDate,
+             A.acceptOrg,
+             A.caseNo,
+             A.caseSource
+        FROM
+            inst_order_law  A
+        LEFT JOIN inst_orderinfo B ON A.orderId = B.orderId
+        LEFT JOIN inst_user C ON B.userId = C.id
+        LEFT JOIN inst_merchantinfo D ON B.merchantNo = D.MERCHANTNO
+        LEFT JOIN inst_managecar_info E on A.orderId = E.orderId
+        WHERE            
+            <choose>  
+                <when test="flag !=null and flag == 1 ">  
+                    A.caseStatus = 25
+                </when >  
+                <otherwise>  
+                   A.caseStatus = 30
+                </otherwise>  
+            </choose>
+            <if test="merList != null and merList.size() > 0">
+                AND d.merchantno in
+                <foreach item="item" index="index" collection="merList" open="("
+                    separator="," close=")">
+                    #{item.merchantNo}
+                </foreach>
+            </if>
+            <if test="orderId != null and orderId != ''">
+                AND a.orderid = #{orderId}
+            </if>
+            <if test="realName !=null and realName != ''">
+                AND c.realName = #{realName}
+            </if>
+            <if test="regId !=null and regId != ''">
+                AND c.regId = #{regId}
+            </if> 
+            ORDER BY A.updateTime DESC          
+    </select>
+     
+    <!-- 贷后案件查询 -->
+    <select id="selectAfterCaseOrderInfoList" parameterType="com.alibaba.fastjson.JSONObject" resultType="map">
+        SELECT
+            A.orderId,
+            C.realName,
+            C.regId,
+            D.MERCHANTSHORTNAME AS merchantName,
+            B.orderAmt,
+            B.monthInterest,
+            B.orderItems,
+            A.`status` as carStatus,
+            A.processStatus,
+            ifnull(E.gpsStatus,0) as gpsStatus  
+        FROM
+            inst_managecar_info A
+         JOIN inst_orderinfo B ON A.orderId = B.orderId
+         JOIN inst_user C ON B.userId = C.id
+         JOIN inst_merchantinfo D ON B.merchantNo = D.MERCHANTNO
+        LEFT JOIN inst_gpsinfo E ON A.orderId = E.orderId 
+             and E.id = (select id from inst_gpsinfo where orderId = A.orderId order by createTime desc,id desc limit 1)
+        WHERE 1=1 
+            <if test="merList != null and merList.size() > 0">
+                AND D.MERCHANTNO in
+                <foreach item="item" index="index" collection="merList" open="("
+                    separator="," close=")">
+                    #{item.merchantNo}
+                </foreach>
+            </if>
+            <if test="orderId != null and orderId != ''">
+                AND A.orderId = #{orderId}
+            </if>
+            <if test="realName !=null and realName != ''">
+                AND C.realName = #{realName}
+            </if>
+            <if test="regId !=null and regId != ''">
+                AND C.regId = #{regId}
+            </if>     
+            <if test="carStatus !=null and carStatus != ''">
+                AND A.`status` = #{carStatus}
+            </if>    
+            <if test="processStatus !=null and processStatus != ''">
+                AND A.processStatus = #{processStatus}
+            </if>  
+            <if test="startTime !=null and startTime != ''">
+	            AND DATE_FORMAT(B.createTime, '%Y-%m-%d') &gt;= #{startTime}
+	        </if>
+	        <if test="endTime !=null and endTime != ''">
+	            AND DATE_FORMAT(B.createTime, '%Y-%m-%d') &lt;= #{endTime}
+	        </if>
+            order by B.createTime DESC
+    </select>
+    
+    <!-- 贷后案件查询统计 -->
+    <select id="totalAfterCaseOrderInfo" parameterType="com.alibaba.fastjson.JSONObject" resultType="map">
+        SELECT
+            ifnull(count(A.id),0) as afterOrderCount,
+            ifnull(sum(B.orderAmt),0) as orderAmtTotal  
+        FROM
+            inst_managecar_info A
+         JOIN inst_orderinfo B ON A.orderId = B.orderId
+         JOIN inst_user C ON B.userId = C.id
+         JOIN inst_merchantinfo D ON B.merchantNo = D.MERCHANTNO
+        WHERE 1=1 
+            <if test="merList != null and merList.size() > 0">
+                AND D.MERCHANTNO in
+                <foreach item="item" index="index" collection="merList" open="("
+                    separator="," close=")">
+                    #{item.merchantNo}
+                </foreach>
+            </if>
+            <if test="orderId != null and orderId != ''">
+                AND A.orderId = #{orderId}
+            </if>
+            <if test="realName !=null and realName != ''">
+                AND C.realName = #{realName}
+            </if>
+            <if test="regId !=null and regId != ''">
+                AND C.regId = #{regId}
+            </if>     
+            <if test="carStatus !=null and carStatus != ''">
+                AND A.`status` = #{carStatus}
+            </if>    
+            <if test="processStatus !=null and processStatus != ''">
+                AND A.processStatus = #{processStatus}
+            </if>  
+            <if test="startTime !=null and startTime != ''">
+	            AND DATE_FORMAT(B.createTime, '%Y-%m-%d') &gt;= #{startTime}
+	        </if>
+	        <if test="endTime !=null and endTime != ''">
+	            AND DATE_FORMAT(B.createTime, '%Y-%m-%d') &lt;= #{endTime}
+	        </if>
+    </select>
+    
+    <!-- 法务查询 -->
+    <select id="selectAfterCaseOrderLawList" parameterType="com.alibaba.fastjson.JSONObject" resultType="map">
+        SELECT
+            B.orderId,
+            C.realName,
+            C.regId,
+            D.MERCHANTSHORTNAME AS merchantName,
+            B.orderAmt,
+            B.monthInterest,
+            B.orderItems,
+            ifnull(A.`status`,70) as carStatus,
+            case 
+            when E.caseSource = '2' or E.caseSource = 2 then null 
+            else A.processStatus 
+            end as processStatus,
+            (select sum(receivedPayment) from inst_order_received_payment
+                where orderId = B.orderId and caseId=E.caseId) as sumReceivedPayment,
+            F.executeResult,
+            E.register,
+            E.acceptOrg,
+            DATE_FORMAT(E.registerDate, '%Y-%m-%d') as registerDate,
+            E.accuserFlag,
+            E.reason,
+            E.registerFlag,
+            E.claimRequest,
+            E.mandatoryLawyer,
+            E.legalCost,
+            E.barFee,
+            E.composeFlag,
+            E.compromiseFlag,
+            E.composeRemark,
+            E.registerRemark,
+            E.caseStatus,
+            E.caseNo,
+            E.caseSource,
+            E.caseId   
+        FROM
+            inst_order_law E
+         JOIN inst_orderinfo B ON E.orderId = B.orderId
+         JOIN inst_user C ON B.userId = C.id
+         JOIN inst_merchantinfo D ON B.merchantNo = D.MERCHANTNO
+        LEFT JOIN inst_managecar_info A ON A.orderId = E.orderId
+        LEFT JOIN inst_order_case_execute F ON E.caseId = F.caseId
+             and F.id = (select id from inst_order_case_execute where caseId = E.caseId order by createTime desc,id desc limit 1)
+        WHERE 1=1 
+            <if test="merList != null and merList.size() > 0">
+                AND D.MERCHANTNO in
+                <foreach item="item" index="index" collection="merList" open="("
+                    separator="," close=")">
+                    #{item.merchantNo}
+                </foreach>
+            </if>
+            <if test="orderId != null and orderId != ''">
+                AND B.orderId = #{orderId}
+            </if>
+            <if test="realName !=null and realName != ''">
+                AND C.realName = #{realName}
+            </if>
+            <if test="regId !=null and regId != ''">
+                AND C.regId = #{regId}
+            </if>     
+            <if test="carStatus !=null and carStatus != ''">
+                <if test="carStatus == 70 or carStatus == '70'">
+                    AND (A.`status` = #{carStatus} or A.`status` is null)
+                </if>
+                <if test="carStatus != 70 and carStatus != '70'">
+                    AND A.`status` = #{carStatus}
+                </if>
+            </if>    
+            <if test="processStatus !=null and processStatus != ''">
+                AND A.processStatus = #{processStatus}
+            </if>  
+            <if test="caseStatus !=null and caseStatus != ''">
+                AND E.caseStatus = #{caseStatus}
+            </if>  
+            <if test="caseNo !=null and caseNo != ''">
+                AND E.caseNo = #{caseNo}
+            </if> 
+            <if test="caseId !=null and caseId != ''">
+                AND E.caseId = #{caseId}
+            </if>  
+            <if test="startTime !=null and startTime != ''">
+	            AND DATE_FORMAT(E.registerDate, '%Y-%m-%d') &gt;= #{startTime}
+	        </if>
+	        <if test="endTime !=null and endTime != ''">
+	            AND DATE_FORMAT(E.registerDate, '%Y-%m-%d') &lt;= #{endTime}
+	        </if>
+            order by E.createTime DESC 
+    </select>
+    
+    <!-- 法务查询统计 -->
+    <select id="totalAfterCaseOrderLaw" parameterType="com.alibaba.fastjson.JSONObject" resultType="map">
+        SELECT
+            ifnull(count(E.id),0) as caseLawCount,
+            ifnull(count(distinct B.orderId),0) as afterOrderCount 
+        FROM
+           inst_order_law E
+         JOIN inst_orderinfo B ON E.orderId = B.orderId
+         JOIN inst_user C ON B.userId = C.id
+         JOIN inst_merchantinfo D ON B.merchantNo = D.MERCHANTNO
+         LEFT JOIN inst_managecar_info A ON A.orderId = E.orderId
+        WHERE 1=1 
+            <if test="merList != null and merList.size() > 0">
+                AND D.MERCHANTNO in
+                <foreach item="item" index="index" collection="merList" open="("
+                    separator="," close=")">
+                    #{item.merchantNo}
+                </foreach>
+            </if>
+            <if test="orderId != null and orderId != ''">
+                AND B.orderId = #{orderId}
+            </if>
+            <if test="realName !=null and realName != ''">
+                AND C.realName = #{realName}
+            </if>
+            <if test="regId !=null and regId != ''">
+                AND C.regId = #{regId}
+            </if>     
+            <if test="carStatus !=null and carStatus != ''">
+                <if test="carStatus == 70 or carStatus == '70'">
+                    AND (A.`status` = #{carStatus} or A.`status` is null)
+                </if>
+                <if test="carStatus != 70 and carStatus != '70'">
+                    AND A.`status` = #{carStatus}
+                </if>
+            </if> 
+            <if test="processStatus !=null and processStatus != ''">
+                AND A.processStatus = #{processStatus}
+            </if>  
+            <if test="caseStatus !=null and caseStatus != ''">
+                AND E.caseStatus = #{caseStatus}
+            </if>  
+            <if test="caseNo !=null and caseNo != ''">
+                AND E.caseNo = #{caseNo}
+            </if> 
+            <if test="caseId !=null and caseId != ''">
+                AND E.caseId = #{caseId}
+            </if> 
+            <if test="startTime !=null and startTime != ''">
+	            AND DATE_FORMAT(E.registerDate, '%Y-%m-%d') &gt;= #{startTime}
+	        </if>
+	        <if test="endTime !=null and endTime != ''">
+	            AND DATE_FORMAT(E.registerDate, '%Y-%m-%d') &lt;= #{endTime}
+	        </if>
+    </select>
+    <!-- 查询电话提醒记录列表 -->
+    <select id="getAfterLoanInfoByOrderIdNew" parameterType="java.lang.String" resultType="com.iqb.consumer.data.layer.bean.afterLoan.AfterLoanBean">
+	        SELECT distinct 
+	            C.MERCHANTSHORTNAME AS merchantName,
+	            C.merchantNo,
+	            D.realName,
+	            D.regId,
+	            law.orderId,
+	            B.orderAmt,
+	            B.monthInterest,
+	            B.orderItems,
+	            B.orderName,
+	            E.plate,
+	            E.carNo,            
+	            F.gpsStatus,
+	            F.remark,
+	            F.disposalScheme,
+	            A.afterLoanOpinion,
+	            A.lost_contact_reason as lostContactReason,
+	            A.lostContactFlag,
+	            A.collectFlag,
+	            A.into_garage_date as intoGarageDate,
+	            A.into_garage_name as intoGarageName,
+	            A.trailer_reason as trailerReason,
+	            A.checkOpinion,
+	            A.gpsArea,
+	            A.repaymentFlag,
+	            A.collectOpinion,
+	            A.collectOpinionConfirm,
+	            A.riskRemark,
+	            A.processMethod,
+	            E.carColor,
+	            E.mileage,
+	            E.carKeyFlag,
+	            E.engine,
+	            G.should_receivedAmt as shouldReceivedAmt,
+	            DATE_FORMAT(G.should_receivedDate,'%Y-%m-%d') as shouldReceivedDate,
+	            G.commision,
+	            G.trailerAmt,
+	            G.stopAmt,
+	            G.otherAmt,
+	            G.totalAmt,
+	            G.receivedAmt,
+	            G.receivedRemark,
+	            DATE_FORMAT(G.receivedDate,'%Y-%m-%d') as receivedDate,
+	            G.receivedFlag
+	        FROM
+		        inst_order_law law
+		        LEFT JOIN  inst_managecar_info A on law.orderId  = A.orderId
+		        LEFT JOIN inst_orderinfo B ON law.orderId = B.orderId
+		        LEFT JOIN inst_merchantinfo C ON B.merchantNo = C.merchantNo
+		        LEFT JOIN inst_user D ON B.userId = D.id
+		        LEFT JOIN inst_authoritycard E ON law.orderId = E.orderId
+		        LEFT JOIN (
+		            SELECT
+		                p.*
+		            FROM
+		                (
+		                    SELECT
+		                        *
+		                    FROM
+		                        inst_gpsinfo
+		                    ORDER BY
+		                        id DESC
+		                ) p
+		            GROUP BY
+		                p.orderId
+		        ) F ON F.orderId = law.orderId 
+		        LEFT JOIN inst_managercar_receive_info G on law.caseId = G.caseId 
+		        where
+	        law.orderId = #{orderId} limit 1  
+    </select>
+</mapper>

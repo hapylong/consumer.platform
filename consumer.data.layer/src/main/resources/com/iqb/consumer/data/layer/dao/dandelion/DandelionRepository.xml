@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+	Apache License, Version 2.0 (the "License"); you may not use this file except 
+	in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.dandelion.DandelionRepository">
+	<select id="getInfoByOid" parameterType="String" resultType="com.iqb.consumer.data.layer.bean.dandelion.pojo.GetInfoByOidResponsePojo">
+		SELECT 
+		  a.merchantno, a.orderid, a.regid, a.biztype,a.orderAmt,a.orderItems, a.riskstatus,a.loanAmt,a.loanDate ,a.riskretremark, a.orderremark AS protype, a.proInfo,
+		  b.realname, b.idno AS idCard,
+		  c.bankcardno AS bankcard ,c.bankName AS bankName,c.bankMobile,D.MERCHANTSHORTNAME as merchantName
+		FROM
+		  inst_orderinfo a
+		LEFT JOIN inst_user b ON a.regid = b.regid
+		LEFT JOIN inst_bankcard c ON a.userid = c.userid
+		LEFT JOIN inst_merchantinfo D on a.merchantNo = D.MERCHANTNO
+		WHERE
+		NOT EXISTS(SELECT 1 FROM inst_user C WHERE C.regid=A.regid AND C.id>B.id)
+		AND NOT EXISTS(SELECT 1 FROM inst_bankcard D WHERE d.userId=B.id AND D.id>C.id)
+          AND a.orderid = #{orderId}
+	</select>
+	
+	<insert id="persistSubletInfo" parameterType="com.iqb.consumer.data.layer.bean.dandelion.entity.InstCreditInfoEntity">
+        INSERT INTO
+          inst_creditinfo
+            (
+              orderId,designCode,designName,guarantorNum,
+              creditType,borrowTogether,borrTogetherName,
+              creditInfo,version,createTime,updateTime
+             )
+        VALUES
+            (
+              #{orderId},#{designCode},#{designName},#{guarantorNum},
+              #{creditType},#{borrowTogether},#{borrTogetherName},
+              #{creditInfo},#{version},#{createTime},#{updateTime}
+             )
+    </insert>
+    
+    <update id="updateSubletInfo" parameterType="com.iqb.consumer.data.layer.bean.dandelion.entity.InstCreditInfoEntity">
+        UPDATE
+            inst_creditinfo
+        SET
+            designcode = #{designCode} , updatetime = NOW(), designname = #{designName}
+        WHERE 
+            orderid = #{orderId}
+    </update>
+    
+    <select id="getInstCreditInfoEntityByOid" parameterType="String" resultType="com.iqb.consumer.data.layer.bean.dandelion.entity.InstCreditInfoEntity">
+        SELECT 
+          a.*, b.remark, b.projectname,b.guarantee,b.guaranteeName
+        FROM
+          inst_creditinfo a
+        LEFT JOIN
+          inst_orderotherinfo b
+        ON
+          a.orderid = b.orderid
+        WHERE
+          a.orderid = #{orderId}
+    </select>
+    
+    <update id="updateToAddGuaranteeNo" parameterType="com.iqb.consumer.data.layer.bean.dandelion.entity.InstCreditInfoEntity">
+        UPDATE
+            inst_creditinfo
+        SET
+            guarantornum = #{guarantorNum} , updatetime = NOW()
+        WHERE 
+            id = #{id}
+    </update>
+    
+    <update id="updateBorrowInfo" parameterType="com.iqb.consumer.data.layer.bean.dandelion.entity.InstCreditInfoEntity">
+        UPDATE
+            inst_creditinfo
+        <set>
+        	<if test="creditType != null and creditType != ''">
+        		credittype = #{creditType} ,
+        	</if>
+        	<if test="amtAdvice != null and amtAdvice != ''">
+        		amtadvice = #{amtAdvice} ,
+        	</if>
+        	<if test="remark != null and remark != ''">
+        		remark = #{remark} ,
+        	</if>
+        	<if test="signGuarant != null and signGuarant != ''">
+        		signGuarant = #{signGuarant} ,
+        	</if>
+        	updatetime = NOW()
+        </set>
+        WHERE 
+            orderid = #{orderId}
+    </update>
+    
+    <update id="updatePersionInfo" parameterType="com.iqb.consumer.data.layer.bean.dandelion.entity.InstCreditInfoEntity">
+        UPDATE
+            inst_creditinfo
+        <set>
+        	<if test="borrTogetherName != null and borrTogetherName != ''">
+        		borrtogethername = #{borrTogetherName} ,
+        	</if>
+        	<if test="creditInfo != null and creditInfo != ''">
+        		creditinfo = #{creditInfo} ,
+        	</if>
+        	<if test="borrowTogether != null">
+        		borrowtogether = #{borrowTogether} ,
+        	</if>
+        	updatetime = NOW()
+        </set>
+        WHERE 
+            orderid = #{orderId}
+    </update>
+    <update id="updateMortgateInfo" parameterType="com.iqb.consumer.data.layer.bean.dandelion.entity.InstCreditInfoEntity">
+        UPDATE
+            inst_creditinfo
+        <set>
+        	<if test="mortgageTotalAmt != null and mortgageTotalAmt != ''">
+        		mortgageTotalAmt = #{mortgageTotalAmt} ,
+        	</if>
+        	<if test="mortgageInfo != null and mortgageInfo != ''">
+        		mortgageInfo = #{mortgageInfo} ,
+        	</if>
+        	<if test="adviceAmt != null and adviceAmt != ''">
+        		adviceAmt = #{adviceAmt} ,
+        	</if>
+        	<if test="borrowTogether != null">
+        		borrowTogether = #{borrowTogether} ,
+        	</if>
+        	<if test="borrTogetherName != null">
+        		borrTogetherName = #{borrTogetherName} ,
+        	</if>
+        	updatetime = NOW()
+        </set>
+        WHERE 
+            orderid = #{orderId}
+    </update>
+    <update id="saveUpdateMortgageInfo" parameterType="com.alibaba.fastjson.JSONObject">
+        UPDATE
+            inst_creditinfo
+        <set>
+        	<if test="creditInfo != null and creditInfo != ''">
+        		mortgageInfo = #{mortgageInfo} ,
+        	</if>
+        	updatetime = NOW()
+        </set>
+        WHERE 
+            orderid = #{orderId}
+    </update>
+    
+    <update id="updateDandelionEntityByOid" parameterType="com.iqb.consumer.data.layer.bean.credit_product.entity.InstOrderInfoEntity">
+        UPDATE
+            inst_orderinfo
+        SET
+            <if test="orderAmt != null and orderAmt != ''">
+                 orderAmt = #{orderAmt},  
+            </if>
+            <if test="planId != null">
+                planId = #{planId},  
+            </if>
+            <if test="bizType != null and bizType != ''">
+                bizType = #{bizType},  
+            </if>
+            <if test="preAmt != null and preAmt != ''">
+                preAmt = #{preAmt},  
+            </if>
+            <if test="applyAmt != null and applyAmt != ''">
+                applyAmt = #{applyAmt}, 
+            </if>
+            <if test="assessPrice != null and assessPrice != ''">
+                assessPrice = #{assessPrice},  
+            </if>
+            <if test="monthInterest != null and monthInterest != ''">
+                monthInterest = #{monthInterest},  
+            </if>
+            <if test="margin != null and margin != ''">
+                margin = #{margin}, 
+            </if>
+            <if test="downPayment != null">
+                downPayment = #{downPayment},  
+            </if>
+            <if test="serviceFee != null and serviceFee != ''">
+                serviceFee = #{serviceFee}, 
+            </if>
+            <if test="feeAmount != null and feeAmount != ''">
+                feeAmount = #{feeAmount},  
+            </if>
+            <if test="takePayment != null and takePayment != ''">
+                takePayment = #{takePayment}, 
+            </if>
+            <if test="orderItems != null and orderItems!=''">
+                orderItems = #{orderItems},  
+            </if>
+            <if test="feeYear != null">
+                feeYear = #{feeYear},  
+            </if>
+            <if test="fee != null and fee != ''">
+                fee = #{fee},  
+            </if>
+            <if test="gpsTrafficFee != null and gpsTrafficFee != ''">
+                gpsTrafficFee = #{gpsTrafficFee},
+            </if>
+            <if test="royaltyRate != null and royaltyRate!=''">
+                royaltyRate = #{royaltyRate},
+            </if>
+            <if test="applyLoanDate != null and applyLoanDate!=''">
+                applyLoanDate = #{applyLoanDate},
+            </if>
+            <if test="applyLoanAmt != null and applyLoanAmt!=''">
+                applyLoanAmt = #{applyLoanAmt},
+            </if>
+             <if test="underAmt != null and underAmt!=''">
+                underAmt = #{underAmt},
+            </if>
+            updateTime = NOW()
+        WHERE 
+            orderid = #{orderId}
+    </update>
+    
+</mapper>

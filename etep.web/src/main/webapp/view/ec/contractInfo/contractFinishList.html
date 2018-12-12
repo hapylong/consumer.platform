@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	    <title>签约完成订单列表</title>
+	    <meta charset="UTF-8" />
+	    <meta name="Author" content="" />
+	    <meta name="Keywords" content="" />
+	    <meta name="Description" content="" />
+	    
+	<link rel="stylesheet" href="../../../js/bootstrap/themes/default/bootstrap.css" />
+	<link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+	<link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+	<link rel="stylesheet" href="../../../css/jquery.select2.css" />
+	<link rel="stylesheet" href="../../../css/jquery.select2-bootstrap.css" />
+	<link rel="stylesheet" href="../../../css/jquery.datetimepicker.css" />
+	<link rel="stylesheet" href="../../../js/viewer/viewer.css" />
+	<link rel="stylesheet" href="../../../js/ztree/css/zTreeStyle/zTreeStyle.css" />
+	<link rel="stylesheet" href="../../../css/each/main/derate.css" />
+	
+	<!-- 插件库 -->
+	<script src="../../../js/common/package.js"></script>
+	<script src="../../../js/common/url.js"></script>
+	<script src="../../../js/common/jquery-1.11.3.min.js"></script>
+	<script src="../../../js/bootstrap/bootstrap.js"></script>
+	<script src="../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+	<script src="../../../js/common/jquery.datetimepicker.js"></script>
+	<script src="../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+	<script src="../../../js/common/json2.js"></script>
+	<script src="../../../js/common/base.js"></script>
+	<script src="../../../js/common/jquery.select2.js"></script>
+	<script src="../../../js/common/datagrid2.js"></script>
+	<script src="../../../js/common/formatter.js"></script>
+	<script src="../../../js/ztree/js/jquery.ztree.all.min.js"></script>
+	<script src="../../../js/common/tree.js"></script>
+		
+		<!-- 业务库 -->
+		<script src="../../../js/common/base.js"></script>
+		<script src="../../../js/common/datagrid2.js"></script>
+		<script src="../../../js/common/formatter.js"></script>	
+	    <script src="../../../js/each/ec/contractInfo/contractFinishList.js"></script>
+	    <script src="../../../js/each/cfm/merch/merch.js"></script>
+		
+	</head>   
+	<body>
+		<div class="container-fluid">
+			<div class="col-md-12">
+				<div class="panel panel-info" >
+					<div class="panel-heading">
+						<h3 class="panel-title">查询栏</h3>
+					</div>
+					<div class="panel-body">
+						<form id="searchForm" class="form-horizontal" role="form">
+						  <div class="form-group">
+						  	<label class="control-label col-lg-1 col-md-1 col-sm-1" for="orderId">商户名:</label>
+							<div class="col-lg-2 col-md-2 col-sm-2">
+							    <input id="merchNames" type="text" readonly value="全部商户" name="merchNames" class="form-control merch" onclick="showMenu(); return false;"/>
+							</div>
+							<label class="control-label col-lg-1 col-md-1 col-sm-1" for="orderId">订单号:</label>
+							<div class="col-lg-2 col-md-2 col-sm-2">
+								<input name="orderId" id="orderId" type="text" class="form-control" placeholder="请输入订单号">
+							</div>
+							<label class="control-label col-lg-1 col-md-1 col-sm-1" for="regId">手机号:</label>
+							<div class="col-lg-2 col-md-2 col-sm-2">
+								<input name="regId" id="regId" type="text" class="form-control" placeholder="请输入手机号">
+							</div>
+							<label class="control-label col-lg-1 col-md-1 col-sm-1" for="realName">姓名:</label>
+							<div class="col-lg-2 col-md-2 col-sm-2">
+								<input name="realName" id="realName" type="text" class="form-control" placeholder="请输入姓名">
+							</div>
+						</div>
+						 <div class="form-group">
+							<label class="control-label col-lg-1 col-md-1 col-sm-1" for="contractStatus">合同状态:</label>
+							<div class="col-lg-2 col-md-2 col-sm-2">
+								<select class="form-control" id="contractStatus" name="contractStatus" style="width:100%">
+								<option value=""></option>
+								<option value="1">待手工签约</option>
+								<option value="2">手工签约完毕</option>
+							</select>
+							</div>
+							<label class="control-label col-lg-1 col-md-1 col-sm-1" for="createDateStart">合同签署时间:</label>
+							<div class="col-lg-1 col-md-1 col-sm-1">
+					      		<input type="text" class="form-control input-sm" id="startDateStart" name="startDateStart" placeholder="请选择开始日期" />
+							</div>
+							<div class="col-lg-0.1 col-md-0.1 col-sm-0.1">
+							    <label style="float: left; class="form-label">-</label>
+							</div>
+							<div class="col-lg-1 col-md-1 col-sm-1">
+							    <input type="text" class="form-control input-sm" id="startDateEnd" name="startDateEnd" placeholder="请选择结束日期" />
+							</div>
+							<div class="col-lg-2 col-md-2 col-sm-2">
+								<button id="btn-search" class="btn btn-primary btn-sm" type="button">查询</button>
+								<button id="btn-reset" class="btn btn-primary btn-sm" type="button">重置</button>
+							</div>
+						  </div>	
+						</form>
+					</div>
+				</div>
+				<div class="panel panel-info">
+					<div class="panel-heading">
+						<h3 class="panel-title">合同信息</h3>
+					</div>
+					<div class="panel-body">
+						<form id="listForm">
+							<button id="btn-contractInfoShow" type="button" class="btn btn-primary btn-sm" >预览</button>
+							<button id="btn-contractInfoDown" type="button" class="btn btn-primary btn-sm" >下载</button>
+						</form>
+					</div>
+					<table id='datagrid' class="table table-bordered table-hover">
+						<thead>
+							<tr>
+								<th field="ck"></th>
+								<th field="rn" align="text-center" class="text-center">序号</th>
+								<th field="orderId" align="text-center" class="text-center">订单号</th>
+								<th field="orderName" class="text-center">订单名称</th>
+								<th field="merchantShortName" class="text-center">商户</th>
+								<th field="realName" class="text-center">姓名</th>
+								<th field="regId" class="text-center">手机号</th>
+								<th field="orgCode" hidden="true" ></th>
+								<th field="bizType" align="text-center" formatter="Formatter.bizType(val)" class="text-center">业务类型</th>
+								<th field="contractStatus" align="text-center" formatter="Formatter.contractStatus(val)" class="text-center">合同状态</th>
+								<th field="updateTime" class="text-center" formatter="Formatter.showContractTime(val, row, rowIndex)">合同签署时间</th>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+					<div class="panel-footer">
+						<div id="paginator"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="contractInfoShow-win" class="modal fade" role="dialog" aria-labelledby="update-win-label" aria-describedby="……">
+			<div class="modal-dialog" role="document">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<h5 class="modal-title" id="update-win-label">合同预览</h5>
+		      		</div>
+		      		<div class="modal-form">
+	      				<table id="contractInfoid" class="table table-bordered table-hover table-condensed contractInfoid">
+						    <thead>
+						    	<tr>						    		
+							    	<th field="ck" hidden="true"></th>	
+							    	<th field="rn" align="text-center" class="text-center">序号</th>						    	
+							    	<th field="ecViewUrl" idField="true" hidden="true">url</th>
+							    	<th field="ecDownloadUrl" idField="true" hidden="true">url</th>
+							    	<th field="ecType" idField="true" hidden="true">ecType</th>
+							    	<th field="ecCode" align="text-center" class="text-center">合同编号</th>
+							    	<th field="ecName" align="text-center" class="text-center">合同名称</th>
+							    	<th field="templateSignSeq" align="text-center" class="text-center">合同权值</th>	
+							    	<th field="operation" align="text-center" class="text-center" formatter="IQB.contractFinishList.showButton(val, row, rowIndex)">操作</th>						    	
+						    	</tr>
+						    </thead>
+						    <tbody></tbody>
+						</table>
+						<div class="panel-footer hidden">
+							<div id="contractPaginator"></div>
+						</div>
+	      			</div>		      		
+		      		<div class="modal-footer">		      				      			
+				        <button id="btn-close" type="button" class="btn btn-default btn-sm">关闭</button>		        
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+		<div id="contractInfoDown-win" class="modal fade" role="dialog" aria-labelledby="update-win-label" aria-describedby="……">
+			<div class="modal-dialog" role="document">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<h5 class="modal-title" id="update-win-label">合同下载</h5>
+		      		</div>
+		      		<div class="modal-form">
+		      			<form action="" id="downForm">
+		      				<table id="contractDownid" class="table table-bordered table-hover">
+							    <thead>
+							    	<tr>						    		
+								    	<th field="ck"></th>	
+								    	<th field="rn" align="text-center" class="text-center">序号</th>						    	
+								    	<th field="ecViewUrl" idField="true" hidden="true">url</th>
+								    	<th field="ecDownloadUrl" idField="true" hidden="true">url</th>
+								    	<th field="ecType" idField="true" hidden="true">ecType</th>
+								    	<th field="ecCode" align="text-center" class="text-center">合同编号</th>
+								    	<th field="ecName" align="text-center" class="text-center">合同名称</th>
+								    	<th field="templateSignSeq" align="text-center" class="text-center">合同权值</th>	
+								    	<th field="operation" align="text-center" class="text-center" formatter="IQB.contractFinishList.showButton(val, row, rowIndex)">操作</th>						    	
+							    	</tr>
+							    </thead>
+							    <tbody></tbody>
+							</table>
+							<div class="panel-footer hidden">
+								<div id="contractDownPaginator"></div>
+							</div>
+						</form>
+	      			</div>		      		
+		      		<div class="modal-footer">		      				      		
+		      			<button id="btn-down" type="button" class="btn btn-primary btn-sm">批量下载</button>	
+				        <button id="btn-close-down" type="button" class="btn btn-default btn-sm">关闭</button>		        
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+		<div id="menuContent" class="menuContent" style="max-height:500px;overflow:scroll;display:none; position: absolute;background:#fff;border:1px solid #ccc;">
+       	<ul id="treeDemo" class="ztree" style="margin-top:0;"></ul>
+       </div>
+	</body>
+</html>

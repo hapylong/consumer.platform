@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	    <title>系统参数</title>
+	    <meta charset="UTF-8" />
+	    <meta name="Author" content="" />
+	    <meta name="Keywords" content="" />
+	    <meta name="Description" content="" />
+	    
+	    <!-- 样式库 -->
+	    <link rel="stylesheet" href="../../../js/ztree/css/zTreeStyle/zTreeStyle.css" />
+	    <link rel="stylesheet" href="../../../js/bootstrap/themes/default/bootstrap.css" />
+	    <link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+	    <link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+	    <link rel="stylesheet" href="../../../css/jquery.select2.css" />
+	    <link rel="stylesheet" href="../../../css/jquery.select2-bootstrap.css" />
+	    <link rel="stylesheet" href="../../../css/cfm/configure.css" />
+	    
+	    <!-- 插件库 -->
+	    <script src="../../../js/common/package.js"></script>
+		<script src="../../../js/common/url.js"></script>
+		<script src="../../../js/common/json2.js"></script>	
+		<script src="../../../js/common/jquery-1.11.3.min.js"></script>		
+		<script src="../../../js/bootstrap/bootstrap.js"></script>
+		<script src="../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+		<script src="../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+		<script src="../../../js/ztree/js/jquery.ztree.all.min.js"></script>
+		<script src="../../../js/common/jquery.select2.js"></script>
+		
+		<!-- 业务库 -->
+		<script src="../../../js/common/base.js"></script>
+		<script src="../../../js/common/datagrid2.js"></script>
+		<script src="../../../js/common/tree.js"></script>
+		<script src="../../../js/common/formatter.js"></script>	    
+	    <script src="../../../js/each/cfm/configurationCenter/configure.js"></script>
+	    <script src="../../../js/each/cfm/merch/merch.js"></script>
+	    <script src="../../../js/each/cfm/merch/merchModel.js"></script>
+	    
+		
+		<!-- 页面样式 -->
+		<style type="text/css">
+			body {
+				font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif !important;
+				background:#eee url("../../../img/back.png") repeat;
+			}
+			.container-fluid {
+				padding:5px;
+			}
+			.left-part {
+				height:800px;
+			}
+			.modal-form {
+				margin:8px;
+			}
+			.z-index{
+			    z-index:98;
+			}
+			.z-index2{
+			    z-index:97;
+			}
+		</style>
+	    
+	</head>
+	<body>
+	
+		<div class="container-fluid">
+			<div class="row">				
+				<div class="col-md-12">
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<h4 class="panel-title">查询信息</h4>
+					  	</div>
+					  	<div class="panel-body">	
+					  		<form id="searchForm" class="form-horizontal">
+							  	<div class="form-group">
+							    	<label class="control-label col-lg-1 col-md-1 col-sm-1">商户名 </label>
+							    	<div class="col-lg-2 col-md-2 col-sm-2">
+							    	    <input id="merchNames" type="text" readonly value="全部商户" name="merchNames" class="form-control merch" onclick="showMenu(); return false;"/>
+							    	</div>
+							    	<label class="control-label col-lg-1 col-md-1 col-sm-1">期数 </label>
+							    	<div class="col-lg-2 col-md-2 col-sm-2">
+							    	    <input name="installPeriods" type="text" class="form-control input-sm" placeholder="请输入期数" style='border:1px solid #ccc'>
+							    	</div>
+							    	<label class="control-label col-lg-1 col-md-1 col-sm-1">状态</label>
+								    <div class="col-lg-2 col-md-2 col-sm-2">
+								    	<select id="status" name="status" class="form-control">
+								    	   <option value=''>请选择</option>
+								    	   <option value='1'>启用</option>
+								    	   <option value='2'>禁用</option>
+									    </select>
+								    </div>
+								 </div>
+								 <div class="form-group">
+								    <label class="control-label col-lg-1 col-md-1 col-sm-1">业务类型</label>
+									<div class="col-lg-2 col-md-2 col-sm-2">
+									    <select id="bizType1" name="bizType1" class="form-control">
+								    	    <option value=''>请选择</option>
+								    	    <option value='2001'>以租代售新车</option>
+								    	    <option value='2002'>以租代售二手车</option>
+								    	    <option value='2100'>抵押车</option>
+								    	    <option value='2200'>质押车</option>
+								    	    <option value='1100'>易安家</option>
+								    	    <option value='1000'>医美</option>
+								    	    <option value='1200'>旅游</option>
+								    	    <option value='2300'>车秒贷</option>
+								    	    <option value='2400'>车主贷</option>
+								    	    <option value='3001'>交易权质押类</option>
+								    	    <option value='8002'>过桥垫资</option>
+								    	    <option value='8003'>房屋质押一抵</option>
+								    	    <option value='8004'>房屋质押二抵</option>
+									    </select>
+									  </div>
+									  <div class="col-lg-4 col-md-4 col-sm-4">  
+									    <button id="btn-search" type="button" class="btn btn-default btn-sm">查询</button>
+										<button id="btn-reset" type="button" class="btn btn-default btn-sm">重置</button> 
+										<button id="btn-start" type="button" class="btn btn-primary btn-sm" >启用</button>
+							    		<button id="btn-forbidden" type="button" class="btn btn-danger btn-sm" >禁用</button>
+							  	     </div>
+							  	</div>
+							</form>		  												 	
+					  	</div>
+					</div>
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<h4 class="panel-title">方案信息</h4>
+					  	</div>
+					  	<div class="panel-body">
+					    	<form id="listForm">		    		
+					    		<input type='checkbox' id='checkAll' style='vertical-align:center;margin-left:-5px'><span>全选</span>
+					    		<button id="btn-insert" type="button" class="btn btn-primary btn-sm" >添加方案</button>
+					    		<button id="btn-update" type="button" class="btn btn-warning btn-sm" disabled>修改方案</button>
+					    		<button id="btn-remove" type="button" class="btn btn-danger btn-sm" disabled>删除方案</button> 
+					    	</form>
+					  	</div>
+						<table id='datagrid' class="table table-striped table-bordered table-hover table-condensed">
+						    <thead>
+						    	<tr>						    		
+							    	<th field="ck"></th>	
+							    	<th field="id">产品方案ID</th>
+							    	<th field="merchantNo">商户名</th>						    	
+							    	<th field="installPeriods">期数</th>
+							    	<th field="downPaymentRatio">首付</th>
+							    	<th field="marginRatio">保证金</th>
+							    	<th field="floatMarginRatio">上浮保证金比例</th>							    	
+							    	<th field="serviceFeeRatio">服务费</th>
+							    	<th field="feeYear">上收息（月）</th>
+							    	<th field="upInterestFee">上收息利率</th>
+							    	<th field="takePayment" formatter="Formatter.upPayment(val)">上收月供</th>
+							    	<th field="feeRatio">月息率</th>
+							    	<th field="planName">账户分期计划</th>
+							    	<th field="remark">自定义描述</th>
+							    	<th field="bizTypeName">业务类型</th>
+							    	<th field="reCharge">充值费率</th>	
+							    	<th field="status" formatter="Formatter.planStatus(val)">状态</th>
+							    	<th field="greenChannel" formatter="Formatter.greenChannel(val)">绿色通道</th>	
+						    	</tr>
+						    </thead>
+						    <tbody></tbody>
+						</table>
+					  	<div class="panel-footer">
+							<div id="paginator"></div>
+						</div>
+					</div>
+				</div>
+			</div>		 	
+		</div>
+		
+
+		<div id="update-win" class="modal fade  bs-example-modal-lg" role="dialog" aria-labelledby="update-win-label" aria-describedby="……">
+			<div class="modal-dialog modal-lg" role="document">
+		    	<div class="modal-content" style='min-width:1250px;margin-left: -160px'>
+		      		<div class="modal-header">
+		        		<h5 class="modal-title" id="update-win-label"></h5>
+		      		</div>
+		      		<div class="modal-body"></div>
+	      			<div class="modal-form">
+	      				<form id="updateForm" class="form-horizontal">
+							<input name="id" type="text" class="hidden" />	
+							<div class="form-group">
+				    			<label class="col-sm-1 control-label">商户名</label>
+				    			<div class="col-sm-3">
+									<input id="merchantNo" type="text" readonly placeholder="请选择商户名" name="merchantNo" class="form-control merchModel easyui-validatebox" required="required" onclick="showMenuModel(); return false;"/>
+									<img class="selectPng" src="../../../img/select.png">
+				    			</div>
+				    				<label class="col-sm-1 control-label merchantNo">业务类型</label>
+				    			<div class="col-sm-3">
+									<select id="bizType" name="bizType" class="form-control"></select>
+									<img class="selectPng" src="../../../img/select.png">
+				    			</div>
+				  			</div>	
+				  			<table id="tableDialog" class="table table-striped table-bordered table-hover table-condensed">
+						    <thead>
+						    	<tr>	
+						    	    <th field="ck"></th>		
+							    	<th field="installPeriods" class="installPeriods" style='width:50px'>期数</th>	
+							    	<th field="downPaymentRatio" class="downPaymentRatio" style='width:80px'>首付比例%</th>
+							    	<th field="marginRatio" class="marginRatio" style='width:100px'>保证金比例%</th>
+							    	<th field="floatMarginRatio" class="floatMarginRatio" style='width:125px;'>上浮保证金比例%</th>
+							    	<th field="serviceFeeRatio" class="serviceFeeRatio" style='width:100px'>服务费比例%</th>
+							    	<th field="feeYear" class="feeYear" style='width:90px'>上收息期数</th>	
+							    	<th field="upInterestFee" class="upInterestFee" style='width:90px'>上收息利率</th>	
+							    	<th field="takePayment" style='width:75px'>上收月供</th>
+							    	<th field="feeRatio" style='width:70px'>月息率%</th>
+							    	<th field="planId" style='width:120px'>分期方案</th>
+							    	<th field="remark">自定义描述</th>
+							    	<th field="reCharge">充值费率</th>
+							    	<th field="greenChannel" style='width:120px'>绿色通道</th>
+						    	</tr>			
+						    </thead>
+						    <tbody class="tableDialogTbody">
+						    	<tr>	
+						    	    <td>
+						    	        
+						    	    </td>				    		
+							    	<td>
+							    		<input id="installPeriods" name="installPeriods" type="text" class="form-control input-sm easyui-validatebox" placeholder="期数" maxlength='2' data-options="required:true, validType:['int','maxLength[2]']"/>
+							    	</td>	
+							    	<td>
+							    		<input id="downPaymentRatio" name="downPaymentRatio" type="text" class="form-control input-sm easyui-validatebox" placeholder="首付比例" maxlength='5' data-options="required:true, validType:['moneyTwo','maxLength[5]']"/>
+							    	</td>		
+							    	<td>
+							    		<input id="marginRatio" name="marginRatio" type="text" class="form-control input-sm easyui-validatebox" placeholder="保证金比例" maxlength='5' data-options="required:true, validType:['moneyTwo','maxLength[5]']" />
+							    	</td>	
+							    	<td class="floatMarginRatioBox" >
+							    		<input id="floatMarginRatio" name="floatMarginRatio"  type="text" class="form-control input-sm easyui-validatebox"  placeholder="上浮保证金比例" maxlength='5' data-options="required:true, validType:['moneyTwo','maxLength[5]']" />
+							    	</td>	
+							    	<td>
+							    		<input id="serviceFeeRatio" name="serviceFeeRatio" type="text" class="form-control input-sm easyui-validatebox" placeholder="服务费比例" maxlength='5' data-options="required:true, validType:['moneyTwo','maxLength[5]']" />
+							    	</td>		
+							    	<td>
+							    		<input id="feeYear" name="feeYear" type="text" class="form-control input-sm easyui-validatebox" placeholder="上收息月数" maxlength='2' data-options="required:true, validType:['intz','maxLength[2]']" />
+							    	</td>
+							    	<td>
+							    		<input  id="upInterestFee" name="upInterestFee" type="text" class="form-control input-sm easyui-validatebox" placeholder="上收息利率" maxlength='6' data-options="required:true, validType:['moneyThree','maxLength[6]']" />
+							    	</td>	
+							    	<td>
+							    	<select id="takePayment" name="takePayment" class="form-control">
+									 	<option value="1" selected>是</option>
+									 	<option value="0">否</option>
+									</select>
+							    	</td>		
+							    	<td>
+							    		<input  id="feeRatio" name="feeRatio" type="text" class="form-control input-sm easyui-validatebox" placeholder="月息率" maxlength='6' data-options="required:true, validType:['moneyThree','maxLength[6]']" />
+							    	</td>		
+							    	<td>
+							    	<select id="planId0" name="planId" class="form-control">
+									 	<!-- <option value="1" selected>月供3%</option>
+									 	<option value="2">剩余本金3‰</option>
+									 	<option value="3">剩余本金2‰</option> -->
+									</select>
+							    	</td>	
+							    	<td>
+							    		<input id="remark" name="remark" type="text" class="form-control input-sm " placeholder="请输入描述"/>
+							    	</td>
+							    	<td>
+							    		<input  id="reCharge" name="reCharge" type="text" class="form-control input-sm easyui-validatebox" placeholder="充值费率" maxlength='6' data-options="required:true, validType:['moneyThree','maxLength[6]']" />
+							    	</td>
+							    	<td>
+								    	<select id="greenChannel" name="greenChannel" class="form-control">
+										 	<option value="1" selected>非绿色通道</option>
+										 	<option value="2">绿色通道</option>
+										</select>
+							    	</td>		
+						    	</tr>
+						    </tbody>
+							</table>	
+						</form>
+	      			</div>
+	      			<div class="PlanBox">
+	      				<div class="removePlanBox">			
+	      					<p>移除方案</p>
+	      					<img src="../../../img/removePlan.png">
+	      				</div>
+	      				<div class="addPlanBox">
+	      					<p>添加方案</p>
+	      					<img src="../../../img/addPlan.png">	
+	      				</div>
+	      			</div>		      		
+		      		<div class="modal-footer">
+				        <button id="btn-save" type="button" class="btn btn-success ">保存</button>
+				        <button id="btn-close" type="button" class="btn btn-default ">关闭</button>		        
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+		<div id="menuContent" class="menuContent" style="max-height:500px;overflow:scroll;display:none; position: absolute;background:#fff;border:1px solid #ccc;">
+	        <ul id="treeDemo" class="ztree" style="margin-top:0;"></ul>
+        </div>
+        <div id="menuContentModel" class="menuContent" style="max-height:500px;overflow:scroll;display:none; position: absolute;background:#fff;border:1px solid #ccc;">
+	        <ul id="treeDemoModel" class="ztree" style="margin-top:0; width:200px;"></ul>
+        </div>
+	</body>
+</html>

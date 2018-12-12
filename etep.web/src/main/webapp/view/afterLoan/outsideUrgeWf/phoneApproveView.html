@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	    <title>订单详情</title>
+	    <meta charset="UTF-8" />
+	    <meta name="Author" content="" />
+	    <meta name="Keywords" content="" />
+	    <meta name="Description" content="" />
+	    
+	<!-- 样式库 -->
+	<link rel="stylesheet" href="../../../js/bootstrap/themes/default/bootstrap.css" />
+	<link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+	<link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+	<link rel="stylesheet" href="../../../css/jquery.select2.css" />
+	<link rel="stylesheet" href="../../../css/jquery.select2-bootstrap.css" />
+	<link rel="stylesheet" href="../../../css/jquery.datetimepicker.css" />
+	<link rel="stylesheet" href="../../../js/viewer/viewer.css" />
+	<link rel="stylesheet" href="../../../js/prettyphoto/css/prettyPhoto.css" />
+	<!-- 插件库 -->
+	<script src="../../../js/common/package.js"></script>
+	<script src="../../../js/common/url.js"></script>
+	<script src="../../../js/common/jquery-1.11.3.min.js"></script>
+	<script src="../../../js/bootstrap/bootstrap.js"></script>
+	<script src="../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+	<script src="../../../js/common/jquery.datetimepicker.js"></script>
+	<script src="../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+	<script src="../../../js/common/json2.js"></script>
+	<script src="../../../js/common/base.js"></script> 
+	<script src="../../../js/common/jquery.select2.js"></script>
+	<script src="../../../js/common/datagrid2.js"></script>
+	<script src="../../../js/common/formatter.js"></script>
+	<script src="../../../js/common/jquery.form.js"></script>
+	<script src="../../../js/viewer/viewer.js"></script>
+	<script src="../../../js/ztree/js/jquery.ztree.all.min.js"></script>
+	<script src="../../../js/common/tree.js"></script>
+	<script src="../../../js/prettyphoto/js/jquery.prettyPhoto.js"></script>
+	
+	<script src="../../../js/each/afterLoan/outsideUrgeWf/phoneApprove.js"></script>
+		
+		<!-- 页面样式 -->
+		<style type="text/css">
+			.container-fluid {
+				padding-top: 4px;
+			}
+			.text-right {
+				text-align: right;
+			}
+			.text-muted {
+				font-weight: bold;
+			}
+			.text-stress {
+				font-weight: bold;
+			}
+			.list-group-blank {
+				background-color: #f5f5f5;
+			}
+			th {
+				text-align: center;
+			}
+			td {
+				text-align: center;
+			}
+			.modal-form {
+				margin: 15px 0;
+			}
+			.float-left {
+				float: left;
+				margin-right: 8px;
+			}
+			.special-panel {
+				border-top-left-radius: 0 !important;
+			}
+			.nav-tabs {
+				border-bottom: 1px solid #fff;				
+			}
+			h5 {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				-o-text-overflow: ellipsis;
+				-webkit-text-overflow: ellipsis;
+				-moz-text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+			a :hover {
+				cursor: pointer;
+			}
+			.thumbnail{
+			    float:left;
+			    margin-left:4px;
+			}
+		</style>
+		
+	    
+	</head>
+	<body>
+		
+		<div class="container-fluid">		
+			<ul id="tab" class="nav nav-tabs" role="tablist">
+			  	<li role="presentation" class="active"><a href="#order-tab" role="tab" data-toggle="tab">流程审批</a></li>
+			</ul>
+			<div class="tab-content">
+				<div role="tabpanel" class="tab-pane fade in active" id="order-tab">		
+					<div class="panel panel-default">
+					  	<ul class="list-group">
+							<li class="list-group-item" style="border-bottom: 1px solid #fff;">
+								<div class="row">				
+									<div class="col-md-1 text-right"><span class="text-stress">机构名称</span></div>
+									<div class="col-md-2">
+										<span id="merchantName" class="text-muted"></span>
+									</div>
+									<div class="col-md-1 text-right"><span class="text-stress">订单号</span></div>
+									<div class="col-md-2">
+										<span id="orderId" class="text-muted"></span>
+									</div>
+									<div class="col-md-1 text-right"><span class="text-stress">姓名</span></div>
+									<div class="col-md-2">
+										<span id="realName" class="text-muted"></span>
+									</div>
+									<div class="col-md-1 text-right"><span class="text-stress">手机号</span></div>
+									<div class="col-md-2">
+										<span id="regId" class="text-muted"></span>
+									</div>
+								</div>
+							</li>
+							<li class="list-group-item" style="border-top: 1px solid #fff;">
+								<div class="row">				
+									<div class="col-md-1 text-right"><span class="text-stress">期数</span></div>
+									<div class="col-md-2">
+										<span id="curItems" class="text-muted"></span>
+									</div>
+									<div class="col-md-1 text-right"><span class="text-stress">总期数</span></div>
+									<div class="col-md-2">
+										<span id="orderItems" class="text-muted"></span>
+									</div>
+									<div class="col-md-1 text-right"><span class="text-stress">账单状态</span></div>
+									<div class="col-md-2">
+										<span id="billInfoStatus" class="text-muted"></span>
+									</div>
+									<div class="col-md-1 text-right"><span class="text-stress">最后还款日</span></div>
+									<div class="col-md-2">
+										<span id="lastRepayDate" class="text-muted"></span>
+									</div>
+								</div>
+							</li>
+							<li class="list-group-item" style="border-top: 1px solid #fff;">
+								<div class="row">				
+									<div class="col-md-1 text-right"><span class="text-stress">逾期天数</span></div>
+									<div class="col-md-2">
+										<span id="overdueDays" class="text-muted"></span>
+									</div>
+									<div class="col-md-1 text-right"><span class="text-stress">罚息</span></div>
+									<div class="col-md-2">
+										<span id="perOverdueAmt" class="text-muted"></span>
+									</div>
+									<div class="col-md-1 text-right"><span class="text-stress">违约金</span></div>
+									<div class="col-md-2">
+										<span id="overdueAmt" class="text-muted"></span>
+									</div>
+									<div class="col-md-1 text-right"><span class="text-stress">本期应还</span></div>
+									<div class="col-md-2">
+										<span id="curRepayAmt" class="text-muted"></span>
+									</div>
+								</div>
+							</li>
+						</ul>
+						<table id='datagrid2' class="table table-striped table-bordered table-hover table-condensed">
+						    <thead>
+						    	<tr>
+                                    <th field="rn">序号</th>
+                                    <th field="processTime">操作时间</th>
+                                    <th field="mobileCollection">电催结果</th>
+                                    <th field="mobileDealOpinion">处理意见</th>
+                                    <th field="remark">备注</th>
+                                    <th field="processUser">操作人</th>
+                                </tr>
+						    </thead>
+						    <tbody></tbody>
+						</table>
+						<div class="panel-footer">
+                            <div id="paginator">
+                            </div>
+                        </div>	
+						<table id="datagrid" class="table table-hover">
+							<thead>
+								<tr class="warning">
+									<th field="ck" hidden="true"></th>
+									<th field="rn" align="text-center" class="text-center">序号</th>
+									<th field="id" idField="true" hidden="true">ID</th>
+									<th field="procCtaskname" align="text-center" class="text-center">任务名称</th>
+									<th field="procTaskAssignee" align="text-center" class="text-center">处理人</th>
+									<th field="procLicensor" align="text-center" class="text-center">委托人</th>
+									<th field="procTaskCommittime" align="text-center" class="text-center">任务到达时间</th>
+									<th field="procTaskEndtime" align="text-center" class="text-center">任务受理时间</th>
+									<th field="procTaskEndtime" align="text-center" class="text-center">任务完成时间</th>
+									<th field="procTaskApprStatus" align="text-center" class="text-center">审批结论</th>
+									<th field="procTaskApprOpinion" align="text-center" class="text-center" formatter="Formatter.opinion(val)">审批意见</th>
+								</tr>
+							</thead>
+							<tbody></tbody>
+						</table>	    	
+					</div>
+				</div>
+			</div>	
+		</div>	
+		<div id="approve-win" class="modal fade" role="dialog" aria-labelledby="approve-win-label" aria-describedby="">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="approve-win-label">审批</h5>
+					</div>
+					<div class="modal-form">
+						<form id="approveForm" class="form-horizontal">
+							<div class="form-group">
+								<label class="col-sm-3 control-label">审批结果</label>
+								<div class="col-sm-4">
+									<select class="form-control" disabled>
+										<option value="1" selected>通过</option>
+										<option value="2">退回</option>
+										<option value="0">拒绝</option>
+									</select> 
+									<input type="text" class="hidden" value="1" name="approveStatus">
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-3 control-label">审批意见</label>
+								<div class="col-sm-8">
+									<textarea name="approveOpinion" class="form-control" rows="3" placeholder="请输入审批意见"></textarea>
+								</div>
+							</div>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button id="btn-approve-save" type="button"	class="btn btn-success btn-sm">提交</button>
+						<button id="btn-approve-close" type="button" class="btn btn-default btn-sm">关闭</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

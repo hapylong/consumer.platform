@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>线上借款人信息</title>
+        <meta charset="UTF-8" />
+        <meta name="Author" content="" />
+        <meta name="Keywords" content="" />
+        <meta name="Description" content="" />
+        
+        <!-- 基础CSS库 -->
+        <link rel="stylesheet" href="../../../js/bootstrap/themes/default/bootstrap.css" />
+        <link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+        <link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+        <link rel="stylesheet" href="../../../css/jquery.select2.css" />
+        <link rel="stylesheet" href="../../../css/jquery.select2-bootstrap.css" />
+        
+        <!-- 业务CSS库 -->
+        <link rel="stylesheet" href="../../../css/common/base.css" />
+        <link rel="stylesheet" href="../../../css/common/scrollbar.css" />
+        
+        <!-- 基础JS库 -->
+        <script src="../../../js/common/package.js"></script>
+        <script src="../../../js/common/url.js"></script>
+        <script src="../../../js/common/json2.js"></script> 
+        <script src="../../../js/common/jquery-1.11.3.min.js"></script>     
+        <script src="../../../js/bootstrap/bootstrap.js"></script>
+        <script src="../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+        <script src="../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+        <script src="../../../js/common/jquery.select2.js"></script>
+        
+        <!-- 业务JS库 -->
+        <script src="../../../js/common/base.js"></script>
+        <script src="../../../js/common/datagrid2.js"></script>
+        <script src="../../../js/common/formatter.js"></script>     
+        <script src="../../../js/each/ec/participator/borrowersonline.js"></script>
+        
+        <!-- 页面样式 -->
+        <style type="text/css">
+            .container-fluid {
+                padding-top: 4px;
+            }
+            .modal-form {
+                margin: 15px 0;
+            }
+        </style>
+</head>
+    <body>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">查询栏</h3>
+                    </div>
+                    <div class="panel-body">
+                        <form id="searchForm" class="form-horizontal">
+                            <div class="form-group">
+                                <label class="control-label col-lg-1 col-md-1 col-sm-1">手机号</label>
+                                <div class="col-lg-2 col-md-2 col-sm-2">
+                                    <input name="phone_num" type="text" class="form-control input-sm" placeholder="请输入手机号">
+                                </div>
+                                <label class="control-label col-lg-1 col-md-1 col-sm-1" name="stationRoleName">姓名</label>
+                                <div class="col-lg-2 col-md-2 col-sm-2">
+                                    <input name="name" type="text" class="form-control input-sm" placeholder="请输入姓名">
+	                            </div>
+	                            <div class="col-lg-3 col-md-3 col-sm-3">
+	                                <button id="btn-search" type="button" class="btn btn-default btn-sm">查询</button>
+	                                <button id="btn-reset" type="button" class="btn btn-default btn-sm">重置</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">信息栏</h3>
+                    </div>
+                    <div class="panel-body">
+                        <form id="listForm">
+                            <button id="btn-skip" type="button" class="btn btn-primary btn-sm">添加线上借款人</button><!-- id="btn-insertGo" -->
+                            <button id="btn-signature-select" type="button" class="btn btn-warning btn-sm">查看签名图章</button>
+                            <button id="btn-remove" type="button" class="btn btn-danger btn-sm">删除线上借款人</button>
+                        </form>
+                    </div>
+                    <table id="datagrid" class="table table-bordered table-hover" style="text-align: center;">
+                        <thead >
+                            <tr>
+                                <th field="ck"></th>
+                                <th field="signerCode" hidden="true">机构号</th>
+                                <th field="rn" style="text-align: center;">序号</th>
+                                <th field="id" idField="true" hidden="true" >ID</th>
+                                <th field="ecSignerName" style="text-align: center;">姓名</th>
+								<th field="ecSignerPhone" style="text-align: center;">手机号</th>
+								<th field="ecSignerCertNo" style="text-align: center;">身份证号</th>
+								<th field="ecSignerProvince" style="text-align: center;">省</th>
+								<th field="ecSignerCity" style="text-align: center;">市</th>
+								<th field="ecSignerAddress" style="text-align: center;">地址</th>
+								<th field="customerShortName" style="text-align: center;">机构简称</th>
+								<th field="ecSignerStatus" style="text-align: center;" formatter ="Formatter.isRegistered(val)">注册状态</th>
+								<th field="isApplyCertComplete" style="text-align: center;" formatter ="Formatter.isOwn(val)">有无证书</th>
+								<th field="isUploadSignImg" style="text-align: center;" formatter ="Formatter.isOwn(val)">有无图章</th>
+                                <!-- <th field="stationRoleName" style="text-align: center;">角色名称</th>
+                                <th field="orgName" style="text-align: center;">所属机构</th>
+                                <th field="stationIsSuperadmin" formatter ="Formatter.isSuperadmin(val)" style="text-align: center;">是否为管理员</th>
+                                <th field="stationStatus"  formatter="Formatter.stationStatus(val)" style="text-align: center;">状态</th>
+                                <th field="remark" style="text-align: center;">备注</th> -->
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                    <div class="panel-footer">
+                        <div id="paginator"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="signature-select" class="modal fade" role="dialog" aria-labelledby="signature-select-label" aria-describedby="">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="signature-select-label"></h5>
+                    </div>
+                    <div class="modal-form">
+                        <form id="selectForm" class="form-horizontal">
+                            <input name="id_select" type="text" class="hidden" />  
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">姓名</label>
+                                <div class="col-sm-8">
+                                    <input id="ec_signer_name_select" type="text" class="form-control input-sm easyui-validatebox" readonly="true"/>
+                                </div>
+                            </div>      
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">图章类型</label>
+                                <div class="col-sm-8">
+                                    <div>
+                                        <select id="ec_signer_img_type_select" name="status" class="form-control input-sm easyui-validatebox" disabled="disabled" readonly="true">
+                                          <option value="" selected>--- 请选择 ---</option>
+                                          <option value="1">大陆公章</option>
+                                          <option value="2">香港公章</option>
+                                        </select>
+                                    </div>                                  
+                                </div>
+                            </div>  
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">是否默认公章</label>
+                                <div class="col-sm-8">
+                                    <div>
+                                        <select id="is_default_signer_img_select" name="status" class="form-control input-sm easyui-validatebox" disabled="disabled" readonly="true">
+                                          <option value="" selected>--- 请选择 ---</option>
+                                          <option value="1">是</option>
+                                          <option value="0">否</option>
+                                        </select>
+                                    </div>                                  
+                                </div>
+                            </div>  
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">公章名称</label>
+                                <div class="col-sm-8">
+                                    <input id="ec_signer_img_name_select" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入公章名称" readonly="true"/>
+                                </div>
+                            </div>  
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">图片名称</label>
+                                <div class="col-sm-8">
+                                    <input id="ec_signer_pic_name_select" type="text" class="form-control input-sm easyui-validatebox" placeholder="重命名图片名称" required="required" readonly="true"/>
+                                </div>
+                            </div> 
+                            <div class="form-group" id="uploadIdCardSection">
+                                <label class="col-sm-3 control-label">上传公章</label>
+                                <div class="col-sm-8" id="ec_signer_img_data_blob_select">
+                                </div>
+                            </div> 
+                        </form>                         
+                    </div>                  
+                    <div class="modal-footer">
+                        <button id="btn-signature-select-label-close" type="button" class="btn btn-default btn-sm">关闭</button>             
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+</body>
+</html>
+
+
+

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+    http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx-4.1.xsd
+	http://www.springframework.org/schema/jee
+	http://www.springframework.org/schema/jee/spring-jee-4.1.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-4.1.xsd
+	http://www.springframework.org/schema/schema/util
+	http://www.springframework.org/schema/schema/util/spring-util-4.1.xsd
+    http://www.springframework.org/schema/data/mongo
+    http://www.springframework.org/schema/data/mongo/spring-mongo-1.5.xsd">
+  
+	<context:property-placeholder location="classpath:/config.properties" />
+
+	<!-- 通过工厂Bean创建mongo连接实例,没有密码就把username和password属性删除了 -->
+	<mongo:db-factory host="${mongodb.host}" port="${mongodb.port}" dbname="${mongodb.database}" username="${mongodb.username}" password="${mongodb.password}" />
+
+
+	<!-- mongo模板操作对象 -->
+	<bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+		<constructor-arg name="mongoDbFactory" ref="mongoDbFactory" />
+	</bean>
+
+	<!-- storage -->
+    <mongo:mongo id="storageMongo" host="${storage.mongodb.host}" port="${storage.mongodb.port}">
+        <mongo:options connect-timeout="${storage.mongodb.connectTimeout}"
+                       connections-per-host="${storage.mongodb.connectionsPerHost}"
+                       max-wait-time="${storage.mongodb.maxWaitTime}"
+                       auto-connect-retry="true"
+                       socket-keep-alive="true"
+                       socket-timeout="${storage.mongodb.connectTimeout}"
+                       write-number="1"
+                       write-timeout="0"
+                       write-fsync="true"
+                       slave-ok="true"
+        />
+    </mongo:mongo>
+    
+    <mongo:db-factory id="storageMongoDbFactory" mongo-ref="storageMongo" 
+                      dbname="${storage.mongodb.database}"
+                      username="${storage.mongodb.username}"
+                      password="${storage.mongodb.password}"/>
+
+    <mongo:mapping-converter id="converter" />
+    
+    <!--用于存储图片或 audio -->
+    <bean id="blobGridFsTemplate" class="org.springframework.data.mongodb.gridfs.GridFsTemplate">
+        <constructor-arg ref="storageMongoDbFactory" />
+        <constructor-arg ref="converter" />
+        <constructor-arg name="bucket" value="blob" />
+    </bean>
+    
+    <!--用于存储任务包 -->
+    <bean id="pkgGridFsTemplate" class="org.springframework.data.mongodb.gridfs.GridFsTemplate">
+        <constructor-arg ref="storageMongoDbFactory" />
+        <constructor-arg ref="converter" />
+        <constructor-arg name="bucket" value="pkg" />
+    </bean>
+
+
+
+</beans>

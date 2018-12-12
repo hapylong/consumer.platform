@@ -1,0 +1,550 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+    Apache License, Version 2.0 (the "License"); you may not use this file except 
+    in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+    Unless required by applicable law or agreed to in writing, software distributed 
+    under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+    OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+    the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.trafficmanage.TrafficManageDao">
+    <!-- 车务管理订单查询 -->
+    <select id="selectTrafficManageOrderList" parameterType="com.alibaba.fastjson.JSONObject" resultType="map">
+        SELECT
+            B.orderId,
+            C.realName,
+            C.regId,
+            D.MERCHANTSHORTNAME AS merchantName,
+            B.bizType,
+            B.orderAmt,
+            B.orderItems,
+            ifnull(A.`status`,70) as carStatus,
+            A.processStatus,
+            E.carNo,
+            E.plate,
+            ifnull(F.checkStatus,3) as checkStatus 
+        FROM
+            inst_orderinfo B 
+         JOIN inst_user C ON B.userId = C.id
+         JOIN inst_merchantinfo D ON B.merchantNo = D.MERCHANTNO
+        LEFT JOIN inst_authoritycard E ON E.orderId = B.orderId 
+        LEFT JOIN inst_managecar_info A ON A.orderId = B.orderId
+        LEFT JOIN inst_traffic_manage_additional F ON B.orderId = F.orderId
+             and F.id = (select id from inst_traffic_manage_additional where orderId = E.orderId and checkStatus != 7 order by createTime desc,id desc limit 1)
+        WHERE (B.riskStatus = 3 or B.riskStatus = 7) and B.`status` != 2 and B.bizType in('2001','2002') 
+            <if test="merList != null and merList.size() > 0">
+                AND D.MERCHANTNO in
+                <foreach item="item" index="index" collection="merList" open="("
+                    separator="," close=")">
+                    #{item.merchantNo}
+                </foreach>
+            </if>
+            <if test="orderId != null and orderId != ''">
+                AND B.orderId = #{orderId}
+            </if>
+            <if test="realName !=null and realName != ''">
+                AND C.realName = #{realName}
+            </if>
+            <if test="regId !=null and regId != ''">
+                AND C.regId = #{regId}
+            </if>     
+            <if test="carStatus !=null and carStatus != ''">
+                <if test="carStatus == 70 or carStatus == '70'">
+                    AND (A.`status` = #{carStatus} or A.`status` is null)
+                </if>
+                <if test="carStatus != 70 and carStatus != '70'">
+                    AND A.`status` = #{carStatus}
+                </if>
+            </if>    
+            <if test="processStatus !=null and processStatus != ''">
+                AND A.processStatus = #{processStatus}
+            </if>  
+            <if test="carNo !=null and carNo != ''">
+                AND E.carNo = #{carNo}
+            </if>  
+            <if test="plate !=null and plate != ''">
+                AND E.plate = #{plate}
+            </if> 
+            <if test="checkStatus !=null and checkStatus != '' and checkStatus > 0">
+                <if test="checkStatus == 3 or checkStatus == '3'">
+                    AND (F.`checkStatus` = #{checkStatus} or F.`checkStatus` is null)
+                </if>
+                <if test="checkStatus != 3 and checkStatus != '3'">
+                    AND F.`checkStatus` = #{checkStatus}
+                </if>
+            </if> 
+            order by B.createTime DESC 
+    </select>
+    
+    <!-- 车务管理订单查询统计 -->
+    <select id="countTrafficManageOrder" parameterType="com.alibaba.fastjson.JSONObject" resultType="java.lang.Integer">
+        SELECT
+            count(B.orderId) as orderCount 
+        FROM
+            inst_orderinfo B 
+         JOIN inst_user C ON B.userId = C.id
+         JOIN inst_merchantinfo D ON B.merchantNo = D.MERCHANTNO
+        LEFT JOIN inst_authoritycard E ON E.orderId = B.orderId 
+        LEFT JOIN inst_managecar_info A ON A.orderId = B.orderId
+        LEFT JOIN inst_traffic_manage_additional F ON B.orderId = F.orderId
+             and F.id = (select id from inst_traffic_manage_additional where orderId = E.orderId and checkStatus != 7 order by createTime desc,id desc limit 1)
+        WHERE (B.riskStatus = 3 or B.riskStatus = 7) and B.`status` != 2 and B.bizType in('2001','2002') 
+            <if test="merList != null and merList.size() > 0">
+                AND D.MERCHANTNO in
+                <foreach item="item" index="index" collection="merList" open="("
+                    separator="," close=")">
+                    #{item.merchantNo}
+                </foreach>
+            </if>
+            <if test="orderId != null and orderId != ''">
+                AND B.orderId = #{orderId}
+            </if>
+            <if test="realName !=null and realName != ''">
+                AND C.realName = #{realName}
+            </if>
+            <if test="regId !=null and regId != ''">
+                AND C.regId = #{regId}
+            </if>     
+            <if test="carStatus !=null and carStatus != ''">
+                <if test="carStatus == 70 or carStatus == '70'">
+                    AND (A.`status` = #{carStatus} or A.`status` is null)
+                </if>
+                <if test="carStatus != 70 and carStatus != '70'">
+                    AND A.`status` = #{carStatus}
+                </if>
+            </if>    
+            <if test="processStatus !=null and processStatus != ''">
+                AND A.processStatus = #{processStatus}
+            </if>  
+            <if test="carNo !=null and carNo != ''">
+                AND E.carNo = #{carNo}
+            </if>  
+            <if test="plate !=null and plate != ''">
+                AND E.plate = #{plate}
+            </if> 
+            <if test="checkStatus !=null and checkStatus != '' and checkStatus > 0">
+                <if test="checkStatus == 3 or checkStatus == '3'">
+                    AND (F.`checkStatus` = #{checkStatus} or F.`checkStatus` is null)
+                </if>
+                <if test="checkStatus != 3 and checkStatus != '3'">
+                    AND F.`checkStatus` = #{checkStatus}
+                </if>
+            </if> 
+    </select>
+    
+    <!-- 车务查询 -->
+    <select id="selectTrafficManageInfoList" parameterType="com.alibaba.fastjson.JSONObject" resultType="map">
+        SELECT
+            B.orderId,
+            C.realName,
+            C.regId,
+            D.MERCHANTSHORTNAME AS merchantName,
+            B.bizType,
+            B.orderAmt,
+            B.orderItems,
+            ifnull(A.`status`,70) as carStatus,
+            A.processStatus,
+            E.carNo,
+            E.plate,
+            F.additionalNo,
+            ifnull(F.checkStatus,3) as checkStatus,
+            DATE_FORMAT(F.carInspectTime, '%Y-%m-%d') as carInspectTime,
+            F.comInsOrg,
+            DATE_FORMAT(F.comInsOverTime, '%Y-%m-%d') as comInsOverTime,
+            F.comTraAccOrg,
+            DATE_FORMAT(F.comTraAccOverTime, '%Y-%m-%d') as comTraAccOverTime,
+            ifnull(F.currentMaster,G.currentMaster) as currentMaster,
+            DATE_FORMAT(ifnull(F.registerDate,G.registerDate), '%Y-%m-%d') as registerDate,
+            ifnull(F.color,G.color) as color 
+        FROM
+            inst_orderinfo B 
+         JOIN inst_user C ON B.userId = C.id
+         JOIN inst_merchantinfo D ON B.merchantNo = D.MERCHANTNO
+         JOIN inst_traffic_manage_additional F ON B.orderId = F.orderId
+             and F.id = (select id from inst_traffic_manage_additional where orderId = B.orderId and checkStatus != 7 order by createTime desc,id desc limit 1)
+         LEFT JOIN inst_managecar_info A ON A.orderId = B.orderId 
+		 LEFT JOIN inst_authoritycard E ON E.orderId = B.orderId 
+         LEFT JOIN inst_traffic_manage_extend G ON G.orderId = B.orderId 
+        WHERE 1=1 
+            <if test="merList != null and merList.size() > 0">
+                AND D.MERCHANTNO in
+                <foreach item="item" index="index" collection="merList" open="("
+                    separator="," close=")">
+                    #{item.merchantNo}
+                </foreach>
+            </if>
+            <if test="orderId != null and orderId != ''">
+                AND B.orderId = #{orderId}
+            </if>
+            <if test="realName !=null and realName != ''">
+                AND C.realName = #{realName}
+            </if>
+            <if test="regId !=null and regId != ''">
+                AND C.regId = #{regId}
+            </if>     
+            <if test="carStatus !=null and carStatus != ''">
+                <if test="carStatus == 70 or carStatus == '70'">
+                    AND (A.`status` = #{carStatus} or A.`status` is null)
+                </if>
+                <if test="carStatus != 70 and carStatus != '70'">
+                    AND A.`status` = #{carStatus}
+                </if>
+            </if>    
+            <if test="processStatus !=null and processStatus != ''">
+                AND A.processStatus = #{processStatus}
+            </if>  
+            <if test="carNo !=null and carNo != ''">
+                AND E.carNo = #{carNo}
+            </if>  
+            <if test="plate !=null and plate != ''">
+                AND E.plate = #{plate}
+            </if> 
+            <if test="checkStatus !=null and checkStatus != '' and checkStatus > 0">
+                <if test="checkStatus == 3 or checkStatus == '3'">
+                    AND (F.`checkStatus` = #{checkStatus} or F.`checkStatus` is null) 
+                </if>
+                <if test="checkStatus != 3 and checkStatus != '3'">
+                    AND F.`checkStatus` = #{checkStatus} 
+                </if>
+            </if> 
+            <if test="carInspectTime !=null and carInspectTime != ''">
+	            AND DATE_FORMAT(F.carInspectTime, '%Y-%m-%d') = #{carInspectTime} 
+	        </if> 
+	        <if test="comInsOverTime !=null and comInsOverTime != ''">
+	            AND DATE_FORMAT(F.comInsOverTime, '%Y-%m-%d') = #{comInsOverTime} 
+	        </if> 
+	        <if test="comTraAccOverTime !=null and comTraAccOverTime != ''">
+	            AND DATE_FORMAT(F.comTraAccOverTime, '%Y-%m-%d') = #{comTraAccOverTime} 
+	        </if> 
+            order by B.createTime DESC 
+    </select>
+    
+    <!-- 车务查询统计 -->
+    <select id="countTrafficManageInfo" parameterType="com.alibaba.fastjson.JSONObject" resultType="java.lang.Integer">
+        SELECT
+            ifnull(count(F.id),0) as additionalCount 
+        FROM	 
+		 inst_orderinfo B 
+         JOIN inst_user C ON B.userId = C.id
+         JOIN inst_merchantinfo D ON B.merchantNo = D.MERCHANTNO
+         JOIN inst_traffic_manage_additional F ON B.orderId = F.orderId
+             and F.id = (select id from inst_traffic_manage_additional where orderId = B.orderId and checkStatus != 7 order by createTime desc,id desc limit 1)
+         LEFT JOIN inst_managecar_info A ON A.orderId = B.orderId 
+		 LEFT JOIN inst_authoritycard E ON E.orderId = B.orderId 
+        WHERE 1=1 
+            <if test="merList != null and merList.size() > 0">
+                AND D.MERCHANTNO in
+                <foreach item="item" index="index" collection="merList" open="("
+                    separator="," close=")">
+                    #{item.merchantNo}
+                </foreach>
+            </if>
+            <if test="orderId != null and orderId != ''">
+                AND B.orderId = #{orderId}
+            </if>
+            <if test="realName !=null and realName != ''">
+                AND C.realName = #{realName}
+            </if>
+            <if test="regId !=null and regId != ''">
+                AND C.regId = #{regId}
+            </if>     
+            <if test="carStatus !=null and carStatus != ''">
+                <if test="carStatus == 70 or carStatus == '70'">
+                    AND (A.`status` = #{carStatus} or A.`status` is null)
+                </if>
+                <if test="carStatus != 70 and carStatus != '70'">
+                    AND A.`status` = #{carStatus}
+                </if>
+            </if>    
+            <if test="processStatus !=null and processStatus != ''">
+                AND A.processStatus = #{processStatus}
+            </if>  
+            <if test="carNo !=null and carNo != ''">
+                AND E.carNo = #{carNo}
+            </if>  
+            <if test="plate !=null and plate != ''">
+                AND E.plate = #{plate}
+            </if> 
+            <if test="checkStatus !=null and checkStatus != '' and checkStatus > 0">
+                <if test="checkStatus == 3 or checkStatus == '3'">
+                    AND (F.`checkStatus` = #{checkStatus} or F.`checkStatus` is null) 
+                </if>
+                <if test="checkStatus != 3 and checkStatus != '3'">
+                    AND F.`checkStatus` = #{checkStatus} 
+                </if>
+            </if> 
+            <if test="carInspectTime !=null and carInspectTime != ''">
+	            AND DATE_FORMAT(F.carInspectTime, '%Y-%m-%d') = #{carInspectTime} 
+	        </if> 
+	        <if test="comInsOverTime !=null and comInsOverTime != ''">
+	            AND DATE_FORMAT(F.comInsOverTime, '%Y-%m-%d') = #{comInsOverTime} 
+	        </if> 
+	        <if test="comTraAccOverTime !=null and comTraAccOverTime != ''">
+	            AND DATE_FORMAT(F.comTraAccOverTime, '%Y-%m-%d') = #{comTraAccOverTime} 
+	        </if> 
+    </select>
+    
+    <!-- 车务详情 -->
+    <select id="getTrafficManageDetail" parameterType="com.alibaba.fastjson.JSONObject" resultType="map">
+        SELECT
+            B.orderId,
+            C.realName,
+            C.regId,
+            D.MERCHANTSHORTNAME AS merchantName,
+            B.merchantNo as merchantNo,
+            D.id as orgCode,
+            B.bizType,
+            B.orderAmt,
+            B.orderItems,
+            E.carNo,
+            E.plate,
+            F.additionalNo,
+            case (select count(id) from inst_traffic_manage_additional where checkStatus = 2 and procResult=1 and orderId=B.orderId)
+            when null then '0'
+            when 0 then '0'
+            else '1' 
+            end as readOnlyFlag, 
+            ifnull(F.checkStatus,3) as checkStatus,
+            F.procResult,
+            DATE_FORMAT(F.carInspectTime, '%Y-%m-%d') as carInspectTime,
+            F.comInsOrg,
+            DATE_FORMAT(F.comInsOverTime, '%Y-%m-%d') as comInsOverTime,
+            F.comTraAccOrg,
+            DATE_FORMAT(F.comTraAccOverTime, '%Y-%m-%d') as comTraAccOverTime,
+            ifnull(F.currentMaster,G.currentMaster) as currentMaster,
+            DATE_FORMAT(ifnull(F.registerDate,G.registerDate), '%Y-%m-%d') as registerDate,
+            ifnull(F.color,G.color) as color 
+        FROM
+           inst_orderinfo B 
+         JOIN inst_user C ON B.userId = C.id
+         JOIN inst_merchantinfo D ON B.merchantNo = D.MERCHANTNO 
+		 LEFT JOIN inst_authoritycard E ON E.orderId = B.orderId 
+         LEFT JOIN inst_traffic_manage_additional F ON B.orderId = F.orderId and F.checkStatus != 7 
+         LEFT JOIN inst_traffic_manage_extend G ON G.orderId = B.orderId 
+        WHERE 1=1 
+            <if test="orderId !=null and orderId != ''">
+                AND B.orderId = #{orderId}
+            </if>
+            <if test="additionalNo !=null and additionalNo != ''">
+                AND F.additionalNo = #{additionalNo}
+            </if>
+            <if test="procBizId !=null and procBizId != ''">
+                AND F.procBizId = #{procBizId}
+            </if>
+            <if test="checkStatus !=null and checkStatus != '' and checkStatus > 0">
+                AND F.checkStatus = #{checkStatus}
+            </if>
+            order by F.createTime DESC,F.id DESC limit 1
+    </select>
+    <!-- 补充资料历史记录 -->
+    <select id="selectTrafManaAdditionalhistory" parameterType="com.alibaba.fastjson.JSONObject" resultType="map">
+        SELECT
+            A.orderId,
+            A.additionalNo,
+            DATE_FORMAT(A.carInspectTime, '%Y-%m-%d') as carInspectTime,
+            A.comInsOrg,
+            DATE_FORMAT(A.comInsOverTime, '%Y-%m-%d') as comInsOverTime,
+            A.comTraAccOrg,
+            DATE_FORMAT(A.comTraAccOverTime, '%Y-%m-%d') as comTraAccOverTime,
+            A.checkStatus,
+            DATE_FORMAT(A.operatorTime, '%Y-%m-%d %H:%i:%S') as operatorTime,
+            B.REAL_NAME as operatorUser 
+        FROM
+            inst_traffic_manage_additional A
+         LEFT JOIN iqb_sys_user B ON B.id = (select Max(id) from iqb_sys_user where USER_PHONE = A.operatorRegId)  
+        WHERE A.orderId = #{orderId} 
+            <if test="checkStatus !=null and checkStatus != ''">
+                AND A.checkStatus = #{checkStatus}
+            </if>
+            order by A.createTime DESC
+    </select>
+    
+    <insert id="saveTrafficManageExtend" parameterType="java.util.Map">
+        INSERT INTO 
+            inst_traffic_manage_extend
+            (orderId,registerDate,currentMaster,
+            <if test="color !=null and color != ''">
+            color,
+            </if>
+            version,createTime)
+        VALUES
+            (#{orderId},str_to_date(#{registerDate},'%Y-%m-%d'),#{currentMaster},
+            <if test="color !=null and color != ''">
+            #{color},
+            </if>
+            1,NOW())
+    </insert>
+    
+    <insert id="saveTrafficManageExtendOnlyOne" parameterType="java.util.Map">
+        INSERT INTO 
+            inst_traffic_manage_extend
+            (orderId,registerDate,currentMaster,
+            <if test="color !=null and color != ''">
+            color,
+            </if>
+            version,createTime) 
+        select #{orderId},str_to_date(#{registerDate},'%Y-%m-%d'),#{currentMaster},
+            <if test="color !=null and color != ''">
+            #{color},
+            </if>
+            1,NOW() from dual where (select count(id) from inst_traffic_manage_extend where orderId=#{orderId}) = 0 
+	         and (select count(id) from inst_traffic_manage_additional where orderId=#{orderId} and checkStatus=2 and procResult=1) &lt; 2 
+    </insert>
+    
+    <insert id="saveTrafficManageAdditional" parameterType="java.util.Map">
+        INSERT INTO 
+            inst_traffic_manage_additional
+            (orderId,additionalNo,carInspectTime,comInsOrg,comInsOverTime,comTraAccOrg,comTraAccOverTime
+            ,operatorRegId,operatorTime,
+            <if test="registerDate !=null and registerDate != ''">
+            registerDate,
+            </if>
+            <if test="currentMaster !=null and currentMaster != ''">
+            currentMaster,
+            </if>
+            <if test="color !=null and color != ''">
+            color,
+            </if>
+            checkStatus,version,createTime)
+        VALUES
+            (#{orderId},#{additionalNo},str_to_date(#{carInspectTime},'%Y-%m-%d'),#{comInsOrg},str_to_date(#{comInsOverTime},'%Y-%m-%d')
+            ,#{comTraAccOrg},str_to_date(#{comTraAccOverTime},'%Y-%m-%d'),#{operatorRegId},NOW(),
+            <if test="registerDate !=null and registerDate != ''">
+            str_to_date(#{registerDate},'%Y-%m-%d'),
+            </if>
+            <if test="currentMaster !=null and currentMaster != ''">
+            #{currentMaster},
+            </if>
+            <if test="color !=null and color != ''">
+            #{color},
+            </if>
+            3,1,NOW())
+    </insert>
+    
+    <insert id="saveTrafficManageAdditionalOnlyOne" parameterType="java.util.Map">
+        INSERT INTO 
+            inst_traffic_manage_additional
+            (orderId,additionalNo,carInspectTime,comInsOrg,comInsOverTime,comTraAccOrg,comTraAccOverTime
+            ,operatorRegId,operatorTime,
+            <if test="registerDate !=null and registerDate != ''">
+            registerDate,
+            </if>
+            <if test="currentMaster !=null and currentMaster != ''">
+            currentMaster,
+            </if>
+            <if test="color !=null and color != ''">
+            color,
+            </if>
+            checkStatus,version,createTime) 
+        select #{orderId},#{additionalNo},str_to_date(#{carInspectTime},'%Y-%m-%d'),#{comInsOrg},str_to_date(#{comInsOverTime},'%Y-%m-%d')
+            ,#{comTraAccOrg},str_to_date(#{comTraAccOverTime},'%Y-%m-%d'),#{operatorRegId},NOW(),
+            <if test="registerDate !=null and registerDate != ''">
+            str_to_date(#{registerDate},'%Y-%m-%d'),
+            </if>
+            <if test="currentMaster !=null and currentMaster != ''">
+            #{currentMaster},
+            </if>
+            <if test="color !=null and color != ''">
+            #{color},
+            </if>
+            3,1,NOW() from dual where (select count(id) from inst_traffic_manage_additional where orderId=#{orderId} and (checkStatus != 2 and checkStatus != 7 or additionalNo = #{additionalNo})) = 0 
+    </insert>
+    
+    <update id="updateTrafficManageAdditional" parameterType="java.util.Map">
+        UPDATE inst_traffic_manage_additional set 
+        <if test="carInspectTime !=null and carInspectTime != '' ">
+           carInspectTime = str_to_date(#{carInspectTime},'%Y-%m-%d'),
+        </if>
+        <if test="comInsOrg !=null and comInsOrg != '' ">
+           comInsOrg = #{comInsOrg},
+        </if>
+        <if test="comInsOverTime !=null and comInsOverTime != '' ">
+           comInsOverTime = str_to_date(#{comInsOverTime},'%Y-%m-%d'),
+        </if>
+        <if test="comTraAccOrg !=null and comTraAccOrg != '' ">
+           comTraAccOrg = #{comTraAccOrg},
+        </if>
+        <if test="comTraAccOverTime !=null and comTraAccOverTime != '' ">
+           comTraAccOverTime = str_to_date(#{comTraAccOverTime},'%Y-%m-%d'),
+        </if>
+        <if test="registerDate !=null and registerDate != ''">
+           registerDate = str_to_date(#{registerDate},'%Y-%m-%d'),
+        </if>
+        <if test="currentMaster !=null and currentMaster != ''">
+           currentMaster = #{currentMaster},
+        </if>
+        <if test="color !=null and color != ''">
+           color = #{color},
+        </if>
+           updateTime=NOW() 
+        where checkStatus = 1 
+        <if test="procBizId != null and procBizId != ''">
+           and procBizId = #{procBizId}
+        </if>
+        <if test="procBizId == null or procBizId == ''">
+           and orderId = #{orderId} and additionalNo = #{additionalNo} 
+        </if>   
+    </update>
+    
+    <update id="updateAdditionalStatus"  parameterType="java.util.Map">
+    	UPDATE inst_traffic_manage_additional set 
+    	<if test="checkStatus !=null and checkStatus != ''  and checkStatus > 0">
+           checkStatus = #{checkStatus},
+        </if>
+        <if test="procResult !=null and procResult != '' and procResult > 0">
+           procResult = #{procResult},
+        </if>
+           updateTime=NOW() 
+        where 
+        <if test="procBizId != null and procBizId != ''">
+           procBizId = #{procBizId}
+        </if>
+        <if test="procBizId == null or procBizId == ''">
+           orderId = #{orderId} and additionalNo = #{additionalNo} 
+        </if>
+    </update>
+    
+    <update id="startAdditionalWorkFlow">
+        UPDATE inst_traffic_manage_additional set procBizId = #{procBizId},checkStatus = 1 where orderId = #{orderId} and additionalNo = #{additionalNo} and checkStatus = 3 
+    </update>
+    
+    <select id="selectOrderAdditionalMaxProcBizId" resultType="string">
+        select max(procBizId) from inst_traffic_manage_additional where orderId = #{orderId} limit 1 
+    </select>
+    
+    <select id="countAdditionalByCondition" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select count(id) from inst_traffic_manage_additional where checkStatus != 7 
+         <if test="orderId !=null and orderId != ''">
+             AND orderId = #{orderId}
+         </if>
+         <if test="additionalNo !=null and additionalNo != ''">
+             AND additionalNo = #{additionalNo}
+         </if>
+         <if test="procBizId !=null and procBizId != ''">
+             AND procBizId = #{procBizId}
+         </if>
+         <if test="checkStatus !=null and checkStatus != '' and checkStatus > 0">
+             AND checkStatus = #{checkStatus}
+         </if>
+         <if test="procResult !=null and procResult != '' and procResult > 0">
+             AND procResult = #{procResult}
+         </if>
+         limit 1 
+    </select>
+    
+    <delete id="delAdditional">
+         delete from inst_traffic_manage_additional where 
+         <if test="procBizId != null and procBizId != ''">
+           procBizId = #{procBizId}
+        </if>
+        <if test="procBizId == null or procBizId == ''">
+           orderId = #{orderId} and additionalNo = #{additionalNo} 
+        </if>
+        <if test="checkStatus !=null and checkStatus != '' and checkStatus > 0">
+           and checkStatus = #{checkStatus} 
+        </if>
+    </delete>
+    
+</mapper>

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	    <title>合同模板</title>
+	    <meta charset="UTF-8" />
+	    <meta name="Author" content="" />
+	    <meta name="Keywords" content="" />
+	    <meta name="Description" content="" />
+	    
+	    <!-- 基础CSS库 -->
+	    <link rel="stylesheet" href="../../../js/bootstrap/themes/default/bootstrap.css" />
+	    <link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+	    <link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+	    <link rel="stylesheet" href="../../../css/jquery.select2.css" />
+	    <link rel="stylesheet" href="../../../css/jquery.select2-bootstrap.css" />
+	    
+	    <!-- 业务CSS库 -->
+	    <link rel="stylesheet" href="../../../css/common/base.css" />
+	    <link rel="stylesheet" href="../../../css/common/scrollbar.css" />
+	    
+	    <!-- 基础JS库 -->
+	    <script src="../../../js/common/package.js"></script>
+		<script src="../../../js/common/url.js"></script>
+		<script src="../../../js/common/json2.js"></script>	
+		<script src="../../../js/common/jquery-1.11.3.min.js"></script>		
+		<script src="../../../js/bootstrap/bootstrap.js"></script>
+		<script src="../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+		<script src="../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+		<script src="../../../js/common/jquery.select2.js"></script>
+		<script src="../../../js/common/jquery.form.js"></script>
+		
+		<!-- 业务JS库 -->
+		<script src="../../../js/common/base.js"></script>
+		<script src="../../../js/common/datagrid2.js"></script>
+		<script src="../../../js/common/formatter.js"></script>	    
+	    <script src="../../../js/each/ec/template/contract.js"></script>
+		
+		<!-- 页面样式 -->
+		<style type="text/css">
+			.container-fluid {
+				padding-top: 4px;
+			}
+			.modal-form {
+				margin-top: 5px;
+				margin-left: 0;
+				margin-bottom: 15px;
+				margin-right: 0;
+				max-height: 410px;
+			    overflow-y: scroll;
+			    overflow-x: hidden;
+			}
+			#btn-maintain-insert {
+				margin: 5px;
+			}
+			#maintainForm {
+				margin-top: 15px;
+			}
+		</style>
+	    
+	</head>
+	<body>
+	
+		<div class="container-fluid">
+			<div class="row">				
+				<div class="col-md-12">
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<h4 class="panel-title">查询信息</h4>
+					  	</div>
+					  	<div class="panel-body">	
+					  		<form id="searchForm" class="form-horizontal">
+							  	<div class="form-group">
+							    	<label class="control-label col-lg-1 col-md-1 col-sm-1">合同代码 </label>
+							    	<div class="col-lg-2 col-md-2 col-sm-2">
+							    	    <input name="ecTplCode" type="text" class="form-control input-sm" placeholder="请输入合同代码" />
+							    	</div>
+							    	<label class="control-label col-lg-1 col-md-1 col-sm-1">合同名称 </label>
+							    	<div class="col-lg-2 col-md-2 col-sm-2">
+							    	    <input name="ecTplName" type="text" class="form-control input-sm" placeholder="请输入合同名称 " />
+							    	</div>
+							    	<label class="control-label col-lg-1 col-md-1 col-sm-1">合同状态 </label>
+								    <div class="col-lg-2 col-md-2 col-sm-2">
+								    	<select name="status" style="width: 100%">
+								    		<option value="" selected>全部 </option>
+										  	<option value="1">启用</option>
+										  	<option value="0">停用</option>
+										</select>
+								    </div>
+								    <div class="col-lg-3 col-md-3 col-sm-3">
+										<button id="btn-search" type="button" class="btn btn-default btn-sm">查询</button>
+									    <button id="btn-reset" type="button" class="btn btn-default btn-sm">重置</button> 
+							  	    </div>
+							  	</div>
+							</form>		  												 	
+					  	</div>
+					</div>
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<h4 class="panel-title">模板信息</h4>
+					  	</div>
+					  	<div class="panel-body">
+					    	<form id="listForm">					    		
+					    		<button id="btn-insert" type="button" class="btn btn-primary btn-sm">添加合同模板</button>
+					    		<button id="btn-update" type="button" class="btn btn-warning btn-sm">修改合同模板</button>
+					    		<button id="btn-remove" type="button" class="btn btn-danger btn-sm hidden">删除合同模板</button>
+								<div class="btn-group">
+									<button type="button" class="btn btn-grass btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								    	文件维护 <span class="caret"></span>
+								  	</button>
+								  	<ul class="dropdown-menu">
+								    	<li><a id="btn-upload" href="#">上传文件</a></li>
+								    	<li><a id="btn-download" href="#">下载文件</a></li>
+								    	<li><a id="btn-preview" class="hidden" href="#">预览文件</a></li>
+								  	</ul>
+								</div>
+								<button id="btn-maintain" type="button" class="btn btn-info btn-sm">签署方维护</button>
+					    	</form>
+					  	</div>
+						<table id="datagrid" class="table table-bordered table-hover table-condensed">
+						    <thead>
+						    	<tr>						    		
+							    	<th field="ck" align="text-center" class="text-center"></th>	
+							    	<th field="rn" align="text-center" class="text-center">序号</th>						    	
+							    	<th field="id" idField="true" hidden="true">ID</th>
+							    	<th field="ecTplCode" align="text-center" class="text-center">合同代码</th>
+							    	<th field="ecTplName" align="text-center" class="text-center">合同名称</th>
+							    	<th field="ecTplType" align="text-center" class="text-center" formatter="IQB.contract.getEcTypeName(val)">合同类型</th>
+							    	<th field="ecTplTheme" align="text-center" class="text-center">合同主题</th>							    	
+							    	<th field="ecTplAbstract" align="text-center" class="text-center">合同摘要</th>
+							    	<th field="ecTplEffectiveDays" align="text-center" class="text-center">合同有效期(天)</th>
+							    	<th field="ecTplStorageForm" hidden="true">文件存储</th>
+							    	<th field="isSenderPartSign" align="text-center" class="text-center" formatter="Formatter.isSenderPartSign(val)">平台方是否签署</th>
+							    	<th field="ecType" align="text-center" class="text-center" formatter="Formatter.ecType(val)">合同签署类型</th>
+							    	<th field="status" align="text-center" class="text-center" formatter="Formatter.isEnableHtml(val)">合同状态</th>
+							    	<th field="remark" align="text-center" class="text-center">备注</th>
+						    	</tr>
+						    </thead>
+						    <tbody></tbody>
+						</table>
+					  	<div class="panel-footer">
+							<div id="paginator"></div>
+						</div>
+					</div>
+				</div>
+			</div>		 	
+		</div>
+		
+
+		<div id="update-win" class="modal fade" role="dialog" aria-labelledby="update-win-label" aria-describedby="">
+			<div class="modal-dialog" role="document">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<h5 class="modal-title" id="update-win-label">合同模板</h5>
+		      		</div>
+	      			<div class="modal-form">
+	      				<form id="updateForm" class="form-horizontal">
+							<input name="id" type="text" class="hidden" />	
+							<div class="form-group">
+				    			<label class="col-sm-3 control-label">合同代码</label>
+				    			<div class="col-sm-8">
+				      				<input name="ecTplCode" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入合同代码" required="required" validType="maxLength[30]" />
+				    			</div>
+				  			</div>		
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">合同名称</label>
+				    			<div class="col-sm-8">
+				      				<input name="ecTplName" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入合同名称（请加上后缀名，即.doc或.docx）" required="required" validType="maxLength[30]" />
+				    			</div>
+				  			</div>
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">合同类型</label>
+				    			<div class="col-sm-8">
+				    				<select id="ecTplType" name="ecTplType"></select>
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">合同主题</label>
+				    			<div class="col-sm-8">
+				      				<input name="ecTplTheme" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入合同主题" required="required" validType="maxLength[100]" />
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">合同摘要</label>
+				    			<div class="col-sm-8">
+				      				<input name="ecTplAbstract" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入合同摘要" validType="maxLength[200]" />
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">合同有效期</label>
+				    			<div class="col-sm-8">
+				      				<input name="ecTplEffectiveDays" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入合同有效期" data-options="required:true, validType:['num', 'maxNum[99]']" />
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">平台方是否签署</label>
+				    			<div class="col-sm-8">
+				    				<select id="isSenderPartSign" name="isSenderPartSign">
+									  <option value="1" selected>参与签署</option>
+									  <option value="0">不参与签署</option>
+									</select>
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">合同签署类型</label>
+				    			<div class="col-sm-8">
+				    				<select id="ecType" name="ecType">
+									  <option value="" selected>请选择</option>
+									  <option value="dz">电子合同</option>
+									  <option value="zz">纸质合同</option>
+									</select>
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">合同状态</label>
+				    			<div class="col-sm-8">
+				    				<div>
+				    					<select id="status" name="status">
+										  <option value="1" selected>启用</option>
+										  <option value="0">停用</option>
+										</select>
+				    				</div>				    				
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">备注</label>
+				    			<div class="col-sm-8">
+				      				<textarea name="remark" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入备注" validType="maxLength[100]"></textarea>
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+							    <label class="col-sm-3 control-label">文件</label>
+							    <div class="col-sm-8">
+							    	<input type="file" name="file" id="file" />
+							    	<p class="help-block">支持doc和docx后缀文件</p>
+							    </div>							    
+							</div>			 			
+						</form>
+	      			</div>		      		
+		      		<div class="modal-footer">
+				        <button id="btn-save" type="button" class="btn btn-success btn-sm">保存</button>
+				        <button id="btn-close" type="button" class="btn btn-default btn-sm">关闭</button>		        
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+		
+		
+		<form id="uploadForm" class="hidden">
+			<input name="id" type="text" />
+			<input type="file" name="file" />
+		</form>
+		
+		<form id="downloadForm" class="hidden" method="post"></form>
+		
+		<form id="previewForm" class="hidden" method="post"></form>
+		
+		<div id="maintain-win" class="modal fade" role="dialog" aria-labelledby="update-win-label" aria-describedby="">
+			<div class="modal-dialog modal-lg" role="document">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<h5 class="modal-title" id="maintain-win-label">签署方维护</h5>
+		      		</div>
+	      			<div class="modal-form">
+	      				<button id="btn-maintain-insert" type="button" class="btn btn-success btn-sm maintainDatagrid">添加</button>
+	      				<table id="maintainDatagrid" class="table table-bordered table-hover table-condensed maintainDatagrid">
+						    <thead>
+						    	<tr>						    		
+							    	<th field="ck" hidden="true"></th>	
+							    	<th field="rn" align="text-center" class="text-center">序号</th>						    	
+							    	<th field="id" idField="true" hidden="true">ID</th>
+							    	<th field="ecSignerType" align="text-center" class="text-center" formatter="IQB.contract.getSignerName(val)">签署方类型</th>
+							    	<th field="ecSealPageNum" align="text-center" class="text-center">签章位置页码</th>
+							    	<th field="ecSealPositionX" align="text-center" class="text-center">签章位置X坐标(%)</th>							    	
+							    	<th field="ecSealPositionY" align="text-center" class="text-center">签章位置Y坐标(%)</th>
+							    	<th field="ecSignType" align="text-center" class="text-center" formatter="Formatter.ecSignType(val)">签署类型</th>
+							    	<th field="ecFactorSeq" align="text-center" class="text-center">签署方权值</th>
+							    	<th field="ecSignerVideoType" align="text-center" class="text-center" formatter="Formatter.ecSignerVideoType(val)">视频</th>
+							    	<th field="operation" align="text-center" class="text-center" formatter="IQB.contract.updateAndRemoveOperation(val, row, rowIndex)">操作</th>
+						    	</tr>
+						    </thead>
+						    <tbody></tbody>
+						</table>
+						<div class="panel-footer hidden">
+							<div id="maintainPaginator"></div>
+						</div>
+						<form id="maintainForm" class="form-horizontal maintainForm">
+							<input name="id" type="text" class="hidden" />
+							<div class="form-group">
+				    			<label class="col-sm-3 control-label">签署方类型</label>
+				    			<div class="col-sm-8">
+				    				<select id="ecSignerType" name="ecSignerType"></select>
+				    			</div>
+				  			</div>		
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">签章位置页码</label>
+				    			<div class="col-sm-8">
+				      				<input name="ecSealPageNum" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入签章位置页码" data-options="required:true, validType:['num', 'maxNum[100]']" />
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">签章位置X坐标(%)</label>
+				    			<div class="col-sm-8">
+				      				<input name="ecSealPositionX" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入签章位置X坐标" data-options="required:true, validType:['num', 'maxNum[100]']" />
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">签章位置Y坐标(%)</label>
+				    			<div class="col-sm-8">
+				      				<input name="ecSealPositionY" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入签章位置Y坐标" data-options="required:true, validType:['num', 'maxNum[100]']" />
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">签署类型</label>
+				    			<div class="col-sm-8">
+				    				<select id="ecSignType" name="ecSignType">
+									  <option value="2" selected>自动签署</option>
+									  <option value="1">手动签署</option>
+									</select>
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">签署方权值</label>
+				    			<div class="col-sm-8">
+				      				<input name="ecFactorSeq" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入签署方权值" data-options="required:true, validType:['num', 'maxNum[125]']" />
+				    			</div>
+				  			</div>
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">视频</label>
+				    			<div class="col-sm-8">
+				    				<div>
+				    					<select id="ecSignerVideoType" name="ecSignerVideoType">
+										  <option value="0" selected>无视频</option>
+										  <option value="1">单向视频</option>
+										  <option value="2">双向视频</option>
+										</select>
+				    				</div>				    				
+				    			</div>
+				  			</div>
+				  			<div class="form-group">
+							    <div class="col-sm-offset-3 col-sm-8">
+							      <button id="btn-maintain-save" type="button" class="btn btn-success btn-sm maintainForm">保存</button>
+							    </div>
+							</div>	
+						</form>
+	      			</div>		      		
+		      		<div class="modal-footer">		      				      			
+				        <button id="btn-maintain-back" type="button" class="btn btn-default btn-sm maintainForm">返回</button>		      			      			
+				        <button id="btn-maintain-close" type="button" class="btn btn-default btn-sm maintainDatagrid">关闭</button>		        
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+			
+	</body>
+</html>

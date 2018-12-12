@@ -1,0 +1,108 @@
+/*通用样式*/
+*{margin:0;padding:0;text-decoration: none;list-style: none;font-family:"Microsoft YaHei";outline: none;font-size: 12px;}
+.red{color: red}
+a{color: #4569b2;}
+/*a:hover{color: #416c93;}*/
+.pink{color:#9f755e}
+.of_h{overflow:hidden;}
+.mr10{margin-right:10px;}
+ /*标题样式*/
+}
+h3{color: #f86402;}
+/*选择框样式*/
+.sex{display: block;margin-bottom: 20px;}
+.search{margin-top: 2%;margin-bottom: 2%;}
+.search-span{display:inline-block;margin:0 10px 20px 9px;font-size: 15px;}
+.search-time{margin-top: 2%}
+.search-check{margin-top: 2%}
+.search-selection{margin-top: 2%}
+.search-button{margin-top: 2%}
+.search-page{margin-top: 2%}
+.search-biaoge{}
+.search-form{margin-top: 2%}
+.search-form1{margin-top: 2%;position: relative;}
+.search-biaoge1{margin-top: 2%}
+.search-checkGroup{margin-top:10px;height:20px;line-height:20px;}
+.search-checkGroup input[type=checkbox]{margin:0 5px 0 20px ;}
+.search-checkGroup input[type=checkbox]:first-child{margin-left:0px;}
+/*选择框样式simple  4-5  middle  8   long 10*/
+.simple-select{width: 144px;border:1px solid #ddd;padding: 6px 25px;font-size: 15px;}
+.middle-select{width: 184px;border:1px solid #ddd;padding: 6px 25px;font-size: 15px;}
+.long-select{width: 255px;border:1px solid #ddd;padding: 6px 25px;font-size: 15px;}s
+/*选项卡样式*/
+.search-tab-yeqian{margin-top: 2%}
+.tab-yeqian{overflow: hidden;}
+.tab-yeqian li{float: left;margin-left: 2%;cursor: pointer;}
+.li-selected{background-color: #fef1ea;border-radius: 5px;padding-top: 3px;padding-bottom: 3px;padding-left: 9px;padding-right: 10px;}
+/*说明文字样式*/
+.detail{border-top: 1px solid #fef1ea;}
+.detail span{font-size: 15px;color: #7c6969;}
+/*表格样式*/
+table{background:#fefefe;width: 100%;font-size: 15px;box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);border-top:1px #e0e0e0 solid;border-right:0 ;border-bottom:0 ;border-left:1px #e0e0e0 solid;}   
+th, td{padding: 15px 6px 15px;text-align:left;color: #4c362c;border-top:0;border-right: 1px #e0e0e0 solid ;border-bottom:1px #e0e0e0 solid ;border-left:0;word-break: keep-all;} 
+th{background: #fef1ea;color: #f86402;font-weight: normal;text-align:center;}     
+tr:hover{background-color:#eedbcc;transition: all 1s linear;}
+.last-different{background-color: #fef1ea}
+.search-biaoge2{width: 33%;margin-top: 2%;margin-left: 15%}
+.search-biaoge3{margin-top: 2%}
+.first-differnet{background-color: #fef1ea}
+.search-biaoge3 th, .search-biaoge3 td{text-align: center;}
+/*分页样式*/
+#fenye {overflow: hidden}
+#fenye li { border:0; margin:0; padding:0; font-size:11px; list-style:none;float:left; }
+#fenye a { border:solid 1px #DDDDDD; margin-right:2px; }
+#fenye .previous-off,#fenye .next-off { color:#666666; display:block; float:left; font-weight:bold; padding:3px 4px; }
+#fenye .next a,#fenye .previous a { font-weight:bold; border:solid 1px #FFFFFF;}   
+#fenye .active { color:#ff0084; font-weight:bold; display:block; float:left; padding:4px 6px; }
+#fenye a:link, 
+#fenye a:visited { color:#0063e3; display:block; float:left; padding:3px 6px; text-decoration:none; }
+#fenye a:hover { border:solid 1px #000; background:#0063DC; color:#FFF; }
+/*选择框样式*/
+.danxuan{background-color:#f5f6fa;}
+/*按钮样式*/
+.daoru{background:#f7f7f7;border:1px solid #ddd;color:#BBB;padding:4px 6px;cursor: pointer;font-size:15px;}
+.daoru:hover{background-color: #fff;transition: all 1s linear;}
+.daochu{background:#f7f7f7;border:1px solid #ddd;color:#333;padding: 2px 7px;cursor:pointer;font-size:15px;}
+.daochu:hover{background-color: #fff;transition: all 1s linear;}
+.print{background:#a4a0a0;border:1px solid #ddd;color:#333;padding:5px 6px;cursor:pointer;font-size:15px;}
+.print:hover{background-color: #fff;transition: all 1s linear;}
+.add{background: #fa7c29;border: 0;color: #fff;padding: 4px 10px;cursor:pointer;border-radius: 3px;margin-left: 10px;}
+.add:hover{background-color: #f9ac8a;transition: all 1s linear;}
+.new{background: #f86402;border:1px solid #DCE2E7;color: #fff;padding:6px 20px;margin-right:5px;cursor:pointer;border-radius: 5px;}
+.new:hover{background-color: #f9ac8a;transition: all 1s linear;}
+.btnFormBtm{display:inline-block;width:20%;background: #E27575;border: none;padding: 10px 2%;color: #FFF;box-shadow: 1px 1px 5px #B6B6B6;border-radius: 3px;text-shadow: 1px 1px 1px #9E3F3F;cursor: pointer;margin-top: 0%;text-align: center;}
+input.btnFormBtm{width:24%;}
+/*文本样式*/
+.simple{padding: 8px;border:1px solid #ddd;width: 144px;}
+.short{padding:5px; border:1px solid #ddd;width: 50px;}
+.long{padding:5px; border:1px solid #ddd;width: 180px;}
+.wrong{border-color:red;width: 100px;}
+.xingbie{margin-right: 12px;}
+.time{width: 144px;height: 29px;border: 1px solid #ddd;margin:0 10px 0 0;padding:0 3px;cursor:pointer;}
+/*增加用户样式*/
+.adduser{ width: 30%;margin: 24px auto;font-size: 28px;} 	
+.adduser label {display: block;margin: 10px 10px 15px;font-size: 21px;}
+.adduser input {display: block;width: 100%;height: 40px;font-size: 22px;margin-top: 10px;padding: 6px 10px;color: #333;border: 1px solid #CCC;box-sizing: border-box;border-radius: 15px;}
+.adduser .add-btn {margin-top: 30px;}
+.adduser .add-btn input {color: #FFF;background-color: #ef8768;border: 0 none;outline: none;cursor: pointer;}
+/*表单样式*/
+.form {margin:5% auto 0;max-width: 850px;background: #F7F7F7;padding: 25px 15px 25px 10px;font: 12px Georgia, "Times New Roman", Times, serif;color: #888;text-shadow: 1px 1px 1px #FFF;border:1px solid #E4E4E4;}
+.form h1 {font-size: 25px;padding: 0px 0px 10px 40px;display: block;border-bottom:1px solid #E4E4E4;margin: -10px -15px 30px -10px;;color: #888;}
+.form h1>span {display: block;font-size: 11px;}
+.form label {display: block;margin: 0px;overflow:hidden;}
+.form label>span {float: left;width: 20%;text-align: right;padding-right: 10px;margin-top: 10px;margin-bottom: 10px;color: #888;}
+.form input[type="password"],.form input[type="password"],.form input[type="text"],.form input[type="date"], .form select {border: 1px solid #DADADA;color: #888;height: 30px;margin-bottom: 16px;margin-right: 6px;margin-top: 2px;outline: 0 none;padding: 3px 3px 3px 5px;width: 65%;font-size: 12px;line-height:15px;box-shadow: inset 0px 1px 4px #ECECEC;-moz-box-shadow: inset 0px 1px 4px #ECECEC;-webkit-box-shadow: inset 0px 1px 4px #ECECEC;}
+.form textarea{padding: 5px 3px 3px 5px;height:100px;width: 70%;margin-bottom:16px;}
+.form .button {background: #E27575;border: none;padding: 10px 2%;color: #FFF;box-shadow: 1px 1px 5px #B6B6B6;border-radius: 3px;text-shadow: 1px 1px 1px #9E3F3F;cursor: pointer;margin-top: 0%;text-align: center;margin: 0 auto;}
+.form .button:hover {background: #CF7A7A}
+.form .mlb10{margin-left:10%;}
+/*弹出框样式*/
+.pop{margin-top: 2%}
+.pop1{margin-top: 2%;margin-left: 32%}
+.td-even{background: #fef1ea;width: 14%;text-align: center;}
+.td-odd{width: 24%;text-align: center;}
+.pop1 table {width: 50%;}
+.pop1 span{font-size: 15px;margin-top: 1%;margin-bottom: 1%;display: inline-block;}
+.pop1 img{width: 12%}
+/*滑动手*/
+.cp{cursor: pointer;color:blue}

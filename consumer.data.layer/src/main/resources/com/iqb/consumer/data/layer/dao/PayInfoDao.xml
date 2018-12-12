@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+	Apache License, Version 2.0 (the "License"); you may not use this file except 
+	in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.PayInfoDao">
+
+	<!-- 配置映射字段 -->
+	<resultMap type="com.iqb.consumer.data.layer.bean.xfpay.PayInfoBean"
+		id="payInfoBean">
+		<!-- 商户名称 -->
+		<result property="id" column="ID" />
+		<result property="userId" column="USERID" />
+		<result property="mobileNo" column="MOBILENO" />
+		<result property="bankType" column="BANKTYPE" />
+		<result property="bankNo" column="BANKNO" />
+		<result property="cardNo" column="CARDNO" />
+		<result property="realName" column="REALNAME" />
+		<result property="status" column="STATUS" />
+		<result property="version" column="VERSION" />
+		<result property="createTime" column="CREATETIME" />
+		<result property="updateTime" column="UPDATETIME" />
+
+	</resultMap>
+
+	<!-- 替代，语句中的内容,简写 -->
+	<sql id="cols">
+		ID,USERID,MOBILENO,BANKTYPE,BANKNO,CARDNO,REALNAME,`STATUS`,VERSION,CREATETIME,UPDATETIME
+		FROM CF_PAYINFO
+	</sql>
+
+	<insert id="insertPayInfo" parameterType="com.iqb.consumer.data.layer.bean.xfpay.PayInfoBean"
+		keyProperty="id" useGeneratedKeys="true">
+		INSERT INTO CF_PAYINFO (USERID,
+		MOBILENO, BANKTYPE,BANKNO, CARDNO, REALNAME, STATUS, VERSION,
+		CREATETIME,
+		UPDATETIME) VALUES (#{userId}, #{mobileNo},
+		#{bankType},#{bankNo}, #{cardNo}, #{realName}, #{status}, #{version},
+		#{createTime},
+		#{updateTime});
+	</insert>
+
+	<!-- 解绑支付 -->
+	<update id="unBindCardStatus" parameterType="java.util.Map">
+		UPDATE CF_PAYINFO
+		SET STATUS = #{status} WHERE ID = #{id}
+	</update>
+
+	<!-- 修改卡信息 -->
+	<update id="updateBindCardInfo" parameterType="com.iqb.consumer.data.layer.bean.xfpay.PayInfoBean">
+		UPDATE CF_PAYINFO
+		SET ID=#{id}
+		<if test="mobileNo !=null and mobileNo !='' ">
+			,MOBILENO=#{mobileNo}
+		</if>
+		<if test="bankNo !=null and bankNo !='' ">
+			,BANKNO=#{bankNo}
+		</if>
+		<if test="cardNo !=null and cardNo !='' ">
+			,CARDNO=#{cardNo}
+		</if>
+		<if test="realName !=null and realName !='' ">
+			,REALNAME LIKE '%${realName}%'
+		</if>
+		WHERE ID=#{id}
+	</update>
+
+	<!-- 删除卡信息 -->
+	<delete id="delBindCardInfo" parameterType="java.lang.Integer">
+		DELETE FROM
+		CF_PAYINFO WHERE ID = #{id}
+	</delete>
+
+	<!-- 通过用户ID查询支付卡信息 -->
+	<select id="getByOrgId" parameterType="java.lang.Integer"
+		resultMap="payInfoBean">
+		SELECT
+		<include refid="cols"></include>
+		WHERE USERID = #{userId}
+	</select>
+
+	<!-- 通过ID查询支付卡信息 -->
+	<select id="getByIdAndOrgId" parameterType="java.util.Map"
+		resultMap="payInfoBean">
+		SELECT
+		<include refid="cols"></include>
+		WHERE ID = #{id} AND USERID = #{userId}
+	</select>
+
+	<!-- 通过身份证查询卡信息 -->
+	<select id="getByCardNo" parameterType="java.lang.String"
+		resultMap="payInfoBean">
+		SELECT
+		<include refid="cols"></include>
+		WHERE CARDNO = #{cardNo} AND STATUS = 0 AND USERID = #{orgId} limit 1;
+	</select>
+
+</mapper>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the Apache License, Version 2.0 (the "License"); 
+	you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS 
+	IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language 
+	governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.CombinationQueryDao">
+
+	<!-- 配置映射字段 -->
+	<resultMap type="com.iqb.consumer.data.layer.bean.wf.CombinationQueryBean" id="combinationQueryBean">
+		<!-- 商户名称 -->
+		<result property="merchName" column="MERCHANTSHORTNAME" />
+		<result property="merchantNo" column="MERCHANTNO" />
+		<!-- 订单名称 -->
+		<result property="orderId" column="orderId" />
+		<result property="orderName" column="orderName" />
+		<result property="orderAmt" column="orderAmt" />
+		<result property="orderItems" column="orderItems" />
+		<result property="preAmt" column="preAmt" />
+		<!-- FINANCE-2496 以租代购：抵质押物估价节点审核通过后，用户已支付，流程主动撤回，支付状态又变成待支付 -->
+		<result property="receivedPreAmt" column="receivedPreAmt" />
+		<result property="bizType" column="bizType" />
+		<result property="preAmtStatus" column="preAmtStatus" />
+		<result property="riskStatus" column="riskStatus" />
+		<result property="planId" column="planId" />
+		<result property="assessPrice" column="assessPrice" />
+		<result property="margin" column="margin" />
+		<result property="downPayment" column="downPayment" />
+		<result property="serviceFee" column="serviceFee" />
+		<result property="monthInterest" column="monthInterest" />
+		<result property="chargeWay" column="chargeWay" />
+		<result property="feeAmount" column="feeAmount" />
+		<result property="gpsAmt" column="gpsAmt" />
+		<result property="gpsTrafficFee" column="gpsTrafficFee" />
+		<!-- 用户信息 -->
+		<result property="realName" column="realName" />
+		<result property="regId" column="regId" />
+		<!-- 计划全称 -->
+		<result property="planFullName" column="PLANFULLNAME" />
+		<result property="greenChannel" column="GREENCHANNEL" />
+		<result property="guarantee" column="guarantee" />
+		<result property="guaranteeName" column="guaranteeName" />
+		<result property="gpsRemark" column="gpsRemark" />
+		<result property="receiveAmt" column="receiveAmt" />
+		<result property="remark" column="remark" />
+		<result property="amtLines" column="loaninterval" />
+		<result property="riskRetRemark" column="riskRetRemark" />
+		<result property="applyAmt" column="applyAmt" />
+	</resultMap>
+
+	<!-- 替代，语句中的内容,简写 -->
+	<sql id="cols">
+		M.MERCHANTSHORTNAME,
+	M.MERCHANTNO,
+	U.realName,
+	U.regId,
+	O.orderName,
+	O.bizType,
+	O.orderId,
+	O.planId,
+	O.preAmt,
+	O.takepayment,
+	O.chargeWay,
+	O.preAmtStatus,
+	O.orderAmt,
+	O.orderItems,
+	P.PLANFULLNAME,
+	P.GREENCHANNEL,
+	O.assessPrice,
+	O.downPayment,
+	O.margin,
+	O.serviceFee,
+	O.feeAmount,
+	O.monthInterest,
+	O.gpsAmt,
+	O.gpsTrafficFee,
+	O.riskStatus,
+	O.loanInterval,
+	O.applyAmt,
+	O.backFlag,
+	O.receivedPreAmt,
+	OT.guarantee AS guarantee,
+	OT.guaranteeName AS guaranteeName,
+	OT.gpsRemark AS gpsRemark,
+	OT.receiveAmt AS receiveAmt,
+	OT.remark AS remark,
+	o.riskRetRemark
+	</sql>
+
+	<select id="getByOrderId" parameterType="String" resultMap="combinationQueryBean">
+		SELECT
+		<include refid="cols" />
+		FROM
+			inst_orderinfo O
+		LEFT JOIN inst_user U ON O.userId = U.id
+		LEFT JOIN inst_plan P ON O.planId = P.ID
+		LEFT JOIN inst_merchantinfo M ON O.merchantNo = M.MERCHANTNO
+		LEFT JOIN inst_orderotherinfo OT ON O.orderId = OT.orderId
+		WHERE
+			O.orderId = #{orderId}
+			limit 1
+	</select>
+</mapper>

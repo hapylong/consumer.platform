@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+    Apache License, Version 2.0 (the "License"); you may not use this file except 
+    in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+    Unless required by applicable law or agreed to in writing, software distributed 
+    under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+    OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+    the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.sublet.SubletCenterRepository">
+    <select id="getSubletInfoByOid" parameterType="String" resultType="com.iqb.consumer.data.layer.bean.sublet.pojo.SubletInfoByOidPojo">
+        SELECT 
+          a.monthinterest, a.orderitems,a.regid , b.planshortname, c.realname
+        FROM
+          inst_orderinfo a
+        LEFT JOIN
+          inst_plan b
+        ON
+          a.planid = b.id
+        LEFT JOIN
+          inst_user c
+        ON
+          a.regid = c.regid
+        WHERE
+          a.orderid = #{orderId}
+    </select>
+    
+    <insert id="persistSubletInfo" parameterType="com.iqb.consumer.data.layer.bean.sublet.db.entity.InstSubletRecordEntity">
+        INSERT INTO
+          inst_subletrecord
+            (
+              orderid,regid,subletorderid,subletregid,
+              rolloverflag,rolloveritems,managefeeflag,
+              managefee,status,version,createtime,updatetime,repayitems
+            )
+        VALUES
+            (
+              #{orderId},#{regId},#{subletOrderId},#{subletRegId},
+              #{rollOverFlag},#{rollOverItems},#{manageFeeFlag},
+              #{manageFee},#{status},1,NOW(),NOW(),#{repayItems}
+             )
+    </insert>
+    
+    <select id="getSubletRecord" parameterType="String" resultType="com.iqb.consumer.data.layer.bean.sublet.pojo.GetSubletRecordPojo">
+        SELECT
+          a.orderid, a.regid, a.orderitems, a.monthinterest,
+          b.subletorderid, b.subletregid, b.rolloverflag, b.rolloveritems, b.managefeeflag,b.managefee,b.repayItems as overItems,
+          c.planshortname,
+          d.realname as subletrealname
+        FROM 
+          inst_orderinfo a
+        LEFT JOIN
+          (SELECT * FROM inst_subletrecord WHERE orderid = #{orderId} ORDER BY id DESC LIMIT 1) b
+        ON
+          a.orderid = b.subletorderid
+        LEFT JOIN
+          inst_plan c
+        ON
+          a.planid = c.id
+        LEFT JOIN
+          inst_user d
+        ON
+          b.subletregid = d.regid
+        WHERE 
+          a.orderid = #{subletOrderId}
+        AND
+          b.orderid = #{orderId}
+    </select>
+    <select id="getSubletEntityByOid" parameterType="String" resultType="com.iqb.consumer.data.layer.bean.sublet.db.entity.InstSubletRecordEntity">
+        SELECT 
+          orderid, regid, subletorderid, subletregid,
+          rolloverflag, rolloveritems, managefeeflag, managefee, repayItems
+        FROM 
+          inst_subletrecord
+        WHERE 
+          orderid = #{orderId}
+        ORDER BY 
+            createTime desc
+        LIMIT 1
+    </select>
+</mapper>

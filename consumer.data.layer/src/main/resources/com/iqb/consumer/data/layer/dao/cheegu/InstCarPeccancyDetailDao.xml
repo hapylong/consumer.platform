@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the Apache License, Version 2.0 (the "License"); 
+    you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+    Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS 
+    IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language 
+    governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.cheegu.InstCarPeccancyDetailDao">
+    <!-- 批量插入车辆违章明细信息 -->
+    <insert id="insertInstCarPeccancyDetail" parameterType="com.iqb.consumer.data.layer.bean.cheegu.InstCarPeccancyDetailBean">
+        INSERT INTO inst_car_peccancy_detail (
+            cOrderId,
+            orderId,
+            vin,
+            peccancyTime,
+            location,
+                        
+            reason,            
+            peccancyAmt,
+            status,
+            department,
+            degree,            
+            
+            code,
+            archive,
+            telephone,
+            excuteLocation,
+            excuteDepartment,
+            
+            category,
+            latefine,
+            punishmentAccording,
+            illegalentry,
+            locationName,
+            
+            version,
+            createTime,
+            updateTime    
+        )
+        VALUES
+        (
+                #{id,jdbcType=INTEGER},        #{orderId,jdbcType=VARCHAR},       #{vin,jdbcType=VARCHAR},               #{peccancyTime,jdbcType=DATE},#{location,jdbcType=VARCHAR},
+                #{reason,jdbcType=VARCHAR},    #{peccancyAmt,jdbcType=DECIMAL},   #{status,jdbcType=VARCHAR},            #{department,jdbcType=VARCHAR},#{degree,jdbcType=VARCHAR},
+                #{code,jdbcType=VARCHAR},      #{archive,jdbcType=VARCHAR},       #{telephone,jdbcType=VARCHAR},         #{exLocation,jdbcType=VARCHAR},#{exDepartment,jdbcType=VARCHAR},
+                #{category,jdbcType=VARCHAR},  #{latefine,jdbcType=VARCHAR},      #{punishmentAccording,jdbcType=VARCHAR},   #{illegalentry,jdbcType=VARCHAR},#{locationName,jdbcType=VARCHAR},
+                1,NOW(),NOW()
+           )
+    </insert>
+    <!-- 根据订单号 车架号查询车辆违章明细信息 -->
+    <select id="selectInstCarPeccancyDetailList" parameterType="java.util.Map" resultType="com.iqb.consumer.data.layer.bean.cheegu.InstCarPeccancyDetailBean">
+        SELECT
+            A.vin,
+		    A.orderId,
+		    A.peccancyAmt,
+		    A.degree,
+		    A.peccancyTime,
+		    A.reason,
+		    A.location,
+		    A.department,
+		    A.telephone,
+		    A.excutelocation as exLocation,
+		    A.excutedepartment as exDepartment,
+		    A.punishmentAccording,
+		    A.illegalentry,
+		    A.locationName,
+		    A.remark,
+		    A.operateUser,
+		    A.processDate
+		FROM
+		    inst_car_peccancy_detail A
+		    where A.vin = #{vin}
+    </select>
+        <!-- 根据订单号 车架号修改违章信息表处理状态 -->
+    <update id="updateInstCarPeccancyDetailStatusByOrderId" parameterType="java.util.Map">
+        UPDATE
+            inst_car_peccancy_detail
+        SET
+            remark = #{remark}, processDate = #{processDate},operateUser = #{operateUser},status=#{status}
+        WHERE  orderId = #{orderId} and vin = #{vin} and status=0
+    </update>
+     <!-- 根据订单号车架号查询车辆违章明细信息 -->   
+    <select id="selectInstCarPeccancyDetailInfo" parameterType="java.util.Map" resultType="com.iqb.consumer.data.layer.bean.cheegu.InstCarPeccancyDetailBean">
+        SELECT * from inst_car_peccancy_detail A WHERE A.orderId = #{orderId} and A.vin = #{vin} and A.peccancyTime = #{peccancyTime} limit 1
+    </select>
+    <!-- 根据订单号 车架号 查询上月未处理的违章信息 -->
+    <select id="selectInstCarDetailList" parameterType="java.util.Map" resultType="com.iqb.consumer.data.layer.bean.cheegu.InstCarPeccancyDetailBean">
+        SELECT
+            A.orderId,
+            A.vin,
+            A.cOrderId
+        FROM
+            inst_car_peccancy_detail A
+        WHERE
+            A.orderId = #{orderId}
+        AND A.vin = #{vin}
+        AND A.`status` = 0
+        AND DATE_FORMAT(A.updateTime, '%Y-%m-%d') <![CDATA[< ]]> DATE_FORMAT(now(), '%Y-%m-%d')
+    </select>
+    <!-- 根据订单号 车价号查询违章总扣分 总罚款金额 -->
+    <select id="selectInstCarDetailSum" parameterType="java.util.Map" resultType="com.iqb.consumer.data.layer.bean.cheegu.InstCarPeccancyBean">
+        SELECT
+            A.orderId,
+            SUM(A.degree) as totalDegree,
+            SUM(A.peccancyAmt) as totalPeccancyAmt
+        FROM
+            inst_car_peccancy_detail A
+        WHERE
+            A.orderId = #{orderId}
+          AND A.vin = #{vin}
+          AND A.`status` = 0
+    </select>
+</mapper>

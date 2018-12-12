@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+	Apache License, Version 2.0 (the "License"); you may not use this file except 
+	in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.asset.allocation.assetinfo.dao.HouseAssetDao">
+
+	<resultMap type="com.iqb.consumer.asset.allocation.assetinfo.bean.HouseAssetBean"
+		id="HouseAssetBeanResult">
+		<result property="channelName" 			column="ORG_SHORT_NAME" />
+		<result property="projectName" 			column="PROJECT_NAME" />
+		<result property="orderNo" 				column="ORDER_NO" />
+		<result property="userName" 			column="USER_NAME" />
+		<result property="applyMoney" 			column="APPLY_MONEY" />
+		<result property="restAmt" 				column="RESTAMT" />
+		<result property="applyTerm" 			column="APPLY_TERM" />
+		<result property="allotDate" 			column="ALLOTDATE" />
+		<result property="planName" 			column="PLANNAME" />
+		<result property="orderDate" 			column="ORDERDATE" />
+		<result property="source" 				column="SOURCE" />
+		<result property="idCard" 				column="ID_CARD" />
+		<result property="creditorName" 		column="CREDITOR_NAME" />
+		<result property="creditorIdNo" 		column="CREDITOR_ID_NO" />
+		<result property="creditorBankNo" 		column="CREDITOR_BANK_NO" />
+		<result property="creditorBankName"		column="CREDITOR_BANK_NAME" />
+		<result property="creditorPhone"		column="CREDITOR_PHONE" />
+		<result property="bizTypeName"			column="BIZ_TYPE_NAME" />
+		<result property="mobile"				column="MOBILE"/>
+		<result property="planId"				column="PLAN_ID"/>
+		
+		<result property="guaranteeCorporationName"		column="guaranteeCorporationName"/>
+		<result property="guaranteeCorporationCorName"	column="guaranteeCorporationCorName"/>
+		
+
+	</resultMap>
+	
+	<!-- 根据条件查询结算记录表-->
+	<select id="selectHouseAssetByParams" resultMap="HouseAssetBeanResult" parameterType="java.util.Map">
+		SELECT
+			A.PROJECT_NAME,
+			A.ORDER_NO,
+			A.USER_NAME,
+			A.APPROVAL_AMT AS APPLY_MONEY,
+			A.APPLY_TERM,
+			A.CREATED_TIME ORDERDATE,
+			A.PLAN_ID,
+			(A.APPROVAL_AMT - IFNULL(A.ALLOT_AMT,0)) as  RESTAMT,
+			B.MERCHANTSHORTNAME as ORG_SHORT_NAME,
+			C.CREATETIME as allotDate,
+			C.sourcesFunding AS SOURCE,
+			D.PLANFULLNAME as PLANNAME
+		FROM
+			eatep_house_order A
+		LEFT JOIN inst_merchantinfo B ON A.CHANNEL_CODE = B.MERCHANTNO
+		LEFT JOIN cf_requestmoney C on A.ORDER_NO = C.orderId
+		LEFT JOIN inst_plan D on A.PLAN_ID=D.ID
+		WHERE
+			A.LOAN_FORM=2
+			<![CDATA[ 
+				and  NOT EXISTS(SELECT 1 FROM cf_requestmoney WHERE c.ORDERID=ORDERID AND C.id<id)
+				and A.APPROVAL_AMT != IFNULL(A.ALLOT_AMT,0)
+			]]>
+		<if test="merList != null and merList.length > 0">
+			AND A.CHANNEL_CODE in
+			<foreach item="item" index="index" collection="merList" open="("
+				separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+		<if test="orderNo != null and orderNo != ''">
+			AND A.ORDER_NO = #{orderNo}
+		</if>
+		<if test="projectName != null and projectName != ''">
+			and   A.PROJECT_NAME  LIKE '%${projectName}%'
+		</if>
+		<if test="startDate != null and startDate != ''">
+			AND DATE_FORMAT(C.CREATETIME,'%Y-%m-%d') &gt;= #{startDate}
+		</if>
+		<if test="endDate != null and endDate != ''">
+			AND DATE_FORMAT(C.CREATETIME,'%Y-%m-%d') &lt;= #{endDate}
+		</if>
+		ORDER BY A.UPDATE_TIME desc
+	</select>
+	
+	<!-- 根据条件查询房贷信息-->
+	<select id="selectHouseAssetDetailByParams" resultMap="HouseAssetBeanResult" parameterType="java.util.Map">
+		SELECT
+			A.ORDER_NO,
+			A.APPLY_TERM,
+			DATE_FORMAT(A.CREATED_TIME,'%Y-%m-%d') ORDERDATE,
+			A.USER_NAME,
+			A.ID_CARD,
+			A.MOBILE,
+			A.APPROVAL_AMT APPLY_MONEY,
+		  A.PROJECT_NAME,
+			(
+				A.APPROVAL_AMT - IFNULL(A.ALLOT_AMT, 0)
+			) AS RESTAMT,
+			B.MERCHANTSHORTNAME ORG_SHORT_NAME,
+			C.DICT_NAME as BIZ_TYPE_NAME,
+			D.CREDITOR_NAME,
+			D.CREDITOR_ID_NO,
+			D.CREDITOR_BANK_NO,
+			D.CREDITOR_BANK_NAME,
+			D.CREDITOR_PHONE,
+			D.GUARANTEE_CORPORATION_NAME AS guaranteeCorporationName,
+		    E.CORPORATE_NAME AS guaranteeCorporationCorName
+		FROM
+			eatep_house_order A
+		LEFT JOIN inst_merchantinfo B ON A.CHANNEL_CODE = B.MERCHANTNO
+		LEFT JOIN iqb_sys_dict_item C ON A.BUSINESS_TYPE = C.DICT_CODE
+		LEFT JOIN iqb_customer_store_info D ON B.ID = D.CUSTOMER_CODE
+		LEFT JOIN IQB_CUSTOMER_BASE_INFO E ON E.CUSTOMER_CODE = D.CUSTOMER_CODE  
+		WHERE
+			A.ORDER_NO = #{orderNo}
+		ORDER BY A.HOUSE_ID ASC
+		LIMIT 1;
+	</select>
+</mapper>

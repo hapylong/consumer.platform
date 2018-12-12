@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	    <title>系统参数</title>
+	    <meta charset="UTF-8" />
+	    <meta name="Author" content="" />
+	    <meta name="Keywords" content="" />
+	    <meta name="Description" content="" />
+	    
+	    <!-- 样式库 -->
+	    <link rel="stylesheet" href="../../../js/ztree/css/zTreeStyle/zTreeStyle.css" />
+	    <link rel="stylesheet" href="../../../js/bootstrap/themes/default/bootstrap.css" />
+	    <link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+	    <link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+	    <link rel="stylesheet" href="../../../css/jquery.select2.css" />
+	    <link rel="stylesheet" href="../../../css/jquery.select2-bootstrap.css" />
+	    
+	    <!-- 插件库 -->
+	    <script src="../../../js/common/package.js"></script>
+		<script src="../../../js/common/url.js"></script>
+		<script src="../../../js/common/json2.js"></script>	
+		<script src="../../../js/common/jquery-1.11.3.min.js"></script>		
+		<script src="../../../js/bootstrap/bootstrap.js"></script>
+		<script src="../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+		<script src="../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+		<script src="../../../js/ztree/js/jquery.ztree.all.min.js"></script>
+		<script src="../../../js/common/jquery.select2.js"></script>
+		
+		<!-- 业务库 -->
+		<script src="../../../js/common/base.js"></script>
+		<script src="../../../js/common/datagrid2.js"></script>
+		<script src="../../../js/common/tree.js"></script>
+		<script src="../../../js/common/formatter.js"></script>	    
+	    <script src="../../../js/each/cfm/configurationCenter/carConfig.js"></script>
+	    <script src="../../../js/each/cfm/merch/merch.js"></script>
+	    <script src="../../../js/each/cfm/merch/merchModel.js"></script>
+		
+		<!-- 页面样式 -->
+		<style type="text/css">
+			body {
+				font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif !important;
+				background:#eee url("../../../img/back.png") repeat;
+			}
+			.container-fluid {
+				padding:5px;
+			}
+			.left-part {
+				height:800px;
+			}
+			.modal-form {
+				margin:8px;
+			}
+			.z-index{
+			    z-index:98;
+			}
+			.z-index2{
+			    z-index:97;
+			}
+		</style>
+	    
+	</head>
+	<body>
+	
+		<div class="container-fluid">
+			<div class="row">				
+				<div class="col-md-12">
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<h4 class="panel-title">查询信息</h4>
+					  	</div>
+					  	<div class="panel-body">	
+					  		<form id="searchForm" class="form-horizontal">
+							  	<div class="form-group">
+							    	<label class="control-label col-lg-1 col-md-1 col-sm-1">商户名 </label>
+							    	<div class="col-lg-2 col-md-2 col-sm-2">
+							    	    <input id="merchNames" type="text" readonly value="全部商户" name="merchNames" class="form-control merch" onclick="showMenu(); return false;"/>
+							    	</div>
+							    	<label class="control-label col-lg-1 col-md-1 col-sm-1">品牌 </label>
+							    	<div class="col-lg-2 col-md-2 col-sm-2">
+							    	    <input name="projectName" id='projectName' type="text" class="form-control input-sm"/>
+								    </div>
+								    <div class="col-lg-3 col-md-3 col-sm-3">
+								    	<button id="btn-search" type="button" class="btn btn-default btn-sm">查询</button>
+									    <button id="btn-reset" type="button" class="btn btn-default btn-sm">重置</button>
+							  	     </div>
+							  	</div>
+							</form>		  												 	
+					  	</div>
+					</div>
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<h4 class="panel-title">车型信息</h4>
+					  	</div>
+					  	<div class="panel-body">
+					    	<form id="listForm">					    		
+					    		<button id="btn-insert" type="button" class="btn btn-primary btn-sm">添加车型</button>
+					    		<button id="btn-update" type="button" class="btn btn-warning btn-sm">修改车型</button>
+					    		<button id="btn-remove" type="button" class="btn btn-danger btn-sm">删除车型</button>
+					    	</form>
+					  	</div>
+						<table id='datagrid' class="table table-striped table-bordered table-hover table-condensed ">
+						    <thead>
+						    	<tr>						    		
+							    	<th field="ck" width='69px'></th>	
+							    	<th field="rn" >序号</th>
+							    	<th field="merchantNo">商户名</th> 						    	
+							    	<th field="id" hidden='true'>ID</th>
+							    	<th field="projectName">品牌</th>
+							    	<th field="projectInfo">车系</th>
+						    	</tr>
+						    </thead>
+						    <tbody></tbody>
+						</table>
+					  	<div class="panel-footer">
+							<div id="paginator"></div>
+						</div>
+					</div>
+				</div>
+			</div>		 	
+		</div>
+		
+
+		<div id="update-win" class="modal fade" role="dialog" aria-labelledby="update-win-label" aria-describedby="……">
+			<div class="modal-dialog" role="document">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<h5 class="modal-title" id="update-win-label"></h5>
+		      		</div>
+		      		<div class="modal-body"></div>
+	      			<div class="modal-form">
+	      				<form id="updateForm" class="form-horizontal">
+							<input name="id" type="text" class="hidden" />	
+							<input id="type" name="type" type="text" class="hidden" value="1" />
+							<div class="form-group">
+				    			<label class="col-sm-3 control-label">商户名</label>
+				    			<div class="col-sm-9">
+				    				<!-- <select id="merchantNo" name="merchantNo" class="form-control easyui-validatebox" required="required">
+									</select> -->
+									<input id="merchantNo" type="text" readonly  name="merchNames" placeholder='全部商户' class="form-control easyui-validatebox"  required="required"/>
+				    			</div>
+				  			</div>	
+							<div class="form-group">
+							    <label class="col-sm-3 control-label">品牌</label>
+				    			<div class="col-sm-9">
+									<input name="projectName" id='projectName' type="text" class="form-control input-sm easyui-validatebox" required="required" placeholder='奔驰'/>
+								</div>
+				  			</div>
+				  			<div class="form-group">
+				  			    <label class="col-sm-3 control-label">车系</label>
+				    			<div class="col-sm-9">
+									<input name="projectInfo" id='projectInfo' type="text" class="form-control input-sm easyui-validatebox" required="required" placeholder='2015款  R 400 4MATIC豪华型'/>
+								    <input type='hidden' class='orgCode' name='orgCode'>
+								    <input type='hidden' class='merchantNo' name='merchantNo'>
+								</div>
+				  			</div>					 			    
+						</form>
+	      			</div>		      		
+		      		<div class="modal-footer">
+				        <button id="btn-save" type="button" class="btn btn-success btn-sm">保存</button>
+				        <button id="btn-close" type="button" class="btn btn-default btn-sm">关闭</button>		        
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+		<div id="menuContent" class="menuContent" style="max-height:500px;overflow:scroll;display:none; position: absolute;background:#fff;border:1px solid #ccc;">
+	        <ul id="treeDemo" class="ztree" style="margin-top:0;"></ul>
+        </div>
+        <div id="menuContentModel" class="menuContent" style="max-height:500px;overflow:scroll;display:none; position: absolute;background:#fff;border:1px solid #ccc;">
+	        <ul id="treeDemoModel" class="ztree" style="margin-top:0;width:200px;"></ul>
+        </div>
+	</body>
+</html>

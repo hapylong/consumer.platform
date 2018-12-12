@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>欢迎登录</title>
+    <link href="css/login.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="js/bootstrap/themes/default/bootstrap.css"/>
+    <script type="text/javascript" src="js/common/jquery-1.11.3.min.js"></script>
+    <script type="text/javascript" src="js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap/bootstrap.js"></script>      
+    <script type="text/javascript" src="js/common/package.js"></script>
+    <script type="text/javascript" src="js/common/url.js"></script>
+    <script type="text/javascript" src="js/common/base.js"></script>
+	<script type="text/javascript" src="js/each/index.js"></script>
+	<script type="text/javascript" src="js/common/script.js"></script>
+	<script type="text/javascript" src="js/common/md5.js"></script>
+	<script src="js/common/particles.js"></script>
+	
+</head>
+<body>
+    <form id="loginForm" method="post">
+		<div id="particles-js" class="loginBg">
+			<div class="loginBox">
+			<!--  	<div class="loginBoxbg"></div> -->
+				<div class="loginLogo"><img src="img/loginHead.png" /></div>
+				<div class="login">
+					<div class="logItem log-sel">
+						<i class="logIcon2"></i>
+						<input class="logIpt" name="userCode" autocomplete="off"  type="text" id="userCode" placeholder="请输入用户名" />
+						<b class="close" style="display:none;"></b>
+					</div>
+					<div class="logItem log-sel">
+						<i class="logIcon3"></i>
+						<input class="logIpt" name="userPassword" autocomplete="off" type="password" id="userPassword" placeholder="请输入密码"/>
+						<input type="password" style="display:none">
+						<b class="close" style="display:none;"></b>
+					</div>
+					<div class="logExtra">
+						<!--<span class="logBtnEx fl">重置</span>-->
+						<span class="logBtnEx fr logBtnclear">清空</span>
+					</div>
+					<div class="logButton">
+						<button class="btn3_mouseover" type="button" onClick="IQB.index.login()" >登录</button>
+					</div>
+					<div align="center" style="width:100%;height:20px;margin-top:4%;">
+						<span id="warning"></span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
+</body>
+</html>

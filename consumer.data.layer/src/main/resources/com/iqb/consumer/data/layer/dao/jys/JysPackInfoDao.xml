@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the Apache License, Version 2.0 (the "License"); 
+	you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS 
+	IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language 
+	governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.jys.JysPackInfoDao">
+
+	<sql id="table">jys_packinfo</sql>
+
+	<!-- 配置映射字段 -->
+	<resultMap type="com.iqb.consumer.data.layer.bean.jys.JYSPackInfo" id="jysPackInfo">
+		<result property="id" column="id" />
+		<result property="orderId" column="orderId" />
+		<result property="beginInterestDate" column="beginInterestDate" />
+		<result property="raiseInstitutions" column="raiseInstitutions" />
+		<result property="guaranteeInstitution" column="guaranteeInstitution" />
+		<result property="guaranteeName" column="guaranteeName" />
+		<result property="packNum" column="packNum" />
+		<result property="packAmt" column="packAmt" />
+		<result property="remark" column="remark" />
+		<result property="version" column="version" />
+		<result property="createTime" column="createTime" />
+		<result property="updateTime" column="updateTime" />
+	</resultMap>
+	
+	<!-- 保存打包信息 -->
+	<insert id="insertPackInfo" parameterType="com.iqb.consumer.data.layer.bean.jys.JYSPackInfo" keyProperty="id"
+		useGeneratedKeys="true">
+		INSERT INTO jys_packinfo (orderId, beginInterestDate, raiseInstitutions, guaranteeInstitution,guaranteeName,
+		packNum, packAmt, remark, version, createTime, updateTime,jysOrderId) VALUES (#{orderId}, #{beginInterestDate}, #{raiseInstitutions},
+		#{guaranteeInstitution},#{guaranteeName}, #{packNum}, #{packAmt}, #{remark}, #{version}, #{createTime}, #{updateTime},#{jysOrderId});
+	</insert>
+
+</mapper>

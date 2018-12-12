@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iqb.consumer.crm.store.dao.CustomerStoreDao" >
+
+	<!-- 查询门店信息  -->
+	<select id="getCustomerStoreInfoList" parameterType="map" resultType="com.iqb.consumer.crm.customer.bean.CustomerBean">
+		SELECT 
+		  icbi.CUSTOMER_NAME AS customerName,
+		  icbi.CUSTOMER_SHORT_NAME AS customerShortName,
+		  icbi.PROVINCE,
+		  icbi.CITY,
+		  icsi.CREDITOR_NAME AS creditorName,
+		  icsi.GUARANTEE_CORPORATION_NAME AS guaranteeCorporationName,
+		  icbi.BELONGS_AREA AS belongsArea,
+		  icsi.STATUS AS creditorStatus,
+		  icbi.CUSTOMER_CODE AS customerCode,
+		  isoi.ORG_NAME AS higherOrgName,
+		  icbi.REMARK 
+		FROM
+		  IQB_CUSTOMER_BASE_INFO icbi 
+		  LEFT JOIN IQB_CUSTOMER_STORE_INFO icsi 
+		    ON icbi.CUSTOMER_CODE = icsi.CUSTOMER_CODE 
+		  LEFT JOIN IQB_SYS_ORGANIZATION_INFO isoi 
+		    ON LEFT(
+		      icbi.CUSTOMER_CODE,
+		      LENGTH(icbi.CUSTOMER_CODE) - 3
+		    ) = isoi.ORG_CODE 
+		WHERE icbi.DELETE_FLAG = 1 
+		  AND icbi.CUSTOMER_TYPE like '%3%'
+		  AND icbi.CUSTOMER_CODE LIKE '${customerCode}%'  
+		<if test="customerName != null and customerName != ''" >
+        	AND icbi.CUSTOMER_NAME LIKE '%${customerName}%'
+      	</if>
+		<if test="customerShortName != null and customerShortName != ''" >
+        	AND icbi.CUSTOMER_SHORT_NAME LIKE '%${customerShortName}%'
+      	</if>
+		<if test="guaranteeCorporationName != null and guaranteeCorporationName != ''" >
+        	AND icsi.GUARANTEE_CORPORATION_NAME LIKE '%${guaranteeCorporationName}%'
+      	</if>
+		<if test="province != null and province != ''" >
+        	AND icbi.PROVINCE LIKE '%${province}%'
+      	</if>
+		<if test="city != null and city != ''" >
+        	AND icbi.CITY LIKE '%${city}%'
+      	</if>
+		<if test="belongsArea != null and belongsArea != ''" >
+        	AND icbi.BELONGS_AREA = #{belongsArea}
+      	</if>
+		<if test="creditorName != null and creditorName != ''" >
+        	AND icsi.CREDITOR_NAME LIKE '%${creditorName}%'
+      	</if>
+		<if test="status != null and status != '' and status != 2" >
+        	AND icsi.STATUS = #{status}
+      	</if>
+		<if test="status == 2" >
+        	AND icsi.STATUS IS NULL OR icsi.STATUS = 2
+      	</if>
+	</select>
+	
+	<!-- 根据客户编码查询门店信息  -->
+	<select id="getCustomerStoreInfoByCode" parameterType="map" resultType="com.iqb.consumer.crm.customer.bean.CustomerBean">
+		SELECT 
+		  icbi.CUSTOMER_NAME AS customerName,
+		  icbi.CUSTOMER_SHORT_NAME AS customerShortName,
+		  icbi.PROVINCE,
+		  icbi.CITY,
+		  icsi.CREDITOR_NAME AS creditorName,
+		  icsi.CREDITOR_ID_NO AS creditorIdNo,
+		  icsi.CREDITOR_BANK_NO AS creditorBankNo,
+		  icsi.CREDITOR_BANK_NAME AS creditorBankName,
+		  icsi.CREDITOR_PHONE AS creditorPhone,
+		  icsi.GUARANTEE_CORPORATION_NAME AS guaranteeCorporationName,
+		  icbi.BELONGS_AREA AS belongsArea,
+		  icbi1.CORPORATE_NAME AS guaranteeCorporationCorName,
+		  icsi.STATUS AS creditorStatus,
+		  icsi.HAS_AUTHED AS hasAuthed,
+		  icsi.AUTH_CHANNEL AS authChannel,
+		  icsi.AUTH_RESULT AS authResult,
+		  icsi.CREDITOR_OTHER_INFO AS creditorOtherInfo,
+		  icbi.CUSTOMER_CODE AS customerCode,
+		  isoi.ORG_NAME AS higherOrgName,
+		  icbi.REMARK 
+		FROM
+		  IQB_CUSTOMER_BASE_INFO icbi 
+		  LEFT JOIN IQB_CUSTOMER_STORE_INFO icsi 
+		    ON icbi.CUSTOMER_CODE = icsi.CUSTOMER_CODE 
+		  LEFT JOIN IQB_CUSTOMER_BASE_INFO icbi1 
+		    ON icsi.GUARANTEE_CORPORATION_CODE = icbi1.CUSTOMER_CODE and icbi1.DELETE_FLAG=1
+		  LEFT JOIN IQB_SYS_ORGANIZATION_INFO isoi 
+		    ON LEFT(
+		      icbi.CUSTOMER_CODE,
+		      LENGTH(icbi.CUSTOMER_CODE) - 3
+		    ) = isoi.ORG_CODE 
+		WHERE icbi.DELETE_FLAG = 1 
+		  AND icbi.CUSTOMER_CODE = #{customerCode} 
+	</select>
+	
+	<!-- 更新门店信息  -->
+	<update id="updateCustomerStoreInfo" parameterType="com.iqb.consumer.crm.customer.bean.IqbCustomerStoreInfoEntity">
+		UPDATE IQB_CUSTOMER_STORE_INFO 
+	    <set >
+	    	STATUS = '2',
+	      <if test="creditorName != null and creditorName != ''" >
+	        CREDITOR_NAME = #{creditorName},
+	      </if>
+	      <if test="creditorIdNo != null and creditorIdNo != ''" >
+	        CREDITOR_ID_NO = #{creditorIdNo},
+	      </if>
+	      <if test="creditorBankNo != null and creditorBankNo != ''" >
+	        CREDITOR_BANK_NO = #{creditorBankNo},
+	      </if>
+	      <if test="creditorBankName != null and creditorBankName != ''" >
+	        CREDITOR_BANK_NAME = #{creditorBankName},
+	      </if>
+	      <if test="creditorPhone != null and creditorPhone != ''" >
+	        CREDITOR_PHONE = #{creditorPhone},
+	      </if>
+	      <if test="guaranteeCorporationCode != null and guaranteeCorporationCode != ''" >
+	        GUARANTEE_CORPORATION_CODE = #{guaranteeCorporationCode},
+	      </if>
+	      <if test="guaranteeCorporationName != null and guaranteeCorporationName != ''" >
+	        GUARANTEE_CORPORATION_NAME = #{guaranteeCorporationName},
+	      </if>
+	      <if test="creditorOtherInfo != null and creditorOtherInfo != ''" >
+            CREDITOR_OTHER_INFO = #{creditorOtherInfo},
+          </if>
+	    </set>
+	    WHERE CUSTOMER_CODE = #{customerCode} 
+	</update>
+	
+	<!-- 更新门店审核信息  -->
+	<update id="updateCustomerStoreAuditInfo" parameterType="com.iqb.consumer.crm.customer.bean.CustomerBean">
+		UPDATE IQB_CUSTOMER_STORE_INFO 
+	    <set >
+	     	STATUS = '1',
+	      <if test="hasAuthed != null and hasAuthed != ''" >
+	        HAS_AUTHED = #{hasAuthed},
+	      </if>
+	      <if test="authChannel != null and authChannel != ''" >
+	        AUTH_CHANNEL = #{authChannel},
+	      </if>
+	      <if test="authResult != null and authResult != ''" >
+	        AUTH_RESULT = #{authResult},
+	      </if>
+	    </set>
+	    WHERE CUSTOMER_CODE = #{customerCode} 
+	</update>
+	
+	<!-- 新增门店信息  -->
+	<insert id="insertCustomerStoreInfo" parameterType="com.iqb.consumer.crm.customer.bean.IqbCustomerStoreInfoEntity">
+		INSERT INTO IQB_CUSTOMER_STORE_INFO (
+		  CUSTOMER_CODE,
+		  CREDITOR_NAME,
+		  CREDITOR_ID_NO,
+		  CREDITOR_BANK_NO,
+		  CREDITOR_BANK_NAME,
+		  CREDITOR_PHONE,
+		  GUARANTEE_CORPORATION_CODE,
+		  GUARANTEE_CORPORATION_NAME,
+		  STATUS,
+		  CREDITOR_OTHER_INFO
+		) VALUE (
+		  #{customerCode}, 
+		  #{creditorName}, 
+		  #{creditorIdNo}, 
+		  #{creditorBankNo}, 
+		  #{creditorBankName}, 
+		  #{creditorPhone}, 
+		  #{guaranteeCorporationCode}, 
+		  #{guaranteeCorporationName},
+		  '2',
+		  #{creditorOtherInfo})
+	</insert>
+	
+	<!-- 根据用户编码查询用户存储信息  -->
+	<select id="getCustomerStoreDbInfoByCode" parameterType="map" resultType="com.iqb.consumer.crm.customer.bean.CustomerBean">
+		SELECT CUSTOMER_CODE AS customerCode FROM IQB_CUSTOMER_STORE_INFO WHERE CUSTOMER_CODE = #{customerCode}
+	</select>
+	
+	<update id="updateCustomerInfo" parameterType="com.iqb.consumer.crm.customer.bean.pojo.UpdateCustomerInfoRequestPojo">
+        UPDATE 
+            cf_creditorinfo
+        SET
+            creditname = #{creditName}, creditcardno = #{creditCardNo}, 
+            creditbankcard = #{creditBankCard}, creditbank = #{creditBank}, 
+            creditphone = #{creditPhone}
+        WHERE orderid = #{orderId} 
+    </update>
+    
+    <select id="getCustomerCodeByOid" parameterType="String" resultType="com.alibaba.fastjson.JSONObject">
+        SELECT 
+            a.id AS customerCode
+        FROM
+            inst_merchantinfo a
+        LEFT JOIN
+            inst_orderinfo b
+        ON
+            a.merchantno = b.merchantno
+        WHERE
+            b.orderid = #{orderId}
+            limit 1
+    </select>
+    
+    <select id="getCustomerCodeByJysOid" parameterType="String" resultType="com.alibaba.fastjson.JSONObject">
+        SELECT 
+            a.id AS customerCode
+        FROM
+            inst_merchantinfo a
+        LEFT JOIN
+            jys_orderinfo b
+        ON
+            a.merchantno = b.merchantno
+        WHERE
+            b.id = #{orderId}
+            limit 1
+    </select>
+    <!-- 根据订单号查询债权人信息 -->
+    <select id="getCreditInfoByOrderId" parameterType="map" resultType="com.iqb.consumer.crm.customer.bean.IqbCustomerStoreInfoEntity">
+    	SELECT
+			A.CREDITNAME as creditorName,
+			A.CREDITCARDNO as creditorIdNo,
+			A.CREDITBANKCARD as creditorBankNo,
+			A.CREDITBANK as creditorBankName,
+			A.CREDITPHONE as creditorPhone
+		FROM
+			jys_creditorinfo A
+		WHERE
+			A.orderId = #{orderId}
+		ORDER BY
+			A.CREATETIME DESC
+		LIMIT 1
+    </select>
+    
+    <!-- 根据交易所订单表id查询债权人信息 -->
+    <select id="getCreditInfoById" parameterType="map" resultType="com.iqb.consumer.crm.customer.bean.IqbCustomerStoreInfoEntity">
+        SELECT
+            A.CREDITNAME as creditorName,
+            A.CREDITCARDNO as creditorIdNo,
+            A.CREDITBANKCARD as creditorBankNo,
+            A.CREDITBANK as creditorBankName,
+            A.CREDITPHONE as creditorPhone
+        FROM
+            jys_creditorinfo A
+            LEFT JOIN jys_orderinfo B on A.id = B.creditorId
+        WHERE
+            B.Id = #{orderId}
+        ORDER BY
+            A.CREATETIME DESC
+        LIMIT 1
+    </select>
+</mapper>

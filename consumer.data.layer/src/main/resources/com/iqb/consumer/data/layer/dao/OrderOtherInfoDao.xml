@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the Apache License, Version 2.0 (the "License"); 
+	you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS 
+	IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language 
+	governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.OrderOtherInfoDao">
+
+	<!-- 配置映射字段 -->
+	<resultMap type="com.iqb.consumer.data.layer.bean.order.OrderOtherInfo" id="orderOtherInfo">
+		<result property="orderId" column="orderId" />
+		<result property="merchantNo" column="merchantNo" />
+		<result property="projectName" column="projectName" />
+		<result property="projectNo" column="projectNo" />
+		<result property="guarantee" column="guarantee" />
+		<result property="guaranteeName" column="guaranteeName" />
+		<result property="carSortNo" column="carSortNo" />
+		<result property="gpsRemark" column="gpsRemark" />
+		<result property="receiveAmt" column="receiveAmt" />
+		<result property="remark" column="remark" />
+		<result property="version" column="version" />
+		<result property="createTime" column="createTime" />
+		<result property="updateTime" column="updateTime" />
+	</resultMap>
+
+	<!-- 保存工作流回调相关信息 -->
+	<update id="updateOrderOtherInfo">
+		UPDATE inst_orderotherinfo SET version = version + 1
+		<if test="gpsRemark!=null and gpsRemark!='' ">
+		,gpsRemark = #{gpsRemark}
+		</if>
+		<if test="receiveAmt!=null and receiveAmt!=''">
+		,receiveAmt = #{receiveAmt}
+		</if>
+		<if test="remark!=null and remark!='' ">
+		,remark = #{remark}
+		</if>
+	   WHERE orderId = #{orderId};
+	</update>
+	<!-- 根据orderId查询 inst_orderotherinfo-->
+	<select id="selectOne" resultMap="orderOtherInfo" parameterType="java.util.Map">
+		SELECT
+			orderId,merchantNo,projectName,projectNo,guarantee,guaranteeName,carSortNo,gpsRemark,receiveAmt,remark
+		FROM
+			inst_orderotherinfo
+		WHERE
+		orderId = #{orderId} limit 1
+	</select>
+	  <!-- 批量插入订单信息 -->
+    <insert id="batchInsertOrderOtherInfo"  parameterType="java.util.List">
+        INSERT INTO inst_orderotherinfo 
+        (orderId,merchantNo, projectName, projectNo, guarantee, guaranteeName,createTime) 
+       VALUES
+       <foreach collection="list" item="item" index="index"
+           separator=",">
+           (
+           #{item.orderId},#{item.merchantNo},#{item.projectName},#{item.projectNo},#{item.guarantee},
+           #{item.guaranteeName},now()
+           )
+       </foreach>
+    </insert>
+    <!-- 根据订单号修改信息 -->
+    <update id="updateOrderOtherInfoByOrderId" parameterType="com.iqb.consumer.data.layer.bean.order.OrderOtherInfo">
+      UPDATE 
+        inst_orderotherinfo
+        <set>
+          <if test="merchantNo != null and merchantNo!=''">
+            merchantNo = #{merchantNo},
+          </if>
+          <if test="projectName != null and projectName!=''">
+            projectName = #{projectName},
+          </if>
+          <if test="projectNo != null and projectNo!=''">
+            projectNo = #{projectNo},
+          </if>
+          <if test="carSortNo != null">
+            carSortNo = #{carSortNo},
+          </if>
+          <if test="guarantee != null and guarantee!=''">
+            guarantee = #{guarantee},
+          </if>
+          <if test="guaranteeName != null and guaranteeName!=''">
+            guaranteeName = #{guaranteeName},
+          </if>
+        </set>
+      WHERE 
+        orderId = #{orderId,jdbcType=VARCHAR}
+    </update>
+</mapper>

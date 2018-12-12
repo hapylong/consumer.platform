@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iqb.consumer.data.layer.dao.credit_product.CreditProductRepository" >
+
+    <select id="merchantCertificate" parameterType="com.iqb.consumer.data.layer.bean.credit_product.request.MerchantCertificateRequestMessage" resultType="Integer">
+        SELECT
+            count(id)
+        FROM
+            inst_merchantbiztype
+        WHERE
+            merchantno = #{merchantNo}
+        AND
+            biztype = #{bizType}
+    </select>
+    
+    <resultMap id="order_break_info_entity" type="com.iqb.consumer.data.layer.bean.credit_product.entity.InstOrderBreakInfoEntity">
+        <id column="ID" property="id"></id>
+        <result column="orderid"            property="orderId"></result>
+        <result column="caramt"             property="carAmt"></result>
+        <result column="gpsamt"             property="gpsAmt"></result>
+        <result column="insamt"             property="insAmt"></result>
+        <result column="taxamt"             property="taxAmt"></result>
+        <result column="businessTaxAmt"     property="businessTaxAmt"></result>
+        <result column="otheramt"           property="otherAmt"></result>
+        <result column="version"            property="version"></result>
+        <result column="createtime"         property="createTime"></result>
+        <result column="updatetime"         property="updateTime"></result>
+    </resultMap>
+    <select id="getOrderBreakInfoEntity" parameterType="String" resultMap="order_break_info_entity">
+        SELECT
+            *
+        FROM
+            inst_orderbreakinfo
+        WHERE
+            orderId = #{orderId}
+    </select>
+    <select id="getCreditorInfoBean" parameterType="String" resultType="com.iqb.consumer.data.layer.bean.creditorinfo.CreditorInfoBean">
+        SELECT
+            *
+        FROM
+            cf_creditorinfo
+        WHERE
+            orderId = #{orderId}
+    </select>
+    
+    <resultMap id="order_info_entity" type="com.iqb.consumer.data.layer.bean.credit_product.entity.InstOrderInfoEntity">
+        <id column="ID" property="id"></id>
+        <result column="orderid" property="orderId"></result>
+        <result column="userid" property="userId"></result>
+        <result column="regid" property="regId"></result>
+        <result column="merchantno" property="merchantNo"></result>
+        <result column="biztype" property="bizType"></result>
+        <result column="ordername" property="orderName"></result>
+        <result column="orderamt" property="orderAmt"></result>
+        <result column="orderitems" property="orderItems"></result>
+        <result column="preamt" property="preAmt"></result>
+        <result column="preamtstatus" property="preAmtStatus"></result>
+        <result column="status" property="status"></result>
+        <result column="wfstatus" property="wfStatus"></result>
+        <result column="riskstatus" property="riskStatus"></result>
+        <result column="refundflag" property="refundFlag"></result>
+        <result column="margin" property="margin"></result>
+        <result column="downpayment" property="downPayment"></result>
+        <result column="servicefee" property="serviceFee"></result>
+        <result column="planid" property="planId"></result>
+        <result column="qrcodeid" property="qrCodeId"></result>
+        <result column="takepayment" property="takePayment"></result>
+        <result column="feeyear" property="feeYear"></result>
+        <result column="feeamount" property="feeAmount"></result>
+        <result column="monthinterest" property="monthInterest"></result>
+        <result column="chargeway" property="chargeWay"></result>
+        <result column="procinstid" property="procInstId"></result>
+        <result column="fee" property="fee"></result>
+        <result column="summoney" property="sumMoney"></result>
+        <result column="applyamt" property="applyAmt"></result>
+        <result column="gpsamt" property="gpsAmt"></result>
+        <result column="assessprice" property="assessPrice"></result>
+        <result column="orderno" property="orderNo"></result>
+        <result column="version" property="version"></result>
+        <result column="createtime" property="createTime"></result>
+        <result column="updatetime" property="updateTime"></result>
+        <result column="contractstatus" property="contractStatus"></result>
+        <result column="orderremark" property="orderRemark"></result>
+        <result column="riskretremark" property="riskRetRemark"></result>
+        <result column="loaninterval" property="loanInterval"></result>
+    </resultMap>
+    
+    <select id="getInstOrderInfoEntityByOrderId" parameterType="String" resultMap="order_info_entity">
+        SELECT
+            *
+        FROM
+            inst_orderinfo
+        WHERE
+            orderId = #{orderId}
+    </select>
+    
+    <insert id="saveInstOrderInfoEntityX" parameterType="com.iqb.consumer.data.layer.bean.credit_product.entity.InstOrderInfoEntity" >
+        INSERT INTO 
+            INST_ORDERINFO
+            (orderid, userid, regid, merchantno, biztype, ordername, orderamt,
+             orderitems, orderremark, preamt, preamtstatus, status, wfstatus,
+             riskstatus, riskretremark, refundflag, margin, downpayment, servicefee,
+             planid, qrcodeid, takepayment, feeyear, feeamount, monthinterest, chargeway,
+             procinstid, fee, summoney, applyamt, gpsamt, assessprice, orderno, loaninterval,
+             version, createtime, updatetime, contractstatus)
+        VALUES
+            (#{orderId}, #{userId}, #{regId}, #{merchantNo}, #{bizType}, #{orderName}, 
+            #{orderAmt}, #{orderItems}, #{orderRemark}, #{preAmt}, #{preAmtStatus}, 
+            #{status}, #{wfStatus}, #{riskStatus}, #{riskRetRemark}, #{refundFlag}, 
+            #{margin}, #{downPayment}, #{serviceFee}, #{planId}, #{qrCodeId}, #{takePayment}, 
+            #{feeYear}, #{feeAmount}, #{monthInterest}, #{chargeWay}, #{procInstId}, #{fee}, 
+            #{sumMoney}, #{applyAmt}, #{gpsAmt}, #{assessPrice}, #{orderNo}, #{loanInterval}, 
+            #{version}, #{createTime}, #{updateTime}, #{contractStatus})
+    </insert>
+    <update id="updateOrderBreakInfoEntity" parameterType="com.iqb.consumer.data.layer.bean.credit_product.entity.InstOrderBreakInfoEntity">
+        UPDATE
+            inst_orderbreakinfo
+        SET
+            caramt = #{carAmt} , updatetime = #{updateTime}
+        WHERE 
+            id = #{id}
+    </update>
+    
+    <update id="updateInstOrderInfoEntityEQUAL" parameterType="com.iqb.consumer.data.layer.bean.credit_product.entity.InstOrderInfoEntity">
+        UPDATE
+            inst_orderinfo
+        SET
+            assessprice = #{assessPrice} , updatetime = #{updateTime}
+        WHERE 
+            id = #{id}
+    </update>
+    
+    <update id="updateInstOrderInfoEntityUNVEN" parameterType="com.iqb.consumer.data.layer.bean.credit_product.entity.InstOrderInfoEntity">
+        UPDATE
+            inst_orderinfo
+        SET
+            downpayment = #{downPayment} , feeamount = #{feeAmount} ,
+            margin = #{margin} , monthinterest = #{monthInterest} ,
+            preamt = #{preAmt} , servicefee = #{serviceFee} , 
+            updatetime = #{updateTime} , assessprice = #{assessPrice} ,
+            orderamt = #{orderAmt} , loaninterval = #{loanInterval}
+        WHERE 
+            id = #{id}
+    </update>
+
+    <update id="updateInstOrderInfoEntityUPDATE" parameterType="com.iqb.consumer.data.layer.bean.credit_product.entity.InstOrderInfoEntity">
+        UPDATE
+            inst_orderinfo
+        SET
+            downpayment = #{downPayment} , feeamount = #{feeAmount} ,
+            margin = #{margin} , monthinterest = #{monthInterest} ,
+            preamt = #{preAmt} , servicefee = #{serviceFee} , 
+            updatetime = #{updateTime},
+            orderitems = #{orderItems},
+            orderamt = #{orderAmt},
+            planid = #{planId},
+            status = #{status},
+            wfstatus = #{wfStatus}
+        WHERE 
+            orderid = #{orderId}
+    </update>
+    
+    <resultMap id="details_info_pojo" type="com.iqb.consumer.data.layer.bean.credit_product.pojo.DetailsInfoPojo">
+        <result column="merchantshortname" property="merchantShortName"></result>
+        <result column="realname" property="realName"></result>
+        <result column="regid" property="regId"></result>
+        <result column="orderid" property="orderId"></result>
+        <result column="biztype" property="bizType"></result>
+        <result column="orderamt" property="orderAmt"></result>
+        <result column="planfullname" property="planFullName"></result>
+        <result column="planshortname" property="planShortName"></result>
+        <result column="orderitems" property="orderItems"></result>
+        <result column="feeratio" property="fee"></result>
+        <result column="monthinterest" property="monthInterest"></result>
+        
+        
+        <result column="margin" 		property="margin"/>
+        <result column="serviceFee" 	property="serviceFee"/>
+        <result column="contractAmt" 	property="contractAmt"/>
+        <result column="loanAmt" 		property="loanAmt"/>
+        <result column="sbAmt" 			property="sbAmt"/>
+        <result column="preAmtStatus" 	property="preAmtStatus"/>
+        
+        <result column="gpsAmt" 	property="gpsAmt"/>
+        <result column="riskAmt" 	property="riskAmt"/>
+        <result column="taxAmt" 	property="taxAmt"/>
+        <result column="serverAmt" 	property="serverAmt"/>
+        <result column="otherAmt" 	property="otherAmt"/>
+    </resultMap>
+    <sql id="details_info_sql">
+        a.regid, a.orderid, a.biztype, a.orderamt, a.orderitems, a.monthinterest, a.preamtstatus,
+        b.merchantshortname,
+        c.realname,
+        d.planfullname, d.feeratio, d.planshortname,
+        A.margin, A.serviceFee, A.orderAmt as contractAmt, A.orderAmt as loanAmt,A.orderAmt as sbAmt,
+        e.gpsAmt,e.riskAmt,e.taxAmt,e.serverAmt,e.otherAmt
+    </sql>
+    <select id="getInfoDetailsX" parameterType="String" resultMap="details_info_pojo">
+        SELECT
+            <include refid="details_info_sql" />
+        FROM
+            inst_orderinfo a
+        LEFT JOIN
+            inst_merchantinfo b
+        ON
+            a.merchantno = b.merchantno
+        LEFT JOIN
+            inst_user c
+        ON
+            a.userid = c.id
+        LEFT JOIN
+            inst_plan d
+        ON 
+            a.planid = d.id
+        LEFT JOIN
+			inst_orderotheramt e
+		ON
+			a.orderId = e.orderId
+        WHERE
+            a.orderId = #{orderId}
+            limit 1
+    </select>
+</mapper>

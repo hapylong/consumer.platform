@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>拆分提交</title>
+        <meta charset="UTF-8" />
+        <meta name="Author" content="" />
+        <meta name="Keywords" content="" />
+        <meta name="Description" content="" />
+        
+        <!-- 样式库 -->
+        <link rel="stylesheet" href="../../../js/bootstrap/themes/default/bootstrap.css" />
+        <link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+        <link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+        <link rel="stylesheet" href="../../../css/jquery.select2.css" />
+        <link rel="stylesheet" href="../../../css/jquery.select2-bootstrap.css" />
+        <link rel="stylesheet" href="../../../css/jquery.datetimepicker.css" />
+        <link rel="stylesheet" href="../../../js/bootstrap/themes/default/jquery.mCustomScrollbar.css" />
+        <link rel="stylesheet" href="../../../js/prettyphoto/css/prettyPhoto.css" />
+        
+        <!-- 插件库 -->
+        <script src="../../../js/common/package.js"></script>
+        <script src="../../../js/common/url.js"></script>
+        <script src="../../../js/common/json2.js"></script> 
+        <script src="../../../js/common/jquery-1.11.3.min.js"></script>     
+        <script src="../../../js/bootstrap/bootstrap.js"></script>
+        <script src="../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+        <script src="../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+        <script src="../../../js/ztree/js/jquery.ztree.all.min.js"></script>
+        <script src="../../../js/common/jquery.select2.js"></script>
+        <script src="../../../js/common/jquery.datetimepicker.js"></script>
+        <script src="../../../js/bootstrap/plugins/jquery.mCustomScrollbar.js"></script>
+        <script src="../../../js/prettyphoto/js/jquery.prettyPhoto.js"></script>    
+        
+        <!-- 业务库 -->
+        <script src="../../../js/common/base.js"></script>
+        <script src="../../../js/common/datagrid2.js"></script>
+        <script src="../../../js/common/tree.js"></script>
+        <script src="../../../js/common/formatter.js"></script>     
+        <script src="../../../js/each/cfm/requestFunds/splitCommit.js"></script>
+        
+        
+        <!-- 页面样式 -->
+        <style type="text/css">
+            body {
+                font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif !important;
+                background:#eee url("../../../img/back.png") repeat;
+            }
+            .container-fluid {
+                padding:5px;
+            }
+            .left-part {
+                height:800px;
+            }
+            .modal-form {
+                margin:5px;
+                height:600px;
+            }
+            .text-left {
+                text-align: left;
+            }
+            .text-center {
+                text-align: center;
+            }
+            .text-right {
+                text-align: right;
+            }
+            .text-muted {
+                font-weight: bold;
+            }
+            .text-stress {
+                font-weight: bold;
+            }
+            .item-title {
+                background-color: #f5f5f5;
+            }
+            .float-left {
+                float: left;
+                margin-left: 5px;
+            }
+            .copies{
+                display: none;
+            }
+            .money{
+                display: none;
+            }
+        </style>
+        
+    </head>
+    <body>
+        <div class="container-fluid">
+            <div class="row">               
+                <div class="col-md-12">
+                    <div class="panel panel-info">
+                        <div class="panel-body">    
+                            <form id="updateForm" class="form-horizontal" action="http://localhost:8080/consumer.manage.front/car/add">
+                                <input id="id" name="id" type="text" class="hidden">   
+                                <input id="packageId" name="packageId" type="text" class="hidden">  
+                                <input id="type" name="type" type="text" class="hidden" value="1">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">资产包编号:</label>
+                                    <div class="col-sm-3">
+                                        <input id="orderId" type="text" readonly name="orderId" class="form-control" title="">
+                                    </div>
+                                     <label class="col-sm-2 control-label">起息日:</label>
+                                    <div class="col-sm-3">
+                                        <input id="beginInterestDate" type="text" readonly name="beginInterestDate" class="form-control" title="">
+                                    </div>
+                                </div>  
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">募集机构:</label>
+                                    <div class="col-sm-3">
+                                        <input id="raiseInstitutions" type="text" readonly name="raiseInstitutions" class="form-control" title="">
+                                    </div>
+                                    <label class="col-sm-2 control-label">到期日:</label>
+                                    <div class="col-sm-3">
+                                        <input id="expireDate" type="text" readonly name="expireDate" class="form-control" title="">
+                                    </div>
+                                </div> 
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">担保机构:</label>
+                                    <div class="col-sm-3">
+                                        <input id="guaranteeInstitution" type="text" readonly name="guaranteeInstitution" class="form-control" title="">
+                                    </div>
+                                    <label class="col-sm-2 control-label">资金包金额:</label>
+                                    <div class="col-sm-3">
+                                         <input id="orderAmt" type="text" readonly name="orderAmt" class="form-control"  title="">
+                                    </div>
+                                </div> 
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"><span class="VINs" style="color: red;">*</span>拆分规则:</label>
+                                    <div class="col-sm-3">
+                                        <select id="breakType" type="text" name="breakType" class="form-control easyui-validatebox" required="required">
+                                            <option value="">请选择</option>
+                                            <option value="1">按份数平均拆分</option>
+                                            <option value="2">按金额拆分</option>
+                                        </select>
+                                    </div>
+                                    <div class="copies">
+                                        <label class="col-sm-2 control-label"><span class="VINs" style="color: red;">*</span>拆分份数:</label>
+                                        <div class="col-sm-3">
+                                            <input id="splitShare" type="text" name="splitShare" class="form-control easyui-validatebox validatebox-text validatebox-readonly validatebox-invalid merchModel" required="required" title="">
+                                        </div>
+                                        <label class="control-label">份</label>
+                                    </div>
+                                    <div class="money">
+                                        <label class="col-sm-2 control-label"><span class="VINs" style="color: red;">*</span>每份金额:</label>
+                                        <div class="col-sm-3">
+                                            <input id="amountPerServing" type="text" name="amountPerServing" class="form-control easyui-validatebox validatebox-text validatebox-readonly validatebox-invalid merchModel" required="required" title="">
+                                        </div>
+                                        <label class="control-label">元</label>
+                                    </div>
+                                </div> 
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">期数:</label>
+                                    <div class="col-sm-3">
+                                        <input id="orderItems" type="text" readonly name="orderItems" class="form-control" title="">
+                                    </div>
+                                     <label class="col-sm-2 control-label">利率:</label>
+                                    <div class="col-sm-3">
+                                        <input id="fee" type="text" readonly name="fee" class="form-control" title="">
+                                    </div>
+                                </div>  
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"><span class="VINs" style="color: red;">*</span>摘牌机构:</label>
+                                    <div class="col-sm-3">
+                                        <select id="delistingMechanism" type="text" name="delistingMechanism" class="form-control easyui-validatebox" required="required">
+                                        </select>
+                                    </div>
+                                    <label class="col-sm-2 control-label"><span class="VINs" style="color: red;">*</span>交易所备案编号:</label>
+                                    <div class="col-sm-3">
+                                        <input id="recordNum" type="text" name="recordNum" class="form-control easyui-validatebox validatebox-text validatebox-readonly validatebox-invalid merchModel" required="required" title="">
+                                    </div>
+                                </div> 
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"><span class="VINs" style="color: red;">*</span>登记备案机构:</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" name="bakOrgan" id='bakOrgan' class="form-control easyui-validatebox" required="required" />
+                                    </div>
+                                    <!-- <label class="col-sm-2 control-label"><span class="VINs" style="color: red;">*</span>项目名称:</label>
+                                    <div class="col-sm-3">
+                                        <input type="text" name="proName" id='proName' class="form-control easyui-validatebox" required="required" />
+                                    </div> -->
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"><span class="VINs" style="color: red;">*</span>挂牌地址(网址):</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" name="url" id='url' class="form-control easyui-validatebox" required="required"/>   
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"><span class="VINs" style="color: red;">*</span>项目概况:</label>
+                                    <div class="col-sm-8">
+                                        <textarea name="proDetail" id='proDetail' class="form-control easyui-validatebox" required="required"></textarea>
+                                    </div>
+                                </div>     
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"><span class="VINs" style="color: red;">*</span>转让条件:</label>
+                                    <div class="col-sm-8">
+                                        <textarea name="tranCondition" id='tranCondition' class="form-control easyui-validatebox" required="required"></textarea>
+                                    </div>
+                                </div>     
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"><span class="VINs" style="color: red;">*</span>保障方式:</label>
+                                    <div class="col-sm-8">
+                                        <textarea name="safeWay" id='safeWay' class="form-control easyui-validatebox" required="required"></textarea>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">备注说明:</label>
+                                    <div class="col-sm-8">
+                                        <textarea id="remark" type="text" name="remark" class="form-control"></textarea>
+                                    </div>
+                                </div>                                 
+                            </form>                                                                   
+                        </div>
+                    </div>
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">资产拆分明细</h3>
+                        </div>
+                        <div class="panel-body">                              
+                            <button id="btn-split" type="button" class="btn btn-primary btn-sm">拆分</button>
+                            <button id="btn-save" type="button" class="btn btn-success btn-sm">保存</button>
+                            <button id="btn-remove" type="button" class="btn btn-danger btn-sm">删除</button>
+                            <button id="btn-close" type="button" class="btn btn-default btn-sm">关闭</button>
+                        </div>
+                        <table id='datagrid' class="table table-striped table-bordered table-hover table-condensed ">
+                            <thead>
+                                <tr>
+                                    <th field="number">序号</th>  
+                                    <th field="id" hidden="true">ID</th>
+                                    <th field="bOrderId">期限ID</th>
+                                    <th field="orderId">资产包编号</th>                   
+                                    <th field="raiseInstitutions">募集机构</th>                             
+                                    <th field="bOrderAmt">金额</th>
+                                    <th field="orderItems">期数</th>
+                                    <th field="fee">利率(月)</th>
+                                    <th field="delistingMechanism">担保机构</th>
+                                    <th field="expireDate">到期日</th>
+                                    <th field="recordNum">交易所备案编号</th> 
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                        <div class="panel-footer">
+                            <div id="paginator"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>          
+        </div>
+    </body>
+</html>

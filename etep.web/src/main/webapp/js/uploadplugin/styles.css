@@ -1,0 +1,29 @@
+H1 {
+    text-align: center;
+}
+
+#examples {
+    padding-left: 0px;
+}
+
+.endingRemark {
+    margin-top: 10px;
+}
+
+DIV.example {
+    margin-top: 10px;
+}
+
+DIV.example ul {
+    width: 800px;
+}
+
+A {
+    color: green;
+}
+
+A.decorate {
+    text-decoration: underline;
+}
+
+#paste-test-img { width: 125px; }

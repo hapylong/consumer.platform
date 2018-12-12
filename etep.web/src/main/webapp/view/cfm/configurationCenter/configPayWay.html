@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>配置商户支付主题</title>
+        <meta charset="UTF-8" />
+        <meta name="Author" content="" />
+        <meta name="Keywords" content="" />
+        <meta name="Description" content="" /> 
+        <!-- 样式库 -->
+	    <link rel="stylesheet" href="../../../js/bootstrap/themes/default/bootstrap.css" />
+	    <link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+	    <link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+	    <link rel="stylesheet" href="../../../js/ztree/css/zTreeStyle/zTreeStyle.css" />
+	    <link rel="stylesheet" href="../../../css/jquery.select2.css" />
+	    <link rel="stylesheet" href="../../../css/jquery.select2-bootstrap.css" />
+   	    <link rel="stylesheet" href="../../../js/lightbox2/css/lightbox.css" />
+   	    <link rel="stylesheet" href="../../../js/bootstrap/themes/default/jquery.mCustomScrollbar.css" />
+	    <link rel="stylesheet" href="../../../css/common/base2.css" />
+	    <!-- 插件库 -->
+	    <script src="../../../js/common/package.js"></script>
+		<script src="../../../js/common/url.js"></script>
+		<script src="../../../js/common/json2.js"></script>	
+		<script src="../../../js/common/jquery-1.11.3.min.js"></script>	
+		<script src="../../../js/common/jquery.form.js"></script>		
+		<script src="../../../js/bootstrap/bootstrap.js"></script>
+		<script src="../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+		<script src="../../../js/bootstrap/plugins/jquery.mCustomScrollbar.js"></script>
+		<script src="../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+		<script src="../../../js/ztree/js/jquery.ztree.all.min.js"></script>
+		<script src="../../../js/common/jquery.select2.js"></script>
+		
+		<!-- 图片上传  -->
+		<link href="../../../js/uploadplugin/fine-uploader-gallery.css" rel="stylesheet" type="text/css" />
+		<link href="../../../js/uploadplugin/fine-uploader-new.css" rel="stylesheet" type="text/css" />
+		<link href="../../../js/uploadplugin/styles.css" rel="stylesheet" type="text/css" />
+		<script src="../../../js/uploadplugin/all.fine-uploader.js"></script>
+		<script src="../../../js/uploadplugin/pica.js"></script>
+		
+		<!-- 业务库 -->
+		<script src="../../../js/common/base.js"></script>
+		<script src="../../../js/common/datagrid2.js"></script>
+		<script src="../../../js/common/tree.js"></script>
+		<script src="../../../js/common/formatter.js"></script>	  
+        <script src="../../../js/each/cfm/configurationCenter/configPayWay.js"></script>
+        <script src="../../../js/each/cfm/merch/merch.js"></script>
+	    <script src="../../../js/each/cfm/merch/merchBizOwner.js"></script>
+        <style type="text/css">
+            body {background:#eee url("../../../img/back.png") repeat;}
+            .container-fluid{
+                padding:5px;
+            }
+            .left-part {
+				height: 800px;
+			}
+			.modal-form {
+				margin: 15px 30px 15px 30px;
+			}
+			.z-index{
+			    z-index:98;
+			}
+			.z-index2{
+			    z-index:97;
+			}
+        </style>
+    </head>
+    <body>  
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-info">
+                    <div class="panel-heading">
+                    	<h3 class="panel-title">查询栏</h3>
+                    </div>
+                        <div class="panel-body">    
+                            <form id="searchForm" class="form-horizontal">                               
+                                <div class="form-group">
+                                    <label class="control-label col-lg-1 col-md-1 col-sm-1">商户:</label>
+                                    <div class="col-lg-2 col-md-2 col-sm-2">
+                                        <input id="merchNames" type="text" readonly value="全部商户" name="merchNames" class="form-control merch" onclick="showMenu(); return false;"/>
+                                    </div>
+                                    <label class="control-label col-lg-1 col-md-1 col-sm-1">支付主体:</label>
+                                    <div class="col-lg-2 col-md-2 col-sm-2">
+                                        <select name='bizOwner' class="form-control" style="width:100%"></select>
+                                    </div>
+                                    <label class="control-label col-lg-1 col-md-1 col-sm-1">支付通道:</label>
+	                                <div class="col-lg-2 col-md-2 col-sm-2">
+	                                    <select name="payWay" class="form-control" style="width:100%"></select>
+									</div>
+									<div class="col-lg-3 col-md-3 col-sm-3">
+										<button id="btn-search" type="button" class="btn btn-default btn-sm">查询</button>
+	                                    <button id="btn-reset" type="button" class="btn btn-default btn-sm">重置</button>
+                                    </div>
+                                </div>
+                            </form>                                                         
+                        </div>
+					</div>		
+					<div class="panel panel-info">	
+                        <div class="panel-heading">
+                            <h3 class="panel-title">信息列表</h3>
+                        </div>
+                        <div class="panel-body">
+                            <form id="listForm">                                
+                                <button id="btn-insert" type="button" class="btn btn-primary btn-sm">新增</button>
+                                <button id="btn-update" type="button" class="btn btn-warning btn-sm">修改</button>
+                                <button id="btn-deletePush" type="button" class="btn btn-danger btn-sm">删除</button>
+                            </form>
+                        </div>
+                        <div class='scrollbar' style='width:100%;overflow-x:scroll'>
+                        <table id="datagrid" class="table table-bordered table-hover" style="text-align:center">
+                            <thead>
+                                <tr>
+                                    <th field="ck"></th>
+                                    <th field="id"  hidden="true">id</th>
+									<th field="rn">序号</th>
+									<th field="merchantName">商户</th>
+									<th field="bizOwner">业务主体</th>
+									<th field="payWay">支付通道</th>
+									<th field="gateWay">网关地址</th>
+									<th field="service">服务值</th>
+									<th field="vSon">版本号</th>
+									<th field="merchantId">支付商户</th>
+									<th field="key" formatter='Formatter.key(val)'>密钥</th>
+									<th field="secId">加密ID</th>
+									<th field="certPath">公钥</th>
+									<th field="prikeyPath">私钥</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                        </div>
+                        <div class="panel-footer">
+                            <div id="paginator">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>          
+        </div>
+        <div id="update-win" class="modal fade" role="dialog" aria-labelledby="update-win-label" aria-describedby="企业客户信息">
+			<div class="modal-dialog modal-lg" role="document">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<h5 class="modal-title" id="update-win-label">配置信息</h5>
+		      		</div>
+		      		<div class="modal-form">
+		       			<form id="updateForm" class="form-horizontal" method="get">
+				  			<div class="form-group">
+				    			<label class="col-md-2 control-label">商户</label>
+				    			<div class="col-md-4">
+				      				<input type="text" readonly placeholder="请选择商户名" class="form-control merchModel easyui-validatebox" required="required" onclick="showMenuModel(); return false;"/>
+				    			    <input type='hidden' class='merchantNo' name='merchantNo'>
+				    			</div>
+				    			<label class="col-md-2 control-label">业务主体</label>
+				    			<div class="col-md-4">
+				      				<select id="bizOwner" name="bizOwner" class="form-control" style="width:100%"></select>
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				  			    <label class="col-md-2 control-label">支付通道</label>
+				    			<div class="col-md-4">
+				      				<select id="payWay" name="payWay" class="form-control" style="width:100%"></select>
+				    			</div>
+				    			<label class="col-md-2 control-label">网关地址</label>
+				    			<div class="col-md-4">
+				      				<input id="gateWay" name="gateWay" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入网关地址" required="required"/>
+				    			</div>
+				  			</div>
+				  			<div class="form-group">
+				    			<label class="col-md-2 control-label">服务值</label>
+                                <div class="col-md-4">
+                                    <input id="service" name="service" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入服务值" required="required" />
+                                </div>
+                                <label class="col-md-2 control-label">版本号</label>
+				    			<div class="col-md-4">
+				      				<input id="vSon" name="vSon" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入版本号" required="required" />
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-md-2 control-label">支付商户</label>
+				    			<div class="col-md-4">
+				      				<input id="merchantId" name="merchantId" type="text" class="form-control input-sm easyui-validatebox" required="required" placeholder="请输入支付商户"/>
+				    			</div>
+				    			<label class="col-md-2 control-label">加密ID</label>
+				    			<div class="col-md-4">
+                                    <input name="secId" id='secId' type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入加密ID" required="required"/>
+                                </div>
+				  			</div>	
+				  			<div class="form-group">
+                                <label class="col-md-2 control-label">公钥</label>
+				    			<div class="col-md-4">
+				      				<input name="certPath" id='certPath' type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入公钥" required="required"/>
+				    			</div>
+				    			<label class="col-md-2 control-label">私钥</label>
+				  			    <div class="col-md-4">
+				      				<input name="prikeyPath" id='prikeyPath' type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入公钥" required="required"/>
+				    			</div>
+				  			</div>
+				  			<div class="form-group">
+				    			<label class="col-md-2 control-label">密钥</label>
+				    			<div class="col-md-10">
+				    			    <textarea name="key" id='key' type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入密钥" required="required"></textarea>
+				    			</div>
+				  			</div>
+		  			</form>
+		      		</div>
+		      		<div class="modal-footer">
+				        <button id="btn-save" type="button" class="btn btn-success btn-sm">保存</button>
+				        <button id="btn-close" type="button" class="btn btn-default btn-sm">关闭</button>		        
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+        <div id="menuContent" class="menuContent" style="max-height:500px;overflow:scroll;display:none; position: absolute;background:#fff;border:1px solid #ccc;">
+	        <ul id="treeDemo" class="ztree" style="margin-top:0;"></ul>
+        </div>
+        <div id="menuContentModel" class="menuContent" style="max-height:500px;overflow:scroll;display:none; position: absolute;background:#fff;border:1px solid #ccc;">
+	        <ul id="treeDemoModel" class="ztree" style="margin-top:0; width:200px;"></ul>
+        </div>  
+    </body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>流程异常处理</title>
+<meta charset="UTF-8" />
+<meta name="Author" content="" />
+<meta name="Keywords" content="" />
+<meta name="Description" content="" />
+<link rel="stylesheet"
+	href="../../../js/bootstrap/themes/default/bootstrap.css" />
+<link rel="stylesheet"
+	href="../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+<link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+<link rel="stylesheet"
+	href="../../../js/ztree/css/zTreeStyle/zTreeStyle.css" />
+<link rel="stylesheet" href="../../../css/jquery.select2.css" />
+<link rel="stylesheet" href="../../../css/jquery.select2-bootstrap.css" />
+<script src="../../../js/common/package.js"></script>
+<script src="../../../js/common/url.js"></script>
+<script src="../../../js/common/jquery-1.11.3.min.js"></script>
+<script src="../../../js/bootstrap/bootstrap.js"></script>
+<script src="../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+<script src="../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+<script src="../../../js/common/jquery.select2.js"></script>
+<script src="../../../js/ztree/js/jquery.ztree.all.min.js"></script>
+<script src="../../../js/common/json2.js"></script>
+<script src="../../../js/common/base.js"></script>
+<script src="../../../js/common/datagrid2.js"></script>
+<script src="../../../js/common/tree.js"></script>
+<script src="../../../js/each/main/main.js"></script>
+<script src="../../../js/common/wflow.js"></script>
+<script src="../../../js/each/etep/wf/wfProcessStop.js"></script>
+<script src="../../../js/common/formatter.js"></script>
+<style type="text/css">
+body {
+	background: #eee url("../../../img/back.png") repeat;
+}
+
+.container-fluid {
+	padding: 5px;
+}
+</style>
+</head>
+<body>
+	<div class="container-fluid">
+		<div class="col-md-12">
+			<div class="panel panel-info">
+				<div class="panel-heading">
+					<h3 class="panel-title">查询条件</h3>
+				</div>
+				<div class="panel-body">
+					<form id="searchForm" class="form-horizontal">
+						<div class="form-group">
+							<label class="control-label col-lg-1 col-md-1 col-sm-1">业务ID:</label>
+							<div class="col-lg-2 col-md-2 col-sm-2">
+							    <input name="procBizid" type="text" class="form-control" placeholder="请输入业务ID">
+							</div>
+							<label class="control-label col-lg-1 col-md-1 col-sm-1">任务名称:</label>
+							<div class="col-lg-2 col-md-2 col-sm-2">
+							    <input name="procCtaskname" type="text" class="form-control" placeholder="请输入任务名称">
+							</div>
+							<label class="control-label col-lg-1 col-md-1 col-sm-1">流程名称:</label>
+							<div class="col-lg-2 col-md-2 col-sm-2">
+							     <input name="procName" type="text" class="form-control" placeholder="请输入流程名称">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-lg-1 col-md-1 col-sm-1">流程状态:</label>
+							<div class="col-lg-2 col-md-2 col-sm-2">
+								<select class="form-control" name="procTaskStatus" style="width: 100%;">
+									<option value=""></option>
+									<option value="1">待签收</option>
+									<option value="2">待处理</option>
+								</select>
+							</div>
+							<div class="col-lg-3 col-md-3 col-sm-3">
+								<button id="btn-search" type="button" class="btn btn-default btn-sm">查询</button>
+								<button id="btn-reset" type="button" class="btn btn-default btn-sm">重置</button>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+			<div class="panel panel-info">
+				<div class="panel-heading">
+					<h3 class="panel-title">流程任务列表</h3>
+				</div>
+				<div class="panel-body">
+					<form id="listForm">
+						<button id="btn-stop" type="button" class="btn btn-primary btn-sm">终止流程</button>
+					</form>
+				</div>
+				<table id='datagrid' class="table table-bordered table-hover">
+					<thead>
+						<tr>
+							<th field="ck"></th>
+							<th field="rn" align="text-center" class="text-center">序号</th>
+							<th field="procInstId" hidden="true">流程实例id</th>
+							<th field="procDisplayurl" hidden="true">查看页面</th>
+							<th field="procOrgcode" hidden="true">机构代码</th>
+							<th field="procBiztype" hidden="true">业务类型</th>
+							<th field="procTaskid" hidden="true">任务ID</th>
+							<th field="procBizId" align="text-center" class="text-center" formatter="IQB.wfProcessStop.formatterOfSkipPage(val, row, rowIndex)">业务ID</th>
+							<th field="procName" align="text-center" class="text-center">流程名称</th>
+							<th field="procMemo" align="text-center" class="text-center">流程摘要</th>
+							<th field="procTaskcode" align="text-center" class="text-center">任务名称</th>
+							<th field="procTaskCommitter" align="text-center" class="text-center">提交人</th>
+							<th field="procTaskAssignee" align="text-center" class="text-center">处理人/角色</th>
+							<th field="procLicensor" align="text-center" class="text-center">委托人</th>
+							<th field="procCreatetime" align="text-center" class="text-center">流程创建时间</th>
+							<th field="procTaskCommittime" align="text-center" class="text-center">任务到达时间</th>
+							<th field="procStatusName" align="text-center" class="text-center">流程状态</th>
+							<th field="procStatus" hidden="true">流程状态</th>
+						</tr>
+					</thead>
+					<tbody></tbody>
+				</table>
+				<div class="panel-footer">
+					<div id="paginator"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div id="stop-win" class="modal fade" tabindex="-1" role="dialog"
+		aria-labelledby="stop-win-label" aria-describedby="添加或修改信息对话框">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="stop-win-label">流程终止原因</h5>
+				</div>
+				<div class="modal-body">
+					<form id="stopForm" class="form-horizontal">
+						<div class="form-group">
+					    	<label class="col-sm-3 control-label">流程终止原因：</label>
+			    			<div class="col-sm-8">
+			      				<textarea rows="6" name="procSpecialDesc" type="text" required="required" class="form-control input-sm easyui-validatebox" placeholder="请输入流程终止原因" validType="maxLength[256]"></textarea>
+			    			</div>	
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button id="btn-stop-save" type="button"
+						class="btn btn-success btn-sm">确定</button>
+					<button id="btn-stop-close" type="button"
+						class="btn btn-default btn-sm">取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

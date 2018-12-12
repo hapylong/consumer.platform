@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the Apache License, Version 2.0 (the "License"); 
+	you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS 
+	IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language 
+	governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.JysOrderDao">
+
+	<sql id="table">jys_orderinfo</sql>
+
+	<!-- 配置映射字段 -->
+	<resultMap type="com.iqb.consumer.data.layer.bean.jys.JYSOrderBean" id="jysOrderInfo">
+		<result property="id" column="id" />
+		<result property="orderId" column="orderId" />
+		<result property="userId" column="userId" />
+		<result property="regId" column="regId" />
+		<result property="merchantNo" column="merchantNo" />
+		<result property="orderName" column="orderName" />
+		<result property="orderAmt" column="orderAmt" />
+		<result property="orderItems" column="orderItems" />
+		<result property="orderRemark" column="orderRemark" />
+		<result property="preAmt" column="preAmt" />
+		<result property="preAmtStatus" column="preAmtStatus" />
+		<result property="status" column="status" />
+		<result property="riskStatus" column="riskStatus" />
+		<result property="riskRetRemark" column="riskRetRemark" />
+		<result property="refundFlag" column="refundFlag" />
+		<result property="margin" column="margin" />
+		<result property="downPayment" column="downPayment" />
+		<result property="serviceFee" column="serviceFee" />
+		<result property="planId" column="planId" />
+		<result property="qrCodeId" column="qrcodeId" />
+		<result property="takePayment" column="takepayment" />
+		<result property="feeYear" column="feeYear" />
+		<result property="feeAmount" column="feeAmount" />
+		<result property="monthInterest" column="monthInterest" />
+		<result property="chargeWay" column="chargeWay" />
+		<result property="procInstId" column="procInstId" />
+		<result property="fee" column="fee" />
+		<result property="sumMoney" column="sumMoney" />
+		<result property="applyAmt" column="applyAmt" />
+		<result property="gpsAmt" column="gpsAmt" />
+		<result property="assessPrice" column="assessPrice" />
+		<result property="wfStatus" column="wfStatus" />
+		<result property="bizType" column="bizType" />
+		<result property="expireDate" column="expireDate" />
+		<result property="planShortName" column="planShortName" />
+		<result property="realName" column="realName" />
+		<result property="procOrgCode" column="PROC_ORGCODE" />
+		<result property="batchNo" column="batchNo" />
+		<result property="version" column="version" />
+		<result property="createTime" column="createTime" />
+		<result property="updateTime" column="updateTime" />
+		
+		<result property="creditName" 		column="creditName" />
+		<result property="creditCardNo" 	column="creditCardNo" />
+		<result property="creditBankCard" 	column="creditBankCard" />
+		<result property="creditBank" 		column="creditBank" />
+		<result property="creditPhone" 		column="creditPhone" />
+		<result property="creditorId"       column="creditorId" />		
+	</resultMap>
+	
+	<!-- 交易所需求:查询单个订单信息 -->
+	<select id="getSingleOrderInfo" parameterType="String" resultMap="jysOrderInfo">
+		SELECT
+			O.userId,O.id,O.batchNo,O.orderId,O.regId,O.expireDate,O.createTime,O.planId,O.status,
+			O.orderName,O.orderAmt,O.orderItems,O.fee,O.monthInterest,O.bizType,O.merchantNo,O.creditorId,
+			U.realName,
+		    (
+		        SELECT
+		            P.PLANSHORTNAME
+		        FROM
+		            inst_plan P
+		        WHERE
+		            P.ID = O.planId
+		        LIMIT 1
+		    ) AS planShortName,
+		    F.CREDITNAME,
+			F.CREDITCARDNO,
+			F.CREDITBANKCARD,
+			F.CREDITBANK,
+			F.CREDITPHONE
+		FROM
+		      jys_orderinfo O 
+		    LEFT JOIN jys_user U on O.userId = U.id
+		    LEFT JOIN jys_creditorinfo F on O.creditorId = F.ID
+		WHERE
+        O.orderId = #{orderId}
+		<!--FINANCE-2976 交易所多次推送BUGFINANCE-2977交易所多次推送BUG -->
+        <if test="id !=null and id != ''">
+              AND O.id = #{id}
+        </if> 
+        LIMIT 1
+	</select>
+
+	<select id="listJYSOrderInfo" parameterType="java.util.Map"
+		resultMap="jysOrderInfo">
+		SELECT
+			(
+                SELECT 
+                    h.dict_name
+                FROM 
+                    iqb_sys_dict_item h
+                WHERE 
+                    h.is_enable = 1 
+                AND
+                    h.dict_type_code='bizType2OpenId'
+                AND 
+                    O.biztype = h.dict_code
+            ) As bizType,
+            O.id,O.orderId,O.batchNo,O.userId,O.regId,O.merchantNo
+            ,O.orderName,O.orderAmt,O.orderItems,O.orderRemark,O.preAmt,O.preAmtStatus
+            ,O.status,O.wfStatus,O.riskStatus,O.riskRetRemark
+            ,O.refundFlag,O.margin,O.downPayment,O.serviceFee
+            ,O.planId,O.qrCodeId,O.takePayment,O.feeYear,O.feeAmount,O.monthInterest,O.chargeWay,O.procInstId,O.fee
+            ,O.sumMoney,O.applyAmt,O.gpsAmt,O.assessPrice,O.expireDate,O.version,O.createTime,O.updateTime
+            ,O.proName,O.bakOrgan,O.url,O.proDetail,O.tranCondition,O.safeWay,O.upperTime,
+			U.realName,
+			(
+				SELECT
+					P.PLANSHORTNAME
+				FROM
+					inst_plan P
+				WHERE
+					P.ID = O.planId
+				LIMIT 1
+			) AS planShortName,
+			M.ID as PROC_ORGCODE,
+			F.CREDITNAME,
+			F.CREDITCARDNO,
+			F.CREDITBANKCARD,
+			F.CREDITBANK,
+			F.CREDITPHONE
+		FROM
+			jys_orderinfo O 
+		LEFT JOIN jys_user U ON U.id = O.userId
+		LEFT JOIN inst_merchantinfo M ON O.merchantNo = M.MERCHANTNO
+		LEFT JOIN jys_creditorinfo F on O.creditorId = F.ID
+		WHERE
+			O.status = #{status}
+		<if test="merList != null and merList.size() > 0">
+			AND O.MERCHANTNO in
+			<foreach item="item" index="index" collection="merList" open="("
+				separator="," close=")">
+				#{item.merchantNo}
+			</foreach>
+		</if>
+		<if test="bizType !=null and bizType != ''">
+			AND O.bizType = #{bizType}
+		</if>
+		<if test="minAmt != null and minAmt !='' and maxAmt != null and maxAmt !=''">
+			AND O.orderAmt between #{minAmt} and #{maxAmt}
+		</if>
+		<if test="startDate != null and startDate !='' and endDate != null and endDate !=''">
+			AND O.expireDate between #{startDate} and #{endDate}
+		</if>
+		<if test="batchNo !=null and batchNo != ''">
+			AND O.batchNo = #{batchNo}
+		</if>
+		<if test="orderItems !=null and orderItems != ''">
+			AND O.orderItems = #{orderItems}
+		</if>
+		<!--FINANCE-2982 交易所：资产导入/资产打包的筛选条件增加：订单号/姓名/手机；FINANCE-3001交易所：资产导入/资产打包的筛选条件增加：订单号/姓名/手机 chengzhen 2018年2月24日 18:10:39 -->
+		<if test="orderId !=null and orderId != ''">
+			AND O.orderId = #{orderId}
+		</if>
+		<if test="regId !=null and regId != ''">
+			AND U.regId = #{regId}
+		</if>
+		<if test="userName !=null and userName != ''">
+			AND U.realName LIKE "%"#{userName}"%"
+		</if>
+		<![CDATA[ ORDER BY O.ID DESC ]]>
+	</select>
+
+	<update id="updateJYSOrderInfo" parameterType="java.util.Map">
+		update jys_orderinfo 
+		<set>
+			version = version + 1,
+			<if test="orderName != null and orderName !='' ">
+				orderName = #{orderName},
+			</if>
+			<if test="orderItems != null and orderItems !='' ">
+				orderItems = #{orderItems},
+			</if>
+			<if test="planId != null and planId !='' ">
+				planId = #{planId},
+			</if>
+			<if test="preAmt != null and preAmt !='' ">
+				preAmt = #{preAmt},
+			</if>
+			<if test="margin != null and margin !='' ">
+				margin = #{margin},
+			</if>
+			<if test="downPayment != null and downPayment !='' ">
+				downPayment = #{downPayment},
+			</if>
+			<if test="serviceFee != null and serviceFee !='' ">
+				serviceFee = #{serviceFee},
+			</if>
+			<if test="takePayment != null and takePayment !='' ">
+				takePayment = #{takePayment},
+			</if>
+			<if test="feeYear != null and feeYear !='' ">
+				feeYear = #{feeYear},
+			</if>
+			<if test="feeAmount != null and feeAmount !='' ">
+				feeAmount = #{feeAmount},
+			</if>
+			<if test="fee != null and fee !='' ">
+				fee = #{fee},
+			</if>
+			<if test="regId != null and regId !='' ">
+				regId = #{regId},
+			</if>
+			<if test="orderAmt != null and orderAmt !='' ">
+				orderAmt = #{orderAmt},
+			</if>
+			<if test="monthInterest != null and monthInterest !='' ">
+				monthInterest = #{monthInterest},
+			</if>
+			<if test="status != null and status !='' ">
+				status = #{status},
+			</if>
+			<if test="wfStatus != null and wfStatus !='' ">
+				wfStatus = #{wfStatus}
+			</if>
+		</set>
+		<!--FINANCE-2976 交易所多次推送BUGFINANCE-2977交易所多次推送BUG 添加id的条件  -->
+		where 
+		orderId = #{orderId}
+		<if test="id !=null and id != ''">
+                  AND id = #{id}
+         </if>
+	</update>
+
+	<update id="deleteJYSOrderInfo" parameterType="java.util.List">
+		update jys_orderinfo set status = 0 where id in
+		<foreach item="item" index="index" collection="list" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+	
+	<!-- 交易所需求:修改订单状态 -->
+	<update id="updateOrderStatus" parameterType="String">
+		UPDATE jys_orderinfo SET version = version + 1, `status`=#{status} WHERE id = #{orderId} AND `status`!=0
+	</update>
+	
+	<update id="updateJYSUserInfo" parameterType="java.util.Map">
+		update jys_user
+		<set>
+			version = version + 1,
+			<if test="realName != null and realName !='' ">
+				realName = #{realName},
+			</if>
+			<if test="regId != null and regId !='' ">
+				regId = #{regId}
+			</if>
+		</set>
+		where id = #{userId}
+	</update>
+	
+	<update id="updateOrderRiskStatus" parameterType="com.iqb.consumer.data.layer.bean.jys.JYSOrderBean">
+        UPDATE 
+            jys_orderinfo 
+        SET 
+            riskStatus = #{riskStatus}, upperTime = #{upperTime}
+        WHERE 
+            orderId = #{orderId}
+    </update>
+	<!-- 插入交易所订单信息 -->
+	<insert id="insertJysOrder" parameterType="com.iqb.consumer.data.layer.bean.jys.JYSOrderBean"
+			useGeneratedKeys="true"  keyProperty="id">
+		INSERT INTO jys_orderinfo (
+			orderId,
+			batchNo,
+			userId,
+			regId,
+			merchantNo,
+			bizType,
+			orderName,
+			orderAmt,
+			orderItems,
+			preAmt,
+			status,
+			wfStatus,
+			riskStatus,
+			margin,
+			downPayment,
+			serviceFee,
+			planId,
+			takePayment,
+			feeYear,
+			feeAmount,
+			monthInterest,
+			chargeWay,
+			fee,
+			expireDate,
+			createTime,
+			creditorId,
+			cfRequestMoneyId
+		)
+		VALUE
+		(
+			#{orderId},
+			#{batchNo},
+			#{userId},
+			#{regId},
+			#{merchantNo},
+			#{bizType},
+			#{orderName},
+			#{orderAmt},
+			#{orderItems},
+			#{preAmt},
+			#{status},
+			#{wfStatus},
+			#{riskStatus},
+			#{margin},
+			#{downPayment},
+			#{serviceFee},
+			#{planId},
+			#{takePayment},
+			#{feeYear},
+			#{feeAmount},
+			#{monthInterest},
+			#{chargeWay},
+			#{fee},
+			#{expireDate},
+			NOW(),
+			#{creditorId},
+			#{cfRequestMoneyId}
+		) 
+	</insert>
+	
+	   <!-- 交易所需求:查询单个订单信息 -->
+    <select id="getOrderInfoById" parameterType="String" resultMap="jysOrderInfo">
+        SELECT
+            O.userId,O.id,O.batchNo,O.orderId,O.regId,O.expireDate,O.createTime,O.planId,
+            O.orderName,O.orderAmt,O.orderItems,O.fee,O.monthInterest,O.bizType,O.merchantNo,
+            U.realName,
+            (
+                SELECT
+                    P.PLANSHORTNAME
+                FROM
+                    inst_plan P
+                WHERE
+                    P.ID = O.planId
+                LIMIT 1
+            ) AS planShortName,
+            F.CREDITNAME,
+            F.CREDITCARDNO,
+            F.CREDITBANKCARD,
+            F.CREDITBANK,
+            F.CREDITPHONE
+        FROM
+            jys_orderinfo O,
+            jys_user U,
+            jys_creditorinfo F
+        WHERE
+            U.id = O.userId
+        AND O.creditorId = F.ID
+		AND F.id  = #{orderId}
+		limit 1
+    </select>
+</mapper>

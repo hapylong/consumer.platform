@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>资产分配详情</title>
+        <meta charset="UTF-8" />
+        <meta name="Author" content="" />
+        <meta name="Keywords" content="" />
+        <meta name="Description" content="" />
+        
+        <!-- 样式库 -->
+        <link rel="stylesheet" href="../../../js/bootstrap/themes/default/bootstrap.css" />
+        <link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+        <link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+        <link rel="stylesheet" href="../../../css/jquery.select2.css" />
+        <link rel="stylesheet" href="../../../css/jquery.select2-bootstrap.css" />
+        <link rel="stylesheet" href="../../../css/jquery.datetimepicker.css" />
+        <link rel="stylesheet" href="../../../js/bootstrap/themes/default/jquery.mCustomScrollbar.css" />
+        <link rel="stylesheet" href="../../../js/prettyphoto/css/prettyPhoto.css" />
+        
+        <!-- 插件库 -->
+        <script src="../../../js/common/package.js"></script>
+        <script src="../../../js/common/url.js"></script>
+        <script src="../../../js/common/json2.js"></script> 
+        <script src="../../../js/common/jquery-1.11.3.min.js"></script>     
+        <script src="../../../js/bootstrap/bootstrap.js"></script>
+        <script src="../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+        <script src="../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+        <script src="../../../js/ztree/js/jquery.ztree.all.min.js"></script>
+        <script src="../../../js/common/jquery.select2.js"></script>
+        <script src="../../../js/common/jquery.datetimepicker.js"></script>
+        <script src="../../../js/bootstrap/plugins/jquery.mCustomScrollbar.js"></script>
+        <script src="../../../js/prettyphoto/js/jquery.prettyPhoto.js"></script>    
+        
+        <!-- 业务库 -->
+        <script src="../../../js/common/base.js"></script>
+        <script src="../../../js/common/datagrid2.js"></script>
+        <script src="../../../js/common/tree.js"></script>
+        <script src="../../../js/common/formatter.js"></script>     
+        <script src="../../../js/each/cfm/requestFunds/requestFunds.js"></script>
+        
+        
+        <!-- 页面样式 -->
+        <style type="text/css">
+            body {
+                font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif !important;
+                background:#eee url("../../../img/back.png") repeat;
+            }
+            .container-fluid {
+                padding:5px;
+            }
+            .left-part {
+                height:800px;
+            }
+            .modal-form {
+                margin:5px;
+                height:600px;
+            }
+            .text-left {
+                text-align: left;
+            }
+            .text-center {
+                text-align: center;
+            }
+            .text-right {
+                text-align: right;
+            }
+            .text-muted {
+                font-weight: bold;
+            }
+            .text-stress {
+                font-weight: bold;
+            }
+            .item-title {
+                background-color: #f5f5f5;
+            }
+            .float-left {
+                float: left;
+                margin-left: 5px;
+            }
+        </style>
+        
+    </head>
+    <body>
+        <div class="container-fluid">
+            <div class="row">               
+                <div class="col-md-12">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">资产包信息</h4>
+                        </div>
+                        <div class="panel-body">                                 
+                            <form id="updateForm" class="form-horizontal" action="http://localhost:8080/consumer.manage.front/car/add">
+                                <input name="id" type="text" class="hidden">    
+                                <input id="type" name="type" type="text" class="hidden" value="1">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">期限:</label>
+                                    <div class="col-sm-4">
+                                        <input id="merchantNo" type="text" readonly="readonly" name="merchantNo" class="form-control" title="">
+                                    </div>
+                                    <label class="col-sm-2 control-label">资产包编号:</label>
+                                    <div class="col-sm-4">
+                                        <input id="merchantNo" type="text" readonly="readonly" name="merchantNo" class="form-control" title="">
+                                    </div>
+                                </div>  
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">募集机构:</label>
+                                    <div class="col-sm-4">
+                                        <input id="merchantNo" type="text" readonly="readonly" name="merchantNo" class="form-control" title="">
+                                    </div>
+                                    <label class="col-sm-2 control-label">金额:</label>
+                                    <div class="col-sm-4">
+                                        <input id="merchantNo" type="text" readonly="readonly" name="merchantNo" class="form-control" title="">
+                                    </div>
+                                </div> 
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"><span class="VINs" style="color: red;">*</span>交易所备案编号:</label>
+                                    <div class="col-sm-4">
+                                        <input id="merchantNo" type="text"   name="merchantNo" class="form-control easyui-validatebox validatebox-text validatebox-readonly validatebox-invalid merchModel" required="required" title="">
+                                    </div>
+                                    <label class="col-sm-2 control-label">金额:</label>
+                                    <div class="col-sm-4">
+                                        <input id="merchantNo" type="text" readonly="readonly" name="merchantNo" class="form-control" title="">
+                                    </div>
+                                </div>   
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">期限:</label>
+                                    <div class="col-sm-4">
+                                        <input id="merchantNo" type="text" readonly="readonly" name="merchantNo" class="form-control" title="">
+                                    </div>
+                                    <label class="col-sm-2 control-label">利率(月):</label>
+                                    <div class="col-sm-4">
+                                        <input id="merchantNo" type="text" readonly="readonly" name="merchantNo" class="form-control" title="">
+                                    </div>
+                                </div> 
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"><span class="VINs" style="color: red;">*</span>分配渠道:</label>
+                                    <div class="col-sm-4">
+                                        <select id="merchantNo" type="text"   name="merchantNo" class="form-control easyui-validatebox validatebox-text validatebox-readonly validatebox-invalid merchModel" required="required">
+                                            <option>请选择</option>
+                                            <option>饭团</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"><span class="VINs" style="color: red;">*</span>项目名称:</label>
+                                    <div class="col-sm-4">
+                                        <input id="merchantNo" type="text"   name="merchantNo" class="form-control easyui-validatebox validatebox-text validatebox-readonly validatebox-invalid merchModel" required="required" title="">
+                                    </div>
+                                    <label class="col-sm-2 control-label"><span class="VINs" style="color: red;">*</span>产品开始时间:</label>
+                                    <div class="col-sm-4">
+                                         <input id='query_start_order_time' type="text"   name="merchantNo" class="form-control easyui-validatebox validatebox-text validatebox-readonly validatebox-invalid merchModel" required="required" title="">
+                                    </div>
+                                </div> 
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"><span class="VINs" style="color: red;">*</span>登记备案机构:</label>
+                                    <div class="col-sm-4">
+                                        <input id="merchantNo" type="text"   name="merchantNo" class="form-control easyui-validatebox validatebox-text validatebox-readonly validatebox-invalid merchModel" required="required" title="">
+                                    </div>
+                                    <label class="col-sm-2 control-label">挂牌地址(网址):</label>
+                                    <div class="col-sm-4">
+                                        <input id="merchantNo" type="text" name="merchantNo" class="form-control" title="">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"><span class="VINs" style="color: red;">*</span>项目概况:</label>
+                                    <div class="col-sm-10">
+                                        <input id="merchantNo" type="text"   name="merchantNo" class="form-control easyui-validatebox validatebox-text validatebox-readonly validatebox-invalid merchModel" required="required" title="">
+                                    </div>
+                                </div>     
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"><span class="VINs" style="color: red;">*</span>转让条件:</label>
+                                    <div class="col-sm-10">
+                                        <input id="merchantNo" type="text"   name="merchantNo" class="form-control easyui-validatebox validatebox-text validatebox-readonly validatebox-invalid merchModel" required="required" title="">
+                                    </div>
+                                </div>     
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"><span class="VINs" style="color: red;">*</span>保障方式:</label>
+                                    <div class="col-sm-10">
+                                        <input id="merchantNo" type="text"   name="merchantNo" class="form-control easyui-validatebox validatebox-text validatebox-readonly validatebox-invalid merchModel" required="required" title="">
+                                    </div>
+                                </div>
+                                <div class="form-group" style="text-align: center;">
+                                    <button id="btn-save" type="button" class="btn btn-success btn-sm">保存</button>
+                                    <button id="btn-close" type="button" class="btn btn-default btn-sm">关闭</button>       
+                                </div>                                                      
+                            </form>                                                       
+                        </div>
+                    </div>
+                </div>
+            </div>          
+        </div>
+    </body>
+</html>

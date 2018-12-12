@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	    <title>抵押车统计</title>
+	    <meta charset="UTF-8" />
+	    <meta name="Author" content="" />
+	    <meta name="Keywords" content="" />
+	    <meta name="Description" content="" />
+	    
+	    <!-- 样式库 -->
+	    <link rel="stylesheet" href="../../../../js/ztree/css/zTreeStyle/zTreeStyle.css" />
+	    <link rel="stylesheet" href="../../../../js/bootstrap/themes/default/bootstrap.css" />
+	    <link rel="stylesheet" href="../../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+	    <link rel="stylesheet" href="../../../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+	    <link rel="stylesheet" href="../../../../css/jquery.datetimepicker.css" />
+	    <link rel="stylesheet" href="../../../../css/jquery.select2.css" />
+	    <link rel="stylesheet" href="../../../../css/jquery.select2-bootstrap.css" />
+	    <!-- 插件库 -->
+	    <script src="../../../../js/common/package.js"></script>
+		<script src="../../../../js/common/url.js"></script>
+		<script src="../../../../js/common/json2.js"></script>	
+		<script src="../../../../js/common/jquery-1.11.3.min.js"></script>		
+		<script src="../../../../js/bootstrap/bootstrap.js"></script>
+		<script src="../../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+		<script src="../../../../js/common/jquery.datetimepicker.js"></script>
+		<script src="../../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+		<script src="../../../../js/ztree/js/jquery.ztree.all.min.js"></script>
+		<script src="../../../../js/common/jquery.select2.js"></script>
+		<script src="../../../../js/common/base.js"></script>
+		<script src="../../../../js/common/datagrid2.js"></script>
+		<script src="../../../../js/common/tree.js"></script>
+		<script src="../../../../js/common/formatter.js"></script>
+		 <script src="../../../../js/each/main/main.js"></script>	    
+		<script src="../../../../js/each/etep/sys/query/mortgagecarQuery.js"></script>
+		<script src="../../../../js/each/cfm/merch/merch.js"></script>
+		<!-- 页面样式 -->
+	 <style type="text/css">
+            body {background:#eee url("../../../../img/back.png") repeat;}
+            .container-fluid{
+                padding:5px;
+            }
+        </style>
+	</head>
+	<body>
+	
+		<div class="container-fluid">
+				<div class="col-md-12">
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<h3 class="panel-title">查询信息</h3>
+					  	</div>
+					  	<div class="panel-body">	
+					  		<form id="searchForm" class="form-horizontal">
+					  			<div class="form-group">
+							    	<label class="control-label col-lg-1 col-md-1 col-sm-1">商户名 </label>
+							    	<div class="col-lg-2 col-md-2 col-sm-2">
+							    	    <input id="merchNames" type="text" readonly value="全部商户" name="merchNames" class="form-control merch" onclick="showMenu(); return false;"/>
+							    	</div>
+							    	<label class="control-label col-lg-1 col-md-1 col-sm-1">订单号</label>
+							    	<div class="col-lg-2 col-md-2 col-sm-2">
+							    	    <input id="orderId" name="orderId" type="text" class="form-control input-sm" placeholder="请输入订单号">
+							    	</div>
+							    	<label class="control-label col-lg-1 col-md-1 col-sm-1">手机号</label>
+							    	<div class="col-lg-2 col-md-2 col-sm-2">
+							    	    <input id="regId" name="regId" type="text" class="form-control input-sm" placeholder="请输入手机号">
+							    	</div>
+							    	<label class="control-label col-lg-1 col-md-1 col-sm-1">姓名</label>
+							    	<div class="col-lg-2 col-md-2 col-sm-2">
+							    	    <input id="realName" name="realName" type="text" class="form-control input-sm" placeholder="请输入姓名">
+							    	</div>
+							    	</div>
+							    <div class="form-group">	
+							    	<label class="control-label col-lg-1 col-md-1 col-sm-1">支付状态</label>
+								    <div class="col-lg-2 col-md-2 col-sm-2">
+								    	<select id="status" name="status" class="form-control">
+								    	    <option value=''>请选择</option>
+								    	    <option value='0'>逾期</option>
+								    	    <option value='1'>未还款</option>
+								    	    <option value='2'>部分还款</option>
+								    	    <option value='3'>已还款</option>
+									    </select>
+								    </div>
+								    <label class="control-label col-lg-1 col-md-1 col-sm-1">最迟还款日</label>
+								    <div class="col-lg-2 col-md-2 col-sm-2">
+								        <input id="lastRepayDate" name="lastRepayDate" size="16" type="text" class="form-control" placeholder="请输入最迟还款日" style="width: 100%;">
+								    </div>
+									<div class="col-lg-3 col-md-3 col-sm-3">
+									    <button id="btn-search" type="button" class="btn btn-default btn-sm">查询</button>
+										<button id="btn-reset" type="button" class="btn btn-default btn-sm">重置</button>
+										<button id="btn-export-all" type="button" class="btn btn-success btn-sm">导出</button>  
+							  	   </div>
+							  	</div>
+							</form>		  												 	
+					  	</div>
+					</div>
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<h3 class="panel-title">抵押车统计信息</h3>
+					  	</div>
+						<table class="table table-bordered table-hover" id="datagrid">
+						    <thead>
+						    	<tr>
+							    	<th field="rn"></th>
+							    	<th field="orderId">订单编号</th>
+							    	<th field="realName">姓名</th>
+							    	<th field="regId">电话</th>
+							    	<th field="orderAmt" formatter = "Formatter.money(val)">借款金额</th>
+							    	<th field="feeratio" formatter = "$.formatMonthRatio(val)" >月利率</th>
+							    	<th field="monthInterest" formatter = "Formatter.money(val)">月供</th>
+							    	<th field="gpsTrafficFee" formatter = "Formatter.money(val)">GPS流量费</th>
+							    	<th field="repayNo">期数</th>
+							    	<th field="serviceCharge" formatter = "Formatter.money(val)">车帮服务费</th>
+							    	<th field="interestDiff" formatter = "Formatter.money(val)">商户息差</th>
+							    	<th field="feeTotal" formatter = "Formatter.money(val)">费用总额</th>
+							    	<th field="applyTime" formatter = "Formatter.dateFund(val)">上标日期</th>
+							    	<th field="orderItems">总期数</th>
+							    	<th field="lastRepayDate" formatter = "Formatter.dateFund(val)">最迟还款日</th>
+							    	<th field="status"  formatter = $.getRiskstatus(val)>还款状态</th>
+							    	<th field="merchantName">商户名称</th>  	
+						    	</tr>
+						    </thead>
+						    <tbody></tbody>
+						</table>
+					  	<div class="panel-footer">
+							<div id="paginator"></div>
+						</div>
+					</div>
+				</div>
+			</div>		 	
+		</div>
+		<div id="menuContent" class="menuContent" style="max-height:500px;overflow:scroll;display:none; position: absolute;background:#fff;border:1px solid #ccc;">
+	        <ul id="treeDemo" class="ztree" style="margin-top:0;"></ul>
+        </div>
+	</body>
+</html>

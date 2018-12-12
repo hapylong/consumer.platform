@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+	Apache License, Version 2.0 (the "License"); you may not use this file except 
+	in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.wf.StatusFlowDao">
+	<sql id="table">inst_statusflow</sql>
+	<!-- 配置映射字段 -->
+	<resultMap type="com.iqb.consumer.data.layer.bean.wf.StatusFlowBean"
+		id="statusFlowBean">
+		<result property="bizType" 			column="bizType" />
+		<result property="dealType" 		column="dealType" />
+		<result property="procCurrTask" 	column="procCurrTask" />
+		<result property="procApprStatus" 	column="procApprStatus" />
+		<result property="wfStatus" 		column="wfStatus" />
+		<result property="riskStatus" 		column="riskStatus" />
+		<result property="goalWfStatus" 	column="goalWfStatus" />
+		<result property="goalRiskStatus" 	column="goalRiskStatus" />
+		<result property="goalStatus" 		column="goalStatus" />
+		<result property="match" 			column="match" />
+		<result property="preAmtStatus" 	column="preAmtStatus" />
+		<result property="remark" 			column="remark" />
+		<result property="version" 			column="version" />
+		<result property="createTime" 		column="createTime" />
+		<result property="updateTime" 		column="updateTime" />
+	</resultMap>
+
+	<sql id="cols">
+		bizType,dealType,procCurrTask,procApprStatus,wfStatus,riskStatus,goalWfStatus,goalRiskStatus,goalStatus,'match',preAmtStatus,remark,version,createTime,updateTime
+	</sql>
+	<!-- 根据条件查询工作流-流程单条记录 -->
+	<select id="selectOne" parameterType="java.util.Map"
+		resultMap="statusFlowBean">
+		SELECT
+		<include refid="cols" />
+		from <include refid="table" />
+		where 1=1
+		<if test="bizType != null and bizType != ''">
+			AND bizType = #{bizType}
+		</if>
+		<if test="dealType != null and dealType != ''">
+			AND dealType = #{dealType}
+		</if>
+		<if test="procCurrTask != null and procCurrTask != ''">
+			AND procCurrTask = #{procCurrTask}
+		</if>
+		<if test="procApprStatus != null and procApprStatus != ''">
+			AND procApprStatus = #{procApprStatus}
+		</if>
+	</select>
+	
+	<select id="selectStatusFlowListByParams" parameterType="java.util.Map"
+		resultMap="statusFlowBean">
+		SELECT
+		<include refid="cols" />
+		from <include refid="table" />
+		where 1=1
+		<if test="bizType != null and bizType != ''">
+			AND bizType = #{bizType}
+		</if>
+		<if test="dealType != null and dealType != ''">
+			AND dealType = #{dealType}
+		</if>
+		<if test="procCurrTask != null and procCurrTask != ''">
+			AND procCurrTask = #{procCurrTask}
+		</if>
+		<if test="procApprStatus != null and procApprStatus != ''">
+			AND procApprStatus = #{procApprStatus}
+		</if>
+	</select>
+	
+	<!-- 根据条件修改工作流-流程记录-->
+	<update id="updateStatusFlowByParams" parameterType="java.util.Map">
+		UPDATE 
+		<include refid="table" />
+		<set>
+			VERSION = #{version}+1 ,
+			<if test="bizType != null and bizType != '' ">
+				BIZTYPE = #{bizType},
+			</if>
+			<if test="dealType != null and dealType != '' ">
+				DEALTYPE = #{dealType},
+			</if>
+			<if test="procCurrTask != null and procCurrTask != '' ">
+				PROCURRTASK = #{procCurrTask},
+			</if>
+			<if test="procApprStatus !=null and procApprStatus !='' ">
+				PROAPPRSTATUS = #{procApprStatus},
+			</if>
+			<if test="wfStatus != null and wfStatus != '' ">
+				WFSTATUS = #{wfStatus},
+			</if>
+			<if test="riskStatus != null and riskStatus != '' ">
+				RISKSTATUS = #{riskStatus},
+			</if>
+			<if test="goalWfStatus != null and goalWfStatus != '' ">
+				GOALWFSTATUS = #{goalWfStatus},
+			</if>
+			<if test="goalRiskStatus != null and goalRiskStatus != '' ">
+				GOALRISKSTATUS = #{goalRiskStatus},
+			</if>
+			<if test="goalStatus != null and goalStatus != '' ">
+				GOALSTATUS = #{goalStatus},
+			</if>
+			<if test="match != null and match != '' ">
+				MATCH = #{match},
+			</if>
+			<if test="preAmtStatus != null and preAmtStatus != '' ">
+				PPEAMTSTATUS = #{preAmtStatus},
+			</if>
+			<if test="remark != null and remark != '' ">
+				REMARK = #{remark},
+			</if>
+			UPDATETIME = NOW()
+		</set>
+		<where>
+		    	1=1
+			<if test="bizType != null and bizType != '' ">
+				AND BIZTYPE = #{bizType},
+			</if>
+			<if test="dealType != null and dealType != '' ">
+				AND DEALTYPE = #{dealType},
+			</if>
+			<if test="procCurrTask != null and procCurrTask != '' ">
+				AND PROCURRTASK = #{procCurrTask},
+			</if>
+			<if test="procApprStatus !=null and procApprStatus !='' ">
+				AND PROAPPRSTATUS = #{procApprStatus},
+			</if>
+		</where>
+	</update>
+	
+</mapper>

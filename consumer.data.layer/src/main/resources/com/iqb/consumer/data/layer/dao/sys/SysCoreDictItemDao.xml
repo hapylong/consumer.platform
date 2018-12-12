@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+	Apache License, Version 2.0 (the "License"); you may not use this file except 
+	in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.sys.SysCoreDictItemDao">
+
+	<!-- 配置映射字段 -->
+	<resultMap type="com.iqb.consumer.data.layer.bean.plan.SysDictItem"
+		id="sysDictItem">
+		<result column="DICT_TYPE_CODE" property="dictDypeCode" />
+		<result column="DICT_NAME" property="dictName" />
+		<result column="DICT_CODE" property="dictCode" />
+		<result column="DICT_VALUE" property="dictValue" />
+		<result column="CASCADE_CODE" property="casCadeCode" />
+		<result column="REMARK" property="remark" />
+		<result column="IS_ENABLE" property="isEnable" />
+	</resultMap>
+
+	<!-- 通过字典类型查询所有字典信息 -->
+	<select id="selDictItem" resultMap="sysDictItem" parameterType="String">
+		SELECT
+		DICT_TYPE_CODE,DICT_NAME,DICT_CODE,DICT_VALUE,CASCADE_CODE,REMARK,IS_ENABLE
+		from iqb_sys_dict_item WHERE IS_ENABLE = 1 AND
+		dict_type_code=#{dictDypeCode};
+	</select>
+
+	<!-- 查询业务类型 -->
+	<select id="selBizType" resultMap="sysDictItem" parameterType="String">
+		SELECT
+		DICT_TYPE_CODE,DICT_NAME,DICT_CODE,DICT_VALUE,CASCADE_CODE,REMARK,IS_ENABLE
+		from iqb_sys_dict_item WHERE IS_ENABLE = 1 AND
+		DICT_TYPE_CODE='business_type' AND DICT_NAME=#{dictName};
+	</select>
+	
+	<select id="getDictByDTCAndDC" resultMap="sysDictItem" parameterType="Map">
+        SELECT
+            dict_type_code,dict_name,dict_code,dict_value,cascade_code,remark,is_enable
+        FROM 
+            iqb_sys_dict_item 
+        WHERE 
+            is_enable = 1 
+        AND
+            dict_type_code=#{dtc} 
+        AND 
+            dict_code=#{dc};
+    </select>
+    
+    <select id="getDictByDTCAndDN" resultMap="sysDictItem" parameterType="Map">
+        SELECT
+            dict_type_code,dict_name,dict_code,dict_value,cascade_code,remark,is_enable
+        FROM 
+            iqb_sys_dict_item 
+        WHERE 
+            is_enable = 1 
+        AND
+            dict_type_code=#{dtc} 
+        AND 
+            dict_name=#{dName};
+    </select>
+</mapper>

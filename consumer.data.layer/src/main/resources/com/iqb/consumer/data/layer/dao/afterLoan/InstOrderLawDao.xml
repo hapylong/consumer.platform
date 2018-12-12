@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+    Apache License, Version 2.0 (the "License"); you may not use this file except 
+    in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+    Unless required by applicable law or agreed to in writing, software distributed 
+    under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+    OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+    the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.afterLoan.InstOrderLawDao">
+     
+     <insert id="saveInstOrderLawnInfo" parameterType="com.alibaba.fastjson.JSONObject" keyProperty="id"
+        useGeneratedKeys="true">
+        INSERT INTO 
+            inst_order_law
+            (
+                <if test="caseId != null and caseId != ''">
+                    caseId,
+                </if>
+                <if test="orderId != null and orderId != ''">
+                    orderId,
+                </if>
+                <if test="reason != null and reason != ''">
+                    reason,
+                </if>
+                <if test="accuserFlag != null and accuserFlag != ''">
+                    accuserFlag,
+                </if>
+                <if test="claimRequest != null and claimRequest != ''">
+                    claimRequest,
+                </if>
+                <if test="registerFlag != null and registerFlag != ''">
+                    registerFlag,
+                </if>
+                <if test="register != null and register != ''">
+                    register,
+                </if>
+                <if test="payFlag != null and payFlag != ''">
+                    payFlag,
+                </if>
+                <if test="associatedAgency != null and associatedAgency != ''">
+                    associatedAgency,
+                </if>
+                <if test="mandatoryLawyer != null and mandatoryLawyer != ''">
+                    mandatoryLawyer,
+                </if>
+                 <if test="acceptOrg != null and acceptOrg != ''">
+                    acceptOrg,
+                </if>
+                <if test="legalCost != null and legalCost != ''">
+                    legalCost,
+                </if>
+                <if test="barFee != null and barFee != ''">
+                    barFee,
+                </if>
+                <if test="registerDate != null and registerDate != ''">
+                    registerDate,
+                </if>
+                <if test="registerRemark != null and registerRemark != ''">
+                    registerRemark,
+                </if>
+                <if test="composeFlag != null and composeFlag != ''">
+                    composeFlag,
+                </if>
+                <if test="compromiseFlag != null and compromiseFlag != ''">
+                    compromiseFlag,
+                </if>
+                <if test="caseNo != null and caseNo != ''">
+                    caseNo,
+                </if>
+                <if test="caseStatus != null and caseStatus != ''">
+                    caseStatus,
+                </if>
+                <if test="caseSource != null and caseSource != ''">
+                    caseSource,
+                </if>
+                
+                version,createTime
+            )
+        VALUES
+            (
+                <if test="caseId != null and caseId != ''">
+                    #{caseId},
+                </if>
+                 <if test="orderId != null and orderId != ''">
+                    #{orderId},
+                </if>
+                <if test="reason != null and reason != ''">
+                    #{reason},
+                </if>
+                <if test="accuserFlag != null and accuserFlag != ''">
+                    #{accuserFlag},
+                </if>
+                <if test="claimRequest != null and claimRequest != ''">
+                    #{claimRequest},
+                </if>
+                <if test="registerFlag != null and registerFlag != ''">
+                    #{registerFlag},
+                </if>
+                <if test="register != null and register != ''">
+                    #{register},
+                </if>
+                <if test="payFlag != null and payFlag != ''">
+                    #{payFlag},
+                </if>
+                <if test="associatedAgency != null and associatedAgency != ''">
+                    #{associatedAgency},
+                </if>
+                <if test="mandatoryLawyer != null and mandatoryLawyer != ''">
+                    #{mandatoryLawyer},
+                </if>
+                 <if test="acceptOrg != null and acceptOrg != ''">
+                    #{acceptOrg},
+                </if>
+                <if test="legalCost != null and legalCost != ''">
+                    #{legalCost},
+                </if>
+                <if test="barFee != null and barFee != ''">
+                    #{barFee},
+                </if>
+                <if test="registerDate != null and registerDate != ''">
+                    #{registerDate},
+                </if>
+                <if test="registerRemark != null and registerRemark != ''">
+                    #{registerRemark},
+                </if>
+                <if test="composeFlag != null and composeFlag != ''">
+                    #{composeFlag},
+                </if>
+                <if test="compromiseFlag != null and compromiseFlag != ''">
+                    #{compromiseFlag},
+                </if>
+                 <if test="caseNo != null and caseNo != ''">
+                    #{caseNo},
+                </if>
+                <if test="caseStatus != null and caseStatus != ''">
+                    #{caseStatus},
+                </if>
+                <if test="caseSource != null and caseSource != ''">
+                    #{caseSource},
+                </if>
+                1, NOW()
+           )
+    </insert>
+    <!--更新案件登记资料-->
+    <update id="updateInstOrderLawnInfo" parameterType="com.alibaba.fastjson.JSONObject">
+        update
+        inst_order_law
+        <set>
+                 updateTime = NOW(),
+                <if test="reason != null and reason != ''">
+                    reason = #{reason},
+                </if>
+                <if test="accuserFlag != null">
+                    accuserFlag = #{accuserFlag,jdbcType=BIT},
+                </if>
+                <if test="claimRequest != null and claimRequest != ''">
+                    claimRequest = #{claimRequest},
+                </if>
+                <if test="registerFlag != null">
+                    registerFlag = #{registerFlag,jdbcType=BIT},
+                </if>
+                <if test="register != null and register != ''">
+                    register = #{register},
+                </if>
+                <if test="payFlag != null">
+                    payFlag = #{payFlag,jdbcType=BIT},
+                </if>
+                <if test="associatedAgency != null and associatedAgency != ''">
+                    associatedAgency = #{associatedAgency},
+                </if>
+                <if test="mandatoryLawyer != null and mandatoryLawyer != ''">
+                    mandatoryLawyer = #{mandatoryLawyer},
+                </if>
+                 <if test="acceptOrg != null and acceptOrg != ''">
+                    acceptOrg = #{acceptOrg},
+                </if>
+                <if test="legalCost != null and legalCost != ''">
+                    legalCost = #{legalCost},
+                </if>
+                <if test="barFee != null and barFee != ''">
+                    barFee = #{barFee},
+                </if>
+                <if test="registerDate != null and registerDate != ''">
+                    registerDate = #{registerDate},
+                </if>
+                <if test="registerRemark != null and registerRemark != ''">
+                    registerRemark = #{registerRemark},
+                </if>
+                <if test="composeRemark != null and composeRemark != ''">
+                    composeRemark = #{composeRemark},
+                </if>
+                <if test="composeFlag != null">
+                    composeFlag = #{composeFlag,jdbcType=BIT},
+                </if>
+                <if test="compromiseFlag != null and compromiseFlag !=''">
+                    compromiseFlag = #{compromiseFlag},
+                </if>
+                <if test="caseStatus != null">
+                    caseStatus = #{caseStatus,jdbcType=BIT},
+                </if>
+                <if test="caseNo != null and caseNo !=''">
+                    caseNo = #{caseNo},
+                </if>
+        </set>
+        where caseId = #{caseId}
+    </update>
+    <!-- 根据订单号查询案件登记信息 -->
+    <select id="getInstOrderLawnInfoByCaseId" parameterType="com.alibaba.fastjson.JSONObject" resultType="com.iqb.consumer.data.layer.bean.afterLoan.InstOrderLawBean">
+        SELECT 
+			A.caseId,
+			A.orderId,
+			A.reason,
+			A.accuserFlag,
+			A.claimRequest,
+			A.registerFlag,
+			A.register,
+			A.payFlag,
+			A.associatedAgency,
+			A.mandatoryLawyer,
+			A.acceptOrg,
+			A.legalCost,
+			A.barFee,
+			A.registerDate,
+			A.registerRemark,
+			A.composeRemark,
+			A.composeFlag,
+			A.compromiseFlag,
+			A.caseNo,
+			A.caseStatus,
+			A.caseSource,
+			DATE_FORMAT(A.createTime,'%Y年%m月%d日') as createTime
+			from inst_order_law A
+		where A.caseId = #{caseId} limit 1 
+    </select>
+    <!-- 根据订单号查询案件登记资料列表 -->
+    <select id="selectInstOrderLawnInfoByOrderId" parameterType="com.alibaba.fastjson.JSONObject" resultType="com.iqb.consumer.data.layer.bean.afterLoan.InstOrderLawBean">
+        select * from inst_order_law where caseId = #{caseId}
+    </select>
+    <!-- 根据caseNo查询案件信息 -->
+    <select id="selectInstOrderLawnInfoByCaseNo" parameterType="com.alibaba.fastjson.JSONObject" resultType="com.iqb.consumer.data.layer.bean.afterLoan.InstOrderLawBean">
+        select * from inst_order_law where caseNo = #{caseNo}
+    </select>
+</mapper>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iqb.consumer.asset.allocation.assetinfo.dao.AllocationChannelDao" >
+
+	<resultMap type="com.iqb.consumer.asset.allocation.assetinfo.bean.AllocationChannelBean" id="allocationChannelBean">
+		<result property="id" 					column="ID" />
+		<result property="bizType" 				column="BIZTYPE" />
+		<result property="sourcesFunding" 		column="SOURCESFUNDING" />
+		<result property="status"		 		column="STATUS" />
+		<result property="bizTypeName" 			column="BIZTYPENAME" />
+		<result property="sourcesFundName" 		column="SOURCESFUNDNAME" />
+		<result property="updateTime" 			column="UPDATETIME" />
+		<result property="createTime" 			column="CREATETIME" />
+	</resultMap>
+	
+	<!-- 保存资产分配渠道配置-->
+	<insert id="insertAllocationChannel" parameterType="com.iqb.consumer.asset.allocation.assetinfo.bean.AllocationChannelBean" keyProperty="id"
+		useGeneratedKeys="true">
+		INSERT INTO inst_allocation_channel(BIZTYPE, SOURCESFUNDING,STATUS,CREATETIME) VALUES (#{bizType}, #{sourcesFunding},#{status},now())
+	</insert>
+	
+	<!-- 更新资产分配渠道配置  -->
+	<update id="updateAllocationChannelById" parameterType="java.util.Map">
+		UPDATE inst_allocation_channel 
+		<set>
+			<if test="bizType != null and bizType != ''">
+				BIZTYPE = #{bizType},
+			</if>	
+			<if test="sourcesFunding != null ">
+				SOURCESFUNDING = #{sourcesFunding},
+			</if>
+			<if test="status != null and status != ''">
+				STATUS = #{status},
+			</if>
+			updateTime = now()
+		</set>
+		WHERE ID = #{id}
+	</update>
+
+	<!-- 获取资产分配渠道配置列表  -->
+	<select id="getAlloactionChannelList" parameterType="java.util.Map"  resultMap="allocationChannelBean">
+		SELECT
+			A.id,
+			A.bizType,
+			B.DICT_NAME bizTypeName,
+			A.sourcesFunding,
+			C.DICT_NAME sourcesFundName
+		FROM
+			inst_allocation_channel A
+		LEFT JOIN iqb_sys_dict_item B ON A.BIZTYPE = B.DICT_CODE
+		AND B.DICT_TYPE_CODE = 'business_type'
+		LEFT JOIN iqb_sys_dict_item C ON A.SOURCESFUNDING = C.DICT_VALUE
+		AND C.DICT_TYPE_CODE = 'fund_source'
+	</select>
+	
+</mapper>

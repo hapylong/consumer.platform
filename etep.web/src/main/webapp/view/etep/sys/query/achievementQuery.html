@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	    <title>业绩统计</title>
+	    <meta charset="UTF-8" />
+	    <meta name="Author" content="" />
+	    <meta name="Keywords" content="" />
+	    <meta name="Description" content="" />
+	    
+	    <!-- 样式库 -->
+	    <link rel="stylesheet" href="../../../../js/bootstrap/themes/default/bootstrap.css" />
+	    <link rel="stylesheet" href="../../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+	    <link rel="stylesheet" href="../../../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+	    <link rel="stylesheet" href="../../../../css/jquery.datetimepicker.css" />
+	    <link rel="stylesheet" href="../../../../css/jquery.select2.css" />
+	    <link rel="stylesheet" href="../../../../css/jquery.select2-bootstrap.css" />
+	    <!-- 插件库 -->
+	    <script src="../../../../js/common/package.js"></script>
+		<script src="../../../../js/common/url.js"></script>
+		<script src="../../../../js/common/json2.js"></script>	
+		<script src="../../../../js/common/jquery-1.11.3.min.js"></script>		
+		<script src="../../../../js/bootstrap/bootstrap.js"></script>
+		<script src="../../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+		<script src="../../../../js/common/jquery.datetimepicker.js"></script>
+		<script src="../../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+		<script src="../../../../js/ztree/js/jquery.ztree.all.min.js"></script>
+		<script src="../../../../js/common/jquery.select2.js"></script>
+		<script src="../../../../js/common/base.js"></script>
+		<script src="../../../../js/common/datagrid2.js"></script>
+		<script src="../../../../js/common/tree.js"></script>
+		<script src="../../../../js/common/formatter.js"></script>
+		 <script src="../../../../js/each/main/main.js"></script>	    
+		<script src="../../../../js/each/etep/sys/query/achievementQuery.js"></script>
+		<!-- 页面样式 -->
+	 <style type="text/css">
+            body {background:#eee url("../../../../img/back.png") repeat;}
+            .container-fluid{
+                padding:5px;
+            }
+        </style>
+	</head>
+	<body>
+	
+		<div class="container-fluid">
+				<div class="col-md-12">
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<h3 class="panel-title">查询信息</h3>
+					  	</div>
+					  	<div class="panel-body">	
+					  		<form id="searchForm" class="form-horizontal">
+					  		    <div class="form-group">
+					  		        <input id="search-orderId" name="orderId" type="text" class="hidden" />
+					  		        <label class="control-label col-lg-1 col-md-1 col-sm-1">上标ID</label>
+							    	<div class="col-lg-2 col-md-2 col-sm-2">
+							    	    <input name="pushId" type="text" class="form-control input-sm" placeholder="请输入上标ID">
+							    	</div>
+							    	<label class="control-label col-lg-1 col-md-1 col-sm-1">上标时间</label>
+							    	<div class="col-lg-2 col-md-2 col-sm-2">
+							    	    <input id="dateStart" name="queryStartTime" size="16" type="text" class="form-control input-sm" placeholder="" style="width: 90%;">
+                                    </div>
+                                    <label class="control-label col-lg-1 col-md-1 col-sm-1">至</label>
+                                    <div class="col-lg-2 col-md-2 col-sm-2">
+                                        <input id="dateEnd" name="queryEndTime" size="16" type="text" class="form-control input-sm" placeholder="" style="width: 90%;">
+                                    </div>
+                                </div>	
+							    <div class="form-group">    
+                                    <label class="control-label col-lg-1 col-md-1 col-sm-1">担保公司</label>
+	                                <div class="col-lg-2 col-md-2 col-sm-2">
+	                                    <select name="guarntee" type="text" class="form-control input-sm" style='width:100%'>
+								    	</select>
+							    	</div>
+							    	<label class="control-label col-lg-1 col-md-1 col-sm-1">借款金额</label>
+							    	<div class="col-lg-2 col-md-2 col-sm-2">
+							    	    <input name="startAmount" type="text" class="form-control input-sm" placeholder="请输入借款金额"  style="width: 90%;">
+							    	</div>
+							    	<label class="control-label col-lg-1 col-md-1 col-sm-1">至</label>
+							    	<div class="col-lg-2 col-md-2 col-sm-2">
+							    	    <input name="endAmount" type="text" class="form-control input-sm" placeholder="请输入借款金额"  style="width: 90%;">
+							    	</div>
+							     </div>	
+							     <div class="form-group"> 	
+							    	<label class="control-label col-lg-1 col-md-1 col-sm-1">借款总期限</label>
+							    	<div class="col-lg-2 col-md-2 col-sm-2">
+							    	    <select id="query_stage_number" name="orderItems" class="form-control input-sm"  style='width:90%'>
+							    	    </select>
+							    	</div>
+							    	<label class="control-label col-lg-1 col-md-1 col-sm-1">状态</label>
+								    <div class="col-lg-2 col-md-2 col-sm-2">
+								    	<select class="form-control input-sm" name="riskStatus" style='width:100%'>
+									    	<option value="">选择</option>
+		                                    <option value=1>已上标</option>
+		                                    <option value=0>待上标</option>
+	                                    </select>
+	                                </div>
+	                                 <label class="control-label col-lg-1 col-md-1 col-sm-1">订单号</label>
+							    	<div class="col-lg-2 col-md-2 col-sm-2">
+							    	    <input name="orderId" type="text" class="form-control input-sm" placeholder="请输入订单号" style="width: 90%;">
+							    	</div>
+	                                <div class="col-lg-3 col-md-3 col-sm-3">
+	                                    <button id="btn-search" type="button" class="btn btn-default btn-sm">查询</button>
+									    <button id="btn-reset" type="button" class="btn btn-default btn-sm">重置</button>
+									    <button id="btn-export-all" type="button" class="btn btn-success btn-sm">导出</button>
+					  		        </div>
+					  		    </div>
+							</form>		  												 	
+					  	</div>
+					</div>
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<h3 class="panel-title">业绩信息</h3>
+					  	</div>
+						<table class="table table-bordered table-hover" id="datagrid">
+						    <thead>
+						    	<tr>
+							    	<th field="rn"></th>
+							    	<th field="orderId">订单编号</th>
+							    	<th field="requestMoneyId" formatter = $.formatId(val)>上标ID</th>
+							    	<th field="requestTime" formatter = "Formatter.dateFund(val)">上标时间</th>
+							    	<th field="id" idField="true" hidden="true">ID</th>
+							    	<th field="realName">债权人</th>
+							    	<th field="guarntee">担保公司</th>
+							    	<th field="orderName">标题名称</th>
+							    	<th field="orderAmt" formatter = "Formatter.money(val)">借款金额</th>
+							    	<th field="orderItems">借款总期限</th>
+							    	<th field="orderPeriod">借款期限</th>
+							    	<th field="requestPeriod" formatter="$.formatReqId(val)">期数</th>
+							    	<th field="olderIds">以前期限ID</th>
+							    	<th field="margin" formatter = "Formatter.money(val)">保证金金额</th>
+							    	<th field="downPayment" formatter = "Formatter.money(val)">首付金额</th>
+							    	<th field="serviceFee" formatter = "Formatter.money(val)">上收息金额</th>
+							    	<th field="total" formatter = "$.getTotal(val, row, rowIndex)">收款合计</th>
+							    	<th field="requestStatus"  formatter = $.getRiskstatus(val)>状态</th>
+						    	</tr>
+						    </thead>
+						    <tbody></tbody>
+						</table>
+					  	<div class="panel-footer">
+							<div id="paginator"></div>
+						</div>
+					</div>
+				</div>
+			</div>		 	
+		</div>
+			
+	</body>
+</html>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iqb.consumer.data.layer.dao.pledge.PledgeInquiryDao">
+
+	<resultMap id="PledgeInfoBeanEntity"
+		type="com.iqb.consumer.data.layer.bean.Pledge.PledgeInfoBean">
+		<id column="ID" property="id"></id>
+		<result column="orderid" property="orderId"></result>
+		<result column="plate" property="plate"></result>
+		<result column="carType" property="carType"></result>
+		<result column="engine" property="engine"></result>
+		<result column="registAdd" property="registAdd"></result>
+		<result column="registDate" property="registDate"></result>
+		<result column="carNo" property="carNo"></result>
+		<result column="mileage" property="mileage"></result>
+		<result column="version" property="version"></result>
+		<result column="createTime" property="createTime"></result>
+		<result column="updateTime" property="updateTime"></result>
+		<result column="rfid" property="rfid"></result>
+		<result column="selectRZ" property="selectRZ"></result>
+		<result column="remark" property="remark"></result>
+		<result column="orderName" property="orderName"></result>
+		<result column="applyAmt" property="applyAmt"></result>
+		<result column="assessPrice" property="assessPrice"></result>
+		<result column="merchantNo" property="merchantNo"></result>
+		<result column="carBrand" property="carBrand"></result>
+		<result column="carDetail" property="carDetail"></result>
+	</resultMap>
+	
+	<sql id="table_pledge_info">inst_pledgeinfo p</sql>
+	<sql id="table_order_info">inst_orderinfo o</sql>
+	
+	<sql id="cols_pledge_info">
+		p.id,
+		p.orderId,
+		p.plate,
+		p.carType,
+		p.engine,
+		p.registAdd,
+		p.registDate,
+		p.carNo,
+		p.mileage,
+		p.version,
+		p.createTime,
+		p.updateTime,
+		p.rfid,
+		p.selectRZ,
+		p.remark,
+		p.applyAmt,
+		p.assessPrice,
+		p.merchantNo,
+		p.carBrand,
+		p.carDetail
+	</sql>
+	<sql id="cols_order_info">
+		o.orderName,
+		o.applyAmt,
+		o.assessPrice,
+		o.merchantNo
+	</sql>
+	
+	<select id="getPledgeOrderInfo" resultMap="PledgeInfoBeanEntity" >
+		SELECT
+		<include refid="cols_pledge_info" />
+		FROM
+		<include refid="table_pledge_info" />
+		<where>
+			p.id =#{orderId}
+		</where>
+	</select>
+	
+	<select id="getUuidByOid" resultType="java.lang.String" >
+        SELECT
+            id
+        FROM
+            inst_pledgeinfo
+        WHERE
+            orderid = #{orderId}
+    </select>
+	
+	<update id="updateOrderInfo" parameterType="java.util.Map">
+		UPDATE
+		<include refid="table_order_info" />
+		SET
+			o.applyAmt=#{applyAmt},o.assessPrice=#{assessPrice},o.wfStatus=#{wfStatus}
+		<where>
+			<if test="orderId !=null and orderId != '' ">o.orderId = #{orderId}</if>
+		</where>
+	</update>
+	
+	<update id="updatePledgeInfo" parameterType="java.util.Map">
+		UPDATE
+		<include refid="table_pledge_info" />
+		SET
+			p.remark=#{remark},p.applyAmt=#{applyAmt},p.assessPrice=#{assessPrice}
+		<where>
+			<if test="orderId !=null and orderId != '' ">p.id =#{orderId}</if>
+		</where>
+	</update>
+	
+	<update id="updateOrderInfoRiskStatus" parameterType="java.util.Map">
+		UPDATE
+		<include refid="table_order_info" />
+		SET
+			o.riskStatus=#{riskStatus}
+		<where>
+			<if test="orderId !=null and orderId != '' ">o.id = #{orderId}</if>
+		</where>
+	</update>
+	
+	<update id="updatePledgeStatus" parameterType="java.util.Map">
+		UPDATE <include refid="table_pledge_info" /> SET p.status = #{status} 
+		<where>
+			<if test="orderId !=null and orderId != '' ">p.id = #{orderId}</if>
+		</where>
+	</update>
+</mapper>

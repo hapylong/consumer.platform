@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+	Apache License, Version 2.0 (the "License"); you may not use this file except 
+	in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.admin.AdminRepository">
+	
+	<resultMap id="isoieMap" type="com.iqb.consumer.data.layer.bean.admin.entity.IqbSysOrganizationInfoEntity">
+	    <id column="ID" jdbcType="INTEGER" property="id" />
+	    <result column="ORG_CODE" jdbcType="VARCHAR" property="orgCode" />
+	    <result column="ORG_NAME" jdbcType="VARCHAR" property="orgName" />
+	    <result column="ORG_SHORT_NAME" jdbcType="VARCHAR" property="orgShortName" />
+	    <result column="ORG_ADDR" jdbcType="VARCHAR" property="orgAddr" />
+	    <result column="ORG_ZIP" jdbcType="VARCHAR" property="orgZip" />
+	    <result column="ORG_PHONE" jdbcType="VARCHAR" property="orgPhone" />
+	    <result column="ORG_EMAIL" jdbcType="VARCHAR" property="orgEmail" />
+	    <result column="ORG_CONTACT" jdbcType="VARCHAR" property="orgContact" />
+	    <result column="ORG_TYPE" jdbcType="VARCHAR" property="orgType" />
+	    <result column="ORG_ORDER" jdbcType="TINYINT" property="orgOrder" />
+	    <result column="PARENT_ID" jdbcType="INTEGER" property="parentId" />
+	    <result column="ORG_LEVEL" jdbcType="TINYINT" property="orgLevel" />
+	    <result column="CREATE_USER" jdbcType="VARCHAR" property="createUser" />
+	    <result column="CREATE_TIME" jdbcType="INTEGER" property="createTime" />
+	    <result column="LAST_USER" jdbcType="VARCHAR" property="lastUser" />
+	    <result column="LAST_TIME" jdbcType="INTEGER" property="lastTime" />
+	    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+	    <result column="DELETE_FLAG" jdbcType="TINYINT" property="deleteFlag" />
+	    <result column="VERSION" jdbcType="TINYINT" property="version" />
+	    <result column="LAST_CAS_ID" jdbcType="BIGINT" property="lastCasId" />
+	  </resultMap>
+    
+	<select id="getIDIEByOrgCodeAndOrgLevel" parameterType="java.util.Map" resultMap="isoieMap">
+	   SELECT
+	       *
+	   FROM
+	       iqb_sys_organization_info
+	   WHERE
+	       org_code=#{orgCode}
+	   limit 1
+	</select>
+	
+	<update id="casChangeOrgCodeTCP" parameterType="com.iqb.consumer.data.layer.bean.admin.pojo.TableColumnPair">
+	   UPDATE 
+	       ${table} 
+	   SET 
+	       ${column}=#{codeB} 
+	   WHERE 
+	       ${column}=#{codeA}
+    </update>
+    <update id="casChangeOrgCodeSTC" parameterType="com.iqb.consumer.data.layer.bean.admin.pojo.SpecialTableColumn">
+       UPDATE 
+           ${table} 
+       SET 
+           ${column}=#{codeB} 
+       WHERE 
+           ${column}=#{codeA}
+       AND
+           ${knownColumn}=#{knownValue}
+    </update>
+    <update id="casUpdateMgLogMsg" parameterType="java.util.Map">
+       UPDATE 
+           iqb_ec_mq_log
+       SET 
+           msg=replace(msg, #{codeA}, #{codeB}) 
+    </update>
+    <insert id="persistCOCRE" parameterType="com.iqb.consumer.data.layer.bean.admin.entity.CASOrgCodeRecordEntity">  
+	    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+	        SELECT LAST_INSERT_ID()
+	    </selectKey>
+	    INSERT INTO 
+	        cas_org_code_record
+	        (last_cas_id, code_a, code_b, `describe`, `snapshot`, create_time, org_level, parent_id, last_parent_id)  
+	    VALUES
+	        (#{lastCasId},#{codeA},#{codeB},#{describe},#{snapshot},#{createTime},#{orgLevel},#{parentId},#{lastParentId}) 
+    </insert>
+    <update id="casUpdateISOI" parameterType="com.iqb.consumer.data.layer.bean.admin.entity.CASOrgCodeRecordEntity">
+       UPDATE 
+           iqb_sys_organization_info
+       SET 
+           org_code = #{codeB}, parent_id = #{parentId}, org_level = #{orgLevel}, last_cas_id = #{id}
+       WHERE 
+           org_code = #{codeA}
+    </update>
+    
+    <select id="getICPEByMerchantNo" parameterType="java.lang.String" resultType="com.iqb.consumer.data.layer.bean.admin.entity.IqbCustomerPermissionEntity">
+       SELECT
+           *
+       FROM
+           iqb_customer_permission
+       WHERE
+           merchantno=#{merchantNo}
+           limit 1
+    </select>
+    
+    <select id="getMerchantTreeList" parameterType="java.lang.Integer" resultType="com.iqb.consumer.data.layer.bean.admin.pojo.MerchantTreePojo">
+        SELECT 
+            id, level, parentId, merchantNo, merchantShortName
+        FROM 
+            inst_merchantinfo
+        <if test="concatId !=null">
+            WHERE 
+	            id 
+	        LIKE CONCAT(#{concatId},'%');
+        </if> 
+    </select>
+    
+    <select id="isMerchantNoExit" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT 
+            count(id)
+        FROM 
+            inst_merchantinfo
+        WHERE
+            merchantno = #{merchantNo}
+    </select>
+    
+    <insert id="saveOrUpdateICPE" parameterType="com.iqb.consumer.data.layer.bean.admin.entity.IqbCustomerPermissionEntity">
+	  <selectKey keyProperty="saveOrUpdate" resultType="int" order="BEFORE">
+	    SELECT count(*) FROM iqb_customer_permission WHERE merchantno = #{merchantNo}
+	  </selectKey>
+	  <if test="saveOrUpdate == 1">
+	    UPDATE 
+	       iqb_customer_permission 
+	    SET 
+	       merchantname = #{merchantName},authoritytree = #{authorityTree} ,updatetime = NOW() 
+	    WHERE 
+	       merchantno = #{merchantNo}
+	  </if>
+	  <if test="saveOrUpdate == 0">
+	    INSERT INTO 
+	       iqb_customer_permission 
+	    VALUES
+	       (
+	           #{merchantNo},#{merchantName},#{authorityTree},NOW(),null
+	       )
+	  </if>
+	</insert>
+	
+	<select id="getMerchantNameByNo" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT 
+            merchantshortname from inst_merchantinfo
+        WHERE
+            merchantno = #{merchantNo}
+    </select>
+</mapper>

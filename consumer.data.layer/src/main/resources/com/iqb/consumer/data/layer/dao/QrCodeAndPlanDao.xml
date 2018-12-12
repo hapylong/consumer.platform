@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+	Apache License, Version 2.0 (the "License"); you may not use this file except 
+	in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.QrCodeAndPlanDao">
+
+	<resultMap type="com.iqb.consumer.data.layer.bean.plan.PlanBean"
+		id="PlanBean">
+		<result property="id" column="ID" />
+		<result property="planShortName" column="PLANSHORTNAME" />
+		<result property="planFullName" column="PLANFULLNAME" />
+		<result property="merchantNo" column="MERCHANTNO" />
+		<result property="downPaymentRatio" column="DOWNPAYMENTRATIO" />
+		<result property="serviceFeeRatio" column="SERVICEFEERATIO" />
+		<result property="marginRatio" column="MARGINRATIO" />
+		<result property="feeRatio" column="FEERATIO" />
+		<result property="feeYear" column="FEEYEAR" />
+		<result property="takePayment" column="TAKEPAYMENT" />
+		<result property="installPeriods" column="INSTALLPERIODS" />
+		<result property="remark" column="REMARK" />
+		<result property="planId" column="PLANID" />
+		<result property="planName" column="planName" /><!-- 账务系统对应的计划名称 by yeoman -->
+		<result property="version" column="VERSION" />
+		<result property="createTime" column="CREATETIME" />
+		<result property="updateTime" column="UPDATETIME" />
+		<result property="bizType" column="bizType" />
+		<result property="bizTypeName" column="bizTypeName" /> <!-- 通过字典表查询业务名称 by yeoman -->
+		<result property="reCharge" column="reCharge" />
+		<result property="status" column="STATUS" /> <!-- 1,启用，2,停用 -->
+		<result property="upInterestFee" column="UPINTERESTFEE" />	<!-- 上收息 -->
+		<result property="floatMarginRatio" column="FLOATMARGINRATIO" />	<!-- 上浮保证金比例 -->
+	</resultMap>
+
+	<sql id="table">inst_plan</sql>
+
+	<!-- 计划的字段 -->
+	<sql id="plan">
+		PLANSHORTNAME,PLANFULLNAME,MERCHANTNO,DOWNPAYMENTRATIO,
+		SERVICEFEERATIO,MARGINRATIO,FEERATIO,FEEYEAR,TAKEPAYMENT,INSTALLPERIODS,
+		REMARK,PLANID,VERSION,CREATETIME,UPDATETIME,bizType,recharge,status,GREENCHANNEL,UPINTERESTFEE,FLOATMARGINRATIO
+	</sql>
+
+	<!-- 添加计划 -->
+	<insert id="insertPlan" parameterType="com.iqb.consumer.data.layer.bean.plan.PlanBean"
+		keyProperty="id" useGeneratedKeys="true">
+		INSERT INTO
+		<include refid="table" />
+		(
+		<include refid="plan" />
+		)
+		VALUES (#{planShortName},#{planFullName}, #{merchantNo},
+		#{downPaymentRatio},
+		#{serviceFeeRatio}, #{marginRatio},#{feeRatio},
+		#{feeYear},
+		#{takePayment},#{installPeriods},#{remark},#{planId},#{version},
+		#{createTime},
+		#{updateTime},#{bizType},#{reCharge}, 1, #{greenChannel},#{upInterestFee},#{floatMarginRatio});
+	</insert>
+
+	<!-- 修改计划 -->
+	<update id="updatePlan" parameterType="com.iqb.consumer.data.layer.bean.plan.PlanBean">
+		UPDATE
+		<include refid="table" />
+		SET
+		<if test="planShortName!=null and planShortName !=''">
+			PLANSHORTNAME = #{planShortName},
+		</if>
+		<if test="planFullName !=null and planFullName !='' ">
+			PLANFULLNAME = #{planFullName},
+		</if>
+		<if test="downPaymentRatio !=null">
+			DOWNPAYMENTRATIO = #{downPaymentRatio},
+		</if>
+		<if test="marginRatio !=null">
+			MARGINRATIO = #{marginRatio},
+		</if>
+		<if test="feeRatio !=null">
+			FEERATIO = #{feeRatio},
+		</if>
+		<if test="feeYear !=null">
+			FEEYEAR = #{feeYear},
+		</if>
+		<if test="takePayment !=null">
+			TAKEPAYMENT = #{takePayment},
+		</if>
+		<if test="serviceFeeRatio !=null">
+			SERVICEFEERATIO = #{serviceFeeRatio},
+		</if>
+		<if test="installPeriods !=null">
+			INSTALLPERIODS = #{installPeriods}
+		</if>
+		<if test="planId !=null and planId != ''">
+			PLANID = #{planId}
+		</if>
+		<if test="remark !=null and remark != ''">
+			REMARK = #{remark}
+		</if>
+		<if test="upInterestFee !=null and upInterestFee != ''">
+			UPINTERESTFEE = #{upInterestFee}
+		</if>
+		WHERE ID=#{id}
+	</update>
+
+	<!-- 通过ID查询计划 -->
+	<select id="getPlanByID" parameterType="Long" resultMap="PlanBean">
+		SELECT *
+		from
+		<include refid="table" />
+		WHERE ID=#{id} LIMIT 1
+	</select>
+
+	<!-- 根据商户查询计划 -->
+	<select id="getPlanByMerNo" parameterType="String" resultMap="PlanBean">
+		SELECT * from
+		<include refid="table" />
+		WHERE MERCHANTNO=#{merchantNo}
+	</select>
+	
+	<!-- 根据商户和子类型查询计划 -->
+	<select id="getPlByMerAndBType" parameterType="String" resultMap="PlanBean">
+		SELECT * from <include refid="table" />	WHERE MERCHANTNO = #{merchantNo} AND BIZTYPE = #{bizType} AND STATUS = 1;
+	</select>
+
+	<!-- 根据商户列表、期数查询计划 -->
+	<select id="getPlanByMerNos" parameterType="java.util.Map"
+		resultMap="PlanBean">
+		SELECT	P.*, (SELECT DICT_NAME FROM	iqb_sys_dict_item SDI WHERE	SDI.DICT_TYPE_CODE = 'finance_planid' AND P.PLANID = SDI.DICT_VALUE) AS planName,(SELECT DICT_NAME FROM iqb_sys_dict_item SDI	WHERE SDI.DICT_TYPE_CODE = 'business_type' AND P.BIZTYPE = SDI.DICT_VALUE) AS bizTypeName
+		 FROM inst_plan P
+		 <where>
+		<if test="merList != null and merList.size() > 0">
+			AND P.MERCHANTNO IN
+			<foreach item="item" index="index" collection="merList" open="("
+				separator="," close=")">
+				#{item.merchantNo}
+			</foreach>
+		</if>
+		<if test="installPeriods !=null and installPeriods != ''">
+			AND P.INSTALLPERIODS = #{installPeriods}
+		</if>
+		<if test="status !=null and status != ''">
+			AND P.STATUS = #{status}
+		</if>
+		<if test="greenChannel !=null and greenChannel != ''">
+            AND P.GREENCHANNEL = #{greenChannel}
+        </if>
+        <if test="bizType !=null and bizType != ''">
+            AND P.BIZTYPE = #{bizType}
+        </if>
+        </where>
+		ORDER BY P.MERCHANTNO, P.ID
+	</select>
+
+	<!-- 删除计划 -->
+	<delete id="deletePlanByID" parameterType="Long">
+		DELETE from
+		<include refid="table" />
+		WHERE ID=#{id}
+	</delete>
+
+	<!-- 获取主键id列表 -->
+	<select id="getAllPlanIdList" resultType="Long">
+		select id from <include refid="table" />
+	</select>
+
+    <update id="updateStatus">
+        UPDATE
+            inst_plan
+        SET
+            status = #{status}
+        WHERE
+            id
+        IN (
+        <foreach collection="ids" item="item" index="index"
+            separator=",">
+            #{item}
+        </foreach>
+        )
+    </update>
+    <!-- 不同商户配置不同的支付主体,insert操作 -->
+	<insert id="addPayConf" parameterType="com.alibaba.fastjson.JSONObject"
+	keyProperty="id" useGeneratedKeys="true">
+		INSERT INTO
+		inst_payconf
+		(
+		merchantNo,bizOwner,payWay,gateWay,service,vSon,merchantId,`key`,secId,certPath,prikeyPath,createTime
+		)
+		VALUES (#{merchantNo},#{bizOwner}, #{payWay},
+		#{gateWay},
+		#{service}, #{vSon},#{merchantId},
+		#{key},
+		#{secId},#{certPath},#{prikeyPath},NOW()
+		);
+	</insert>
+	<!-- 不同商户配置不同的支付主体 ,判断该商户号在库中是否存在 -->
+	<select id="getPayConfByMno" parameterType="com.alibaba.fastjson.JSONObject" resultType="com.iqb.consumer.data.layer.bean.merchant.PayConfBean">
+		SELECT *
+		from
+		inst_payconf
+		WHERE id=#{id}
+	</select>
+	<!-- 不同商户配置不同的支付主体 ,判断该商户号在库中是否存在 -->
+	<select id="getPayConfByMno2" parameterType="com.alibaba.fastjson.JSONObject" resultType="com.iqb.consumer.data.layer.bean.merchant.PayConfBean">
+		SELECT *
+		from
+		inst_payconf
+		WHERE merchantNo = #{merchantNo}
+	</select>
+	<!-- 不同商户配置不同的支付主体,del操作 -->
+	<delete id="delPayConf" parameterType="com.alibaba.fastjson.JSONObject">
+		DELETE from
+		inst_payconf
+		WHERE id=#{id}
+		
+	</delete>
+	<!-- 不同商户配置不同的支付主体,update操作 -->
+	<update id="updatePayConf" parameterType="com.alibaba.fastjson.JSONObject">
+        UPDATE
+            inst_payconf
+        SET
+        	<if test="merchantNo!=null and merchantNo !=''">
+			merchantNo = #{merchantNo},
+			</if>
+			<if test="bizOwner!=null and bizOwner !=''">
+			bizOwner = #{bizOwner},
+			</if>
+			<if test="payWay!=null and payWay !=''">
+			payWay = #{payWay},
+			</if>
+			<if test="gateWay!=null and gateWay !=''">
+			gateWay = #{gateWay},
+			</if>
+			<if test="service!=null and service !=''">
+			service = #{service},
+			</if>
+			<if test="vSon!=null and vSon !=''">
+			vSon = #{vSon},
+			</if>
+			<if test="merchantId!=null and merchantId !=''">
+			merchantId = #{merchantId},
+			</if>
+			<if test="key!=null and key !=''">
+			`key` = #{key},
+			</if>
+			<if test="secId!=null and secId !=''">
+			secId = #{secId},
+			</if>
+			<if test="certPath!=null and certPath !=''">
+			certPath = #{certPath},
+			</if>
+			<if test="prikeyPath!=null and prikeyPath !=''">
+			prikeyPath = #{prikeyPath},
+			</if>
+			updateTime = NOW()   
+	        WHERE
+	            id=#{id}
+    </update>
+    <!-- 不同商户配置不同的支付主体,列表操作 -->
+	<select id="queryPayConfList" parameterType="com.alibaba.fastjson.JSONObject" resultType="com.iqb.consumer.data.layer.bean.merchant.PayConfBean">
+	SELECT 
+		 *
+		FROM
+		  inst_payconf a
+		LEFT JOIN
+		  inst_merchantinfo b
+		ON
+		  a.merchantno = b.merchantno
+		  <where>
+		<if test="merList != null and merList.size() > 0">
+                b.merchantno in
+                <foreach item="item" index="index" collection="merList" open="("
+                    separator="," close=")">
+                    #{item.merchantNo}
+                </foreach>
+        </if>
+        <if test="bizOwner !=null and bizOwner != ''">
+			AND a.bizOwner = #{bizOwner}
+		</if>
+		<if test="payWay !=null and payWay != ''">
+			AND a.payWay = #{payWay}
+		</if>
+		</where>
+	</select>
+	 <!-- 根据字段code 和 子项号 查询对应字典中文 -->
+	 <select id="getChinByCode"  resultType="string">
+	SELECT 
+		 DICT_NAME as dictName
+		FROM
+		  iqb_sys_dict_item 
+		  <where>
+        <if test="code !=null and code != ''">
+			AND DICT_TYPE_CODE = #{code}
+		</if>
+		<if test="code2 !=null and code2 != ''">
+			AND DICT_VALUE = #{code2}
+		</if>
+		</where>
+	</select>
+</mapper>

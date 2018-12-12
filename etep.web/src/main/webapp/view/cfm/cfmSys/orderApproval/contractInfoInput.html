@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	    <title>合同补录信息</title>
+	    <meta charset="UTF-8" />
+	    <meta name="Author" content="" />
+	    <meta name="Keywords" content="" />
+	    <meta name="Description" content="" />
+	    
+	    <!-- 样式库 -->
+	    <link rel="stylesheet" href="../../../../js/ztree/css/zTreeStyle/zTreeStyle.css" />
+	    <link rel="stylesheet" href="../../../../js/bootstrap/themes/default/bootstrap.css" />
+	    <link rel="stylesheet" href="../../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+	    <link rel="stylesheet" href="../../../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+	    <link rel="stylesheet" href="../../../../css/jquery.select2.css" />
+	    <link rel="stylesheet" href="../../../../css/jquery.select2-bootstrap.css" />
+	    <link rel="stylesheet" href="../../../../css/jquery.datetimepicker.css" /> 
+	    
+	    
+	    <!-- 插件库 -->
+	    <script src="../../../../js/common/package.js"></script>
+		<script src="../../../../js/common/url.js"></script>
+		<script src="../../../../js/common/json2.js"></script>	
+		<script src="../../../../js/common/jquery-1.11.3.min.js"></script>		
+		<script src="../../../../js/bootstrap/bootstrap.js"></script>
+		<script src="../../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+		<script src="../../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+		<script src="../../../../js/ztree/js/jquery.ztree.all.min.js"></script>
+		<script src="../../../../js/common/jquery.select2.js"></script>
+		<script src="../../../../js/common/jquery.datetimepicker.js"></script>
+		
+		<!-- 业务库 -->
+		<script src="../../../../js/common/base.js"></script>
+		<script src="../../../../js/common/datagrid2.js"></script>
+		<script src="../../../../js/common/tree.js"></script>
+		<script src="../../../../js/common/formatter.js"></script>	    
+	    <script src="../../../../js/each/cfm/cfmSys/orderApproval/contractInfoInput.js"></script>
+		
+		<!-- 页面样式 -->
+		<style type="text/css">
+			body {
+				font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif !important;
+				background:#eee url("../../../../img/back.png") repeat;
+			}
+			.container-fluid {
+				padding:5px;
+			}
+			.left-part {
+				height:800px;
+			}
+			.modal-form {
+				margin:8px;
+			}
+			.row div{
+			    margin:10px 0;
+			}
+		</style>
+	    
+	</head>   
+	<body>
+	
+		<div class="container-fluid">
+			<div class="row outBox">				
+				<div class="col-md-12">
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<h4 class="panel-title">合同补录信息</h4>
+					  	</div>
+					  	<div class="panel-body">			  	
+							  	<button id="saveContract" type="button" class="btn btn-success btn-sm">保存</button>
+								<button id="toBeContract" type="button" class="btn btn-success btn-sm" disabled>生成合同</button>
+								<button id="signContract" type="button" class="btn btn-success btn-sm" disabled>提交</button>							
+							</form>		  												 	
+					  	</div>
+					</div>
+					<form id="contractCollection" class="form-horizontal">
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<h4 class="panel-title">车辆信息</h4>
+					  	</div>
+						<table class="table table-bordered" style='width:80%;margin:20px auto;border:1px solid #ccc;text-align:center;'>
+						   <tr>
+						      <td><span style='color:red'>*</span>供应商</td>
+						      <td><input type="text" class="form-control input-sm" id="supply"></td>
+						      <td><span style='color:red'>*</span>厂商</td>
+						      <td><input type="text" class="form-control input-sm" id="manufacturer"></td>
+						   </tr>
+						   <tr>
+						      <td><span style='color:red'>*</span>厂牌型号</td>
+						      <td><input type="text" class="form-control input-sm" id="factoryPlateModel"></td>
+						      <td><span style='color:red'>*</span>座位数</td>
+						      <td><input type="text" class="form-control input-sm" id="seat" onkeyup="this.value=this.value.replace(/[^\d]/g,'')"></td>
+						   </tr>
+						   <tr>
+						      <td><span style='color:red'>*</span>车型</td>
+						      <td><input type="text" class="form-control input-sm" id="motorcycleType"></td>
+						      <td><span style='color:red'>*</span>燃油形式</td>
+						      <td><input type="text" class="form-control input-sm" id="fuelOilType"></td>
+						   </tr>
+						   <tr>
+						      <td><span style='color:red'>*</span>发动机型号（特有技术）</td>
+						      <td><input type="text" class="form-control input-sm" id="engineType"></td>
+						      <td><span style='color:red'>*</span>燃油标号</td>
+						      <td><input type="text" class="form-control input-sm" id="fuelOilNumber"></td>
+						   </tr>
+						   <tr>
+						      <td><span style='color:red'>*</span>车架号</td>
+						      <td><input type="text" class="form-control input-sm" id="VIN"></td>
+						      <td><span style='color:red'>*</span>颜色</td>
+						      <td><input type="text" class="form-control input-sm" id="color"></td>
+						   </tr>
+						</table>
+					</div>
+					<div class="panel panel-info panelDisplay">
+					    <div class="panel-heading">
+							<h4 class="panel-title">费用信息</h4>
+					  	</div>
+					  	<ul class="list-group">
+					    	<li class="list-group-item" style="border-bottom: 1px solid #fff;">
+								<div class="row">				
+									<div class="col-md-2 text-right FeeDisplay"><span style='color:red'>*</span><span class="text-stress">评估管理费</span></div>
+									<div class="col-md-4 FeeDisplay FeeDisplayInput"><input type="text" class="form-control input-sm" id="assessFee" onkeyup="this.value=this.value.replace(/[^\.\d]/g,'')"></div>
+									
+									<div class="col-md-2 text-right FeeDisplay"><span style='color:red'>*</span><span class="text-stress">实地考察费</span></div>
+									<div class="col-md-4 FeeDisplay FeeDisplayInput"><input type="text" class="form-control input-sm" id="inspectFee" onkeyup="this.value=this.value.replace(/[^\.\d]/g,'')"></div>
+									
+									<div class="col-md-2 text-right FeeDisplay"><span style='color:red'>*</span><span class="text-stress">进单费</span></div>
+									<div class="col-md-4 FeeDisplay FeeDisplayInput"><input type="text" class="form-control input-sm" id="enterFee" onkeyup="this.value=this.value.replace(/[^\.\d]/g,'')"></div>
+									
+									<div class="col-md-2 text-right FeeDisplay"><span class="text-stress">其它</span></div>
+									<div class="col-md-4 FeeDisplay"><input type="text" class="form-control input-sm easyui-validatebox" id="other" onkeyup="this.value=this.value.replace(/[^\.\d]/g,'')"></div>
+									
+									<div class="col-md-2 text-right lessorFeeDisplay"><span style='color:red'>*</span><span class="text-stress">出租方管理费</span></div>
+									<div class="col-md-4 lessorFeeDisplay lessorFeeDisplayInput"><input type="text" class="form-control input-sm" id="lessorFee" onkeyup="this.value=this.value.replace(/[^\.\d]/g,'')"></div>
+								</div>
+							</li>
+						</ul>
+					</div>
+					<div class="panel panel-info panelDisplay1">
+					    <div class="panel-heading">
+							<h4 class="panel-title">消费金融商家信息</h4>
+					  	</div>
+					  	<ul class="list-group">
+					    	<li class="list-group-item" style="border-bottom: 1px solid #fff;">
+								<div class="row">
+								  	<div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">收款开户名称</span></div>
+									<div class="col-md-3"><input type="text" class="form-control input-sm" id="accountName"></div>
+									
+									<div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">收款开户银行</span></div>
+									<div class="col-md-3"><input type="text" class="form-control input-sm" id="accountBank"></div>
+									
+									<div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">收款银行账号</span></div>
+									<div class="col-md-3"><input type="text" class="form-control input-sm" id="bankNumber"></div>
+							    </div>
+							</li>
+						</ul>		
+					</div>
+					</form>
+				</div>
+			</div>		 	
+		</div>
+	</body>
+</html>

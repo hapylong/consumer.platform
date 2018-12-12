@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+	Apache License, Version 2.0 (the "License"); you may not use this file except 
+	in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.pushRecord.PushRecordDao">
+
+
+	<!-- 查询所有推标记录 -->
+	<select id="pushRecordByOrderIdList" parameterType="java.util.Map" resultType="com.iqb.consumer.data.layer.bean.pushRecord.PushRecordBean">
+		select a.REDEMPTIONDATE as redemptionDate,a.id,a.CREATETIME as APPLYTIME, a.APPLYITEMS, a.SOURCESFUNDING, a.CREDITNAME, a.ORDERID ,b.orderAmt as APPLYAMT,a.PUSHID,a.DEADLINE,
+		c.REAL_NAME as applyName ,a.redemptionDate ,a.applyInstIDay,b.ORDERID as orderId
+		from cf_requestmoney a
+LEFT JOIN inst_orderinfo b on a.ORDERID = b.ORDERID
+LEFT JOIN iqb_sys_user c ON a.ALLOT_REGID = c.ID and c.DELETE_FLAG=1
+LEFT JOIN inst_orderotherinfo d on a.ORDERID = d.ORDERID
+	where 1=1
+	<if test="orderId !=null and orderId != ''">
+			AND a.orderId = #{orderId}
+		</if>
+		<if test="projectName !=null and projectName != ''">
+			AND d.projectName LIKE '%${projectName}%'
+		</if>
+	</select>
+	<!-- 根据订单号打包拆分状态 -->
+	<select id="getJSYStateByOrderId" parameterType="java.util.Map" resultType="java.lang.Integer">
+		select status from jys_orderinfo where 1=1
+		<if test="orderId !=null and orderId != ''">
+			AND orderId = #{orderId} 
+		</if>
+		<if test="id !=null and id != ''">
+			AND cfRequestMoneyId = #{id} 
+		</if>
+	</select>
+	<!-- 保存删除原因 -->
+	<insert id="insertDelPRRemark" parameterType="java.util.Map" keyProperty="id"
+		useGeneratedKeys="true">
+		INSERT INTO inst_delpushremark (orderId, delRemark, applyItems, sourcesFunding, creditName, createTime) VALUES (#{orderId}, #{delRemark}, 
+		#{applyItems}, #{sourcesFunding}, #{creditName},now());
+	</insert>
+	<!-- 删除推标记录 -->
+	<delete id="delPushRecordById" parameterType="java.lang.Long">
+		delete from cf_requestmoney where id = #{id};
+	</delete>
+	<delete id="delJSYPushRecordById" parameterType="java.lang.Long">
+		delete from jys_orderinfo where cfRequestMoneyId = #{id}
+	</delete>
+</mapper>

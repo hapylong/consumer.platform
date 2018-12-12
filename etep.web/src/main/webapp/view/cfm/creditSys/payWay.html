@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	    <title>还款</title>
+	    <meta charset="UTF-8" />
+	    <meta name="Author" content="" />
+	    <meta name="Keywords" content="" />
+	    <meta name="Description" content="" />
+	    
+	    <!-- 样式库 -->
+	    <link rel="stylesheet" href="../../../js/bootstrap/themes/default/bootstrap.css" />
+	    <link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+	    <link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+	    <link rel="stylesheet" href="../../../css/jquery.select2.css" />
+	    <link rel="stylesheet" href="../../../css/jquery.select2-bootstrap.css" />
+	    <link rel="stylesheet" href="../../../css/jquery.datetimepicker.css" />
+	    <link rel="stylesheet" href="../../../css/cfm/style.css" />
+	    
+	    <!-- 插件库 -->
+	    <script src="../../../js/common/package.js"></script>
+		<script src="../../../js/common/url.js"></script>
+		<script src="../../../js/common/json2.js"></script>	
+		<script src="../../../js/common/jquery-1.11.3.min.js"></script>		
+		<script src="../../../js/bootstrap/bootstrap.js"></script>
+		<script src="../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+		<script src="../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+		<script src="../../../js/ztree/js/jquery.ztree.all.min.js"></script>
+		<script src="../../../js/common/jquery.select2.js"></script>
+		
+		<!-- 业务库 -->
+		<script src="../../../js/common/base.js"></script>
+		<script src="../../../js/common/datagrid.js"></script>
+		<script src="../../../js/common/tree.js"></script>
+		<script src="../../../js/common/formatter.js"></script>	    
+	    <script src="../../../js/each/cfm/creditSys/payWay.js"></script>
+	    <script src="../../../js/common/jquery.datetimepicker.js"></script>
+		
+		<!-- 页面样式 -->
+		<style type="text/css">
+			body {
+				font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif !important;
+				background:#eee url("../../../img/back.png") repeat;
+			}
+			.container-fluid {
+				padding:5px;
+			}
+			.left-part {
+				height:800px;
+			}
+			.modal-form {
+				margin:8px;
+			}
+			.container-fluid{
+			    margin-top:20px;
+			}
+		</style>
+	    
+	</head>
+	<body>
+	
+		<div class="container-fluid">
+			<div class="row">				
+				<div class="col-md-2"></div>
+				<div class="col-md-8">
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<h4 class="panel-title">订单信息</h4>
+					  	</div>
+					    <form id="payForm" class="form-inline" method="get">
+						  	<div style='padding:15px 5px;background:#fff6f6;'>
+						  	<!-- <div class="form-group">
+						    	<label class="form-label">订单名称</label>
+						  	</div>
+						  	<div class="form-group">
+						    	<input name="productName" id='productName' type="text" class="form-control input-sm" value='订单名称' readonly >
+						  	</div> -->
+						  	<div class="form-group">
+						    	<label class="form-label">订单号</label>
+						  	</div>
+						  	<div class="form-group">
+						    	<input name="orderId" id='orderId' type="text" class="form-control input-sm" value='订单号' readonly>
+						  	</div>
+						  	<div class="form-group">
+						    	<label class="form-label">金额</label>
+						  	</div>
+						  	<div class="form-group">
+						    	<input name="amount" id='amount' type="text" class="form-control input-sm" value='金额' readonly>
+						  	</div>
+						  		<input type='hidden' id='bankId' name='bankId'>
+						  		<input type='hidden' id=orderItem name='orderItem'>
+						  	</div>					
+						</form>
+						    <div class="form-group" style='margin-top:15px;margin-left:5px;'>
+						    	<label class="form-label">选择支付方式</label>
+						  	</div>
+							<ul id="tabs">
+							    <li><a href="#" title="online" id="current">网银充值</a></li>
+							    <li><a href="#" title="fast">快捷支付</a></li>
+							</ul>
+							<div id="content">
+							    <div id="online"  class="content-son" style="display: block">
+							        <div class="form-group">
+						    			<label class="col-sm-2 control-label">还款金额</label>
+						    			<div class="col-sm-2" style='margin-left:-80px;'>
+						    			    <input name="amount"  type="text" class="form-control input-sm" readonly/>
+						    			</div>
+						    			<button id='toPay' type="button" class="toPay col-sm-1 btn btn-danger btn-sm" onClick="IQB.payWay.toPayOnline();">立即还款</button>
+				  			        </div>
+				  			        <br/>
+				  			        <div class="form-group" style='margin-top:20px'>
+				  			            <label class="col-sm-10 control-label">还款限额：根据发卡行网银支付限额而定，使用U盾可提高支付限额</label>
+				  			        </div>
+				  			        <div class="form-group" style='margin-top:20px'>
+				  			            <label class="col-sm-5 control-label">手  续  费：0元</label> 
+				  			        </div>
+							    </div>
+							    <div id="fast"  class="content-son">
+							        <div class='bankBox'>
+							        </div>
+							        <input type='button' id='fastButton' class="toPay btn btn-danger btn-sm" onClick="IQB.payWay.toPayFast();" value='立即还款'>
+							        <!-- 添加银行卡 -->
+							        <div class='addDiv'>
+							           <div class='addDivInner'>
+							           <form id="addBankForm" class="form-horizontal">
+								           <div class="form-group">
+								    			<label class="col-sm-3 control-label">真实姓名：</label>
+								    			<div class="col-sm-9">
+								    			    <input name="realName" id='realName' type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入真实姓名" data-options="required:true, validType:['name','minLength[2]']" />
+								    			</div>
+					  			           </div>
+					  			           <div class="form-group">
+								    			<label class="col-sm-3 control-label">身份证号：</label>
+								    			<div class="col-sm-9">
+								    			    <input name="IDCard" id='IDCard' type="text" style="text-transform:uppercase" class="form-control input-sm easyui-validatebox" placeholder="请输入身份证号" data-options="required:true, validType:['idCard']" />
+								    			</div>
+					  			           </div>
+					  			           <div class="form-group">
+								    			<label class="col-sm-3 control-label">卡  类  型：</label>
+								    			<div class="col-sm-9">
+								    			    <select id="bankType" name="bankType" class="form-control">
+								    			       
+								                    </select>
+								    			</div>
+					  			           </div>
+					  			           <div class="form-group">
+								    			<label class="col-sm-3 control-label">银行卡号：</label>
+								    			<div class="col-sm-9">
+								    			    <input name="bankCard" id='bankCard' type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入银行卡号" data-options="required:true, validType:['bankCard','minLength[16]','maxLength[19]']" />
+								    			</div>
+					  			           </div>
+					  			           <div class="form-group">
+								    			<label class="col-sm-3 control-label">手  机  号：</label>
+								    			<div class="col-sm-9">
+								    			    <input name="phoneNum" id='phoneNum' type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入手机号" data-options="required:true, validType:['minLength[11]','maxLength[11]']" />
+								    			</div>
+					  			           </div>
+					  			           <div class='buttonBox'>
+					  			                <button id='cancelAdd' type="button" class="col-sm-1 btn btn-danger btn-sm">取消</button>
+					  			                <button id='saveCard' type="button" class="col-sm-1 btn btn-danger btn-sm">保存</button>
+					  			           </div>
+					  			           </form>
+					  			       </div>
+							        </div>
+							        <!-- 修改 -->
+							        <div class='reviseDiv'>
+							           <div class='addDivInner'>
+							           <form id="reviseBankForm" class="form-horizontal">
+								           <div class="form-group">
+								    			<label class="col-sm-3 control-label">真实姓名：</label>
+								    			<div class="col-sm-9">
+								    			    <input name="reviseRealName" id='reviseRealName' type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入真实姓名" data-options="required:true, validType:['safeName','minLength[2]']" />
+								    			</div>
+					  			           </div>
+					  			           <div class="form-group">
+								    			<label class="col-sm-3 control-label">身份证号：</label>
+								    			<div class="col-sm-9">
+								    			    <input name="reviseIDCard" id='reviseIDCard' type="text" style="text-transform:uppercase" class="form-control input-sm easyui-validatebox" placeholder="请输入身份证号" data-options="required:true, validType:['safeIdCard']" />
+								    			</div>
+					  			           </div>
+					  			           <div class="form-group">
+								    			<label class="col-sm-3 control-label">卡  类  型：</label>
+								    			<div class="col-sm-9">
+								    			    <select id="reviseBankType" name="reviseBankType" class="form-control" disabled>
+								    			       
+								                    </select>
+								    			</div>
+					  			           </div>
+					  			           <div class="form-group">
+								    			<label class="col-sm-3 control-label">银行卡号：</label>
+								    			<div class="col-sm-9">
+								    			    <input name="reviseBankCard" id='reviseBankCard' type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入银行卡号" data-options="required:true, validType:['safeBankCard','minLength[16]','maxLength[19]']" />
+								    			</div>
+					  			           </div>
+					  			           <div class="form-group">
+								    			<label class="col-sm-3 control-label">手  机  号：</label>
+								    			<div class="col-sm-9">
+								    			    <input name="revisePhoneNum" id='revisePhoneNum' type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入手机号" data-options="required:true, validType:['safeMobilePhone']" />
+								    			</div>
+					  			           </div>
+					  			           <div class='buttonBox'>
+					  			                <button id='cancelRevise' type="button" class="col-sm-1 btn btn-danger btn-sm">取消</button>
+					  			                <button id='saveRevise' type="button" class="col-sm-1 btn btn-danger btn-sm">保存</button>
+					  			           </div>
+					  			           </form>
+					  			       </div>
+							        </div>
+							        <!-- supportBank -->
+							    <div class="support-bank">
+							             <div class="support-bank-title">支持多家银行，方便快捷</div>
+							             <div class="support-banks">
+							                <div class="bank-type">
+							                    <img src="../../../img/cfmImg/bank1.png" alt=""/>
+							                </div>
+							                 <div class="bank-type">
+							                     <img src="../../../img/cfmImg/bank2.png" alt=""/>
+							                 </div>
+							                 <div class="bank-type">
+							                     <img src="../../../img/cfmImg/bank3.png" alt=""/>
+							                 </div>
+							                  <div class="bank-type">
+							                     <img src="../../../img/cfmImg/bank4.png" alt=""/>
+							                 </div>
+							                 <div class="bank-type">
+							                     <img src="../../../img/cfmImg/bank5.png" alt=""/>
+							                 </div>
+							                 <div class="bank-type">
+							                     <img src="../../../img/cfmImg/bank6.png" alt=""/>
+							                 </div>
+							                 <div class="bank-type">
+							                     <img src="../../../img/cfmImg/bank7.png" alt=""/>
+							                 </div>
+							                 <div class="bank-type">
+							                     <img src="../../../img/cfmImg/bank8.png" alt=""/>
+							                 </div>
+							                 <div class="bank-type">
+							                     <img src="../../../img/cfmImg/bank9.png" alt=""/>
+							                 </div>
+							                 <div class="bank-type">
+							                     <img src="../../../img/cfmImg/bank10.png" alt=""/>
+							                 </div>
+							                 <div class="bank-type">
+							                     <img src="../../../img/cfmImg/bank11.png" alt=""/>
+							                 </div>
+							                 <div class="bank-type">
+							                     <img src="../../../img/cfmImg/bank12.png" alt=""/>
+							                 </div>
+							                 <div class="bank-type">
+							                     <img src="../../../img/cfmImg/bank13.png" alt=""/>
+							                 </div>
+							                 <div class="bank-type" >
+							                     <img src="../../../img/cfmImg/bank14.png" alt=""/>
+							                 </div>
+							                 <div class="bank-type">
+							                     <img src="../../../img/cfmImg/bank15.png" alt=""/>
+							                 </div>
+							             </div>
+							            <div class="support-bank-title" style="margin-top: 20px;">各银行充值限额</div>
+							            <table border=1 bordercolor=#ccc style="border-collapse:collapse">
+							                <tr style="background: #dcdcdc">
+							                    <td>银行</td>
+							                    <td>银行编码</td>
+							                    <td>单笔最低限额</td>
+							                    <td>单笔限额</td>
+							                    <td>日累计限额</td>
+							                    <td>月累计限额</td>
+							                    <td>备注</td>
+							                </tr>
+							                <tr>
+							                    <td rowspan="2">中国工商银行</td>
+							                    <td rowspan="2">ICBC</td>
+							                    <td>——</td>
+							                    <td>5万元</td>
+							                    <td>20万元</td>
+							                    <td></td>
+							                    <td>00:00-14:00这个时间段限额</td>
+							                </tr>
+							                <tr>
+							                     
+							                    <td>——</td>
+							                    <td>1000元</td>
+							                    <td>5万元</td>
+							                    <td></td>
+							                    <td>14:00-24:00这个时间段限额</td>
+							                </tr>
+							                <tr>
+							                    <td>农业银行</td>
+							                    <td>ABC</td>
+							                    <td colspan="5">维护中</td>
+							                </tr>
+							                <tr>
+							                    <td>中国银行</td>
+							                    <td>BOC</td>
+							                    <td>——</td>
+							                    <td>5万元</td>
+							                    <td>20万元</td>
+							                    <td></td>
+							                    <td>柜面、网银开通无卡支付业务</td>
+							                </tr>
+							                <tr>
+							                    <td>建设银行</td>
+							                    <td>CCB</td>
+							                    <td>2元</td>
+							                    <td>20万元</td>
+							                    <td>20万元</td>
+							                    <td></td>
+							                    <td></td>
+							                </tr>
+							                <tr>
+							                    <td>交通银行</td>
+							                    <td>BOCOM</td>
+							                    <td>——</td>
+							                    <td>2万元</td>
+							                    <td>5万元</td>
+							                    <td></td>
+							                    <td>柜面、网银开通无卡支付业务</td>
+							                </tr>
+							                <tr>
+							                    <td>民生银行</td>
+							                    <td>CMBC</td>
+							                    <td>——</td>
+							                    <td>1000元</td>
+							                    <td>5万元</td>
+							                    <td></td>
+							                    <td></td>
+							                </tr>
+							                <tr>
+							                    <td>兴业银行</td>
+							                    <td>CIB</td>
+							                    <td>2元</td>
+							                    <td>5万元</td>
+							                    <td>5万元</td>
+							                    <td></td>
+							                    <td>柜面、网银开通无卡支付业务</td>
+							                </tr>
+							                <tr>
+							                    <td>光大银行 </td>
+							                    <td>CEB</td>
+							                    <td>2元</td>
+							                    <td>1万元</td>
+							                    <td>5万元</td>
+							                    <td></td>
+							                    <td></td>
+							                </tr>
+							                <tr>
+							                    <td>平安银行</td>
+							                    <td>PAB</td>
+							                    <td>2元</td>
+							                    <td>5万元</td>
+							                    <td>10万元</td>
+							                    <td></td>
+							                    <td>柜面、电话银行、网银方式开通无卡支付功能</td>
+							                </tr>
+							                <tr>
+							                    <td>中信银行</td>
+							                    <td>CNCB</td>
+							                    <td>3元</td>
+							                    <td>5000元</td>
+							                    <td>5000元</td>
+							                    <td></td>
+							                    <td></td>
+							                </tr>
+							                <tr>
+							                    <td>北京银行</td>
+							                    <td>BCCB</td>
+							                    <td>——</td>
+							                    <td>5000元</td>
+							                    <td>5000元</td>
+							                    <td></td>
+							                    <td>柜面、电话银行、网银方式开通无卡支付功能</td>
+							                </tr>
+							                <tr>
+							                    <td>广发银行</td>
+							                    <td>GDB</td>
+							                    <td>2元</td>
+							                    <td>50万元</td>
+							                    <td>100万元</td>
+							                    <td></td>
+							                    <td></td>
+							                </tr>
+							                <tr>
+							                    <td>招商银行</td>
+							                    <td>CMB</td>
+							                    <td>1元</td>
+							                    <td>1000元</td>
+							                    <td>5000元</td>
+							                    <td></td>
+							                    <td></td>
+							                </tr>
+							                <tr>
+							                    <td>邮储银行</td>
+							                    <td>PSBC</td>
+							                    <td>——</td>
+							                    <td>5000元</td>
+							                    <td>5000元</td>
+							                    <td></td>
+							                    <td>柜面、网银开通无卡支付业务</td>
+							                </tr>
+							                <tr>
+							                    <td>浦发银行</td>
+							                    <td>SPDB</td>
+							                    <td>——</td>
+							                    <td>20万元</td>
+							                    <td>20万元</td>
+							                    <td></td>
+							                    <td>柜面、网银开通无卡支付业务</td>
+							                </tr>
+							                <tr>
+							                    <td>华夏银行</td>
+							                    <td>HXB</td>
+							                    <td>——</td>
+							                    <td>1000元</td>
+							                    <td>2000元</td>
+							                    <td></td>
+							                    <td>柜面、网银开通无卡支付业务</td>
+							                </tr>
+							            </table>
+                                </div> 
+							    </div>
+							</div>			  	
+					</div>
+				</div>
+				<div class="col-md-2"></div>
+			</div>		 	
+		</div>	
+	</body>
+</html>

@@ -1,0 +1,375 @@
+/*订单审核*/
+#approval,#release{
+    float:right;
+}
+#release{
+    margin-left:10px;
+}
+#upload{
+	position:relative;
+	height:30px!important;
+}
+#uploadShow{
+	position:absolute;
+	top:0px;
+	left:15px;
+	width:80px;
+}
+#upload div{
+	position:absolute;
+	width:80px;
+	height:30px;
+	top:0px;
+	left:100px;
+	background:#eee;
+	border-radius:2px;
+	border:1px solid #ccc;
+	text-align:center;
+	line-height:30px;
+	
+}
+#uploadInput{
+	position:absolute;
+	top:0px;
+	left:100px;
+	width:80px!important;
+	opacity:0;
+}
+#downLoad{
+	position:absolute;
+	top:0px;
+	left:100px;
+}
+#uploadProgress{
+	position:absolute;
+	top:0px;
+	left:200px;
+	display:none;
+}
+#btn-revise{
+	position:absolute;
+	left:0;
+	top:0;
+	display:none;
+}
+#btn-save{
+	position:absolute;
+	left:0;
+	top:0;
+}
+/*choose payWay*/
+#tabs {
+    overflow: hidden;
+    width:98%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    background: #fff;
+	margin:0 auto;
+
+}
+#content{
+    position:relative;
+    z-index:1;
+    width:98%;
+    margin:0 auto;
+	margin-top:-1px;
+    border:1px solid #ccc;
+    border-radius:0 4px 4px 4px;
+    margin-bottom:20px;
+}
+#tabs li {
+	position:relative;
+	z-index:2;
+    float: left;
+    width:133px;
+    height:100%;
+    text-align: center;
+    margin-right:2px;
+    border-radius:4px 4px 0 0;
+    border-top:1px solid #ccc;
+    border-left:1px solid #ccc;
+    border-right:1px solid #ccc;
+}
+#tabs li a{
+	text-decoration:none;
+    display: inline-block;
+	width:100%;
+    height:45px;
+    font-size:15px;
+    line-height: 45px;
+    color:#404040;
+}
+#current{
+    border-bottom:1px solid #fff;
+}
+.content-son{
+	display:none;
+	background: #fff;
+	overflow:hidden;
+	padding:40px 20px;
+}
+.bankBox{
+	width:840px;
+	margin:0 auto;
+	overflow:hidden;
+	padding-top:20px;
+	padding-bottom:35px;
+}
+.bankcard{
+   width:250px;
+   height:128px;
+   border:1px solid #b28850;
+   border-radius:5px;
+   float:left;	
+   margin-left:15px;
+   margin-right:15px;
+   cursor:pointer;
+   position:relative;
+   overflow:hidden;
+   margin-top:20px;
+   position:relative;
+}
+.reviseMask{
+	width:100%;
+	height:100%;
+	position:absolute;
+	left:0;
+	top:0;
+	border-radius:5px;
+	background:rgba(0,0,0,0.6);
+	font-size:14px;
+	text-align:center;
+	line-height:128px;
+	color:#fff;
+	display:none;
+}
+.check{
+	position:absolute;
+	display:none;
+	right:0;
+	bottom:0;
+}
+.userName{
+	font-size:14px;
+	margin-top:25px;
+	padding-left:32px;
+	color:#545454;
+	line-height:16px;
+}
+.bankCard{
+	font-size:14px;
+	padding-left:32px;
+	color:#545454;
+	line-height:16px;
+}
+.bankType{
+	font-size:14px;	
+	padding-left:32px;
+	margin-top:15px;
+	color:#545454;
+	line-height:12px;
+}
+.addbankcard{
+   width:250px;
+   height:128px;
+   border:1px solid #ed6c44;
+   background:#fff2ee;
+   border-radius:5px;
+   float:left;	
+   margin-left:15px;
+   margin-right:15px;
+   margin-top:20px;
+   padding: 50px 50px;
+   cursor:pointer;
+   position:relative;
+   overflow:hidden;
+}
+.cardManage{
+	width:56px;
+	height:30px;
+	line-height:30px;
+	border-radius:3px 3px 0 0;
+	color:#b28850;
+	font-size:16px;
+	text-align:center;
+	position:absolute;
+	top:20px;
+	right:10px;
+}
+.manageImg{
+	margin-left:5px;
+}
+.ManageSon{
+	width:100%;
+	height:52px;
+	border-radius:0 0 3px 3px;
+	border:1px solid #c9c9c9;
+	background:#fff;
+	display:none;
+}
+.ManageSonToggle{
+	background:#b28850;
+	color:#fff;
+}
+.ManageSonItem{
+	width:100%;
+	height:26px;
+	text-align:center;
+	line-height:26px;
+	font-size:16px;
+	color:#545454;
+	margin:0;
+	cursor:pointer;
+}
+.addbankcard img{
+	margin-left:10px;
+}
+.addText{
+	color:#ed6c44;
+}
+.reviseDiv{
+	width:100%;
+	height:400px;
+	background:#f5f5f5;
+	padding-top:50px;
+	display:none;
+}
+.addDiv{
+	width:100%;
+	height:400px;
+	background:#f5f5f5;
+	padding-top:50px;
+	display:none;
+}
+#fast{
+	padding:40px 0;
+	padding-bottom:0;
+}
+#fastButton{
+	display:block;
+	margin:0 auto;
+	width:72px;
+	height:30px;
+}
+.addDivInner{
+	width:400px;
+	overflow:hidden;
+	margin:0 auto;
+}
+.buttonBox{
+	width:200px;
+    overflow:hidden;
+    margin:50px auto 0;
+}
+#cancelAdd{
+	width:80px;
+	float:left;
+}
+#saveCard{
+	width:80px;
+	float:right;
+}
+#cancelRevise{
+	width:80px;
+	float:left;
+}
+#saveRevise{
+	width:80px;
+	float:right;
+}
+/*supportBank*/
+.support-bank{
+    padding:0 20px 20px;
+    margin-top:30px;
+
+}
+.support-bank-title{
+    width:100%;
+    height:38px;
+    background: #ededed;
+    font-size: 14px;
+    line-height: 38px;
+    padding-left:10px;
+}
+.support-banks{
+    width:100%;
+    margin-top:15px;
+    overflow:hidden;
+}
+.bank-type{
+    float:left;
+    margin-left:11px;
+    margin-right: 11px;
+    margin-top:5px;
+    overflow:hidden;
+}
+.support-bank table{
+    width:100%;
+    border: 1px solid #e5e5e5;
+    border-collapse: collapse;
+    margin-top:28px;
+}
+.support-bank table tr{
+    border: 1px solid #e5e5e5;
+    border-collapse: collapse;
+    height:30px;
+}
+.support-bank table tr td{
+    font-size: 12px;
+    text-align: center;
+}
+
+/*支付成功*/
+.successDiv{
+	width:900px;
+	margin:50px auto;
+}
+.success-title{
+	width:900px;
+	height:65px;
+	background:url(../../img/cfmImg/sbg.png) repeat-x;
+	line-height:65px;
+	padding-left:20px;
+	font-size:20px;
+	font-weight:bold;
+	color:#e68b03;
+}
+.success-bottom{
+	width:900px;
+	margin:0 auto;
+	background:#fff;
+	padding:60px 0;
+	overflow:hidden;
+}
+.successImg{
+	width:115px;
+	display:block;
+	float:left;
+	margin-left:120px;
+}
+.success-right{
+	width:600px;
+	display:block;
+	float:left;
+	list-style: none;
+	margin-left:35px;
+}
+.congratulate{
+	display:block;
+    font-size:18px;
+    font-weight:bold;
+}
+.successMessage{
+	font-size:14px;
+	line-height:26px;
+}
+.sorry{
+	display:block;
+    font-size:18px;
+    font-weight:bold;
+}
+.sorryMessage{
+	font-size:14px;
+	line-height:26px;
+}

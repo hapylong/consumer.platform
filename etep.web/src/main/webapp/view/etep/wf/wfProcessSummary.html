@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>流程汇总查询</title>
+<meta charset="UTF-8" />
+<meta name="Author" content="" />
+<meta name="Keywords" content="" />
+<meta name="Description" content="" />
+<link rel="stylesheet" href="../../../js/bootstrap/themes/default/bootstrap.css" />
+<link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+<link rel="stylesheet" href="../../../css/jquery.datetimepicker.css" />
+<link rel="stylesheet" href="../../../css/jquery.select2.css" />
+<link rel="stylesheet" href="../../../css/jquery.select2-bootstrap.css" />
+<script src="../../../js/common/package.js"></script>
+<script src="../../../js/common/url.js"></script>
+<script src="../../../js/common/jquery-1.11.3.min.js"></script>
+<script src="../../../js/bootstrap/bootstrap.js"></script>
+<script src="../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+<script src="../../../js/common/jquery.datetimepicker.js"></script>
+<script src="../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+<script src="../../../js/common/json2.js"></script>
+<script src="../../../js/common/base.js"></script>
+<script src="../../../js/common/jquery.select2.js"></script>
+<script src="../../../js/common/datagrid2.js"></script>
+<script src="../../../js/common/formatter.js"></script>
+<script src="../../../js/each/etep/wf/wfProcessSummary.js"></script>
+<script src="../../../js/common/wflow.js"></script>
+<style type="text/css">
+body {
+	background: #eee url("../../../img/back.png") repeat;
+}
+
+.container-fluid {
+	padding: 5px;
+}
+</style>
+</head>
+<body>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="panel panel-info">
+					<div class="panel-heading">
+						<h3 class="panel-title">查询条件</h3>
+					</div>
+					<div class="panel-body">
+						<form id="searchForm" class="form-horizontal" role="form">
+							<div class="form-group">	
+								<label for="procBizid" class="col-lg-1 col-md-1 col-sm-1 control-label">业务ID:</label>			    	
+						    	<div class="col-lg-2 col-md-2 col-sm-2">						    		
+						      		<input type="text" class="form-control input-sm" name="procBizid" placeholder="请输入业务ID" />
+						    	</div>		
+						    	<label for="procMemo" class="col-lg-1 col-md-1 col-sm-1 control-label">流程摘要:</label>			    	
+						    	<div class="col-lg-2 col-md-2 col-sm-2">
+						      		<input type="text" class="form-control input-sm" name="procMemo" placeholder="请输入流程摘要" />
+						    	</div>		
+						    	<label for="procStatus" class="col-lg-1 col-md-1 col-sm-1 control-label">流程状态：</label>				    	
+						    	<div class="col-lg-1 col-md-1 col-sm-1">
+						      		<select id="procStatus" class="form-control" name="procStatus" style="width: 100%;">
+										<option value=""></option>
+										<option value="0">审批中</option>
+										<option value="3">已暂停</option>
+										<option value="4">已终止</option>
+										<option value="5">已删除</option>
+										<option value="6">已完成</option>
+										<option value="7">已取消</option>
+									</select>
+						    	</div>
+							</div>
+							<div class="form-group">
+						    	<label for="createDateStart" class="col-lg-1 col-md-1 col-sm-1 control-label">流程创建日期：</label>
+						    	<div class="col-lg-1 col-md-1 col-sm-1">
+						      		<input type="text" class="form-control input-sm" id="createDateStart" name="procCreateTimeStart" placeholder="请选择开始日期" />
+						    	</div>
+						    	<!-- <label for="createDateEnd" class="col-md-1 control-label"></label> -->
+						    	<div class="col-lg-1 col-md-1 col-sm-1">
+						      		<input type="text" class="form-control input-sm" id="createDateEnd" name="procCreateTimeEnd" placeholder="请选择结束日期" />
+						    	</div>
+						    	
+						    	<label for="finishedDateStart" class="col-lg-1 col-md-1 col-sm-1 control-label">流程完成日期:</label>
+						    	<div class="col-lg-1 col-md-1 col-sm-1">
+						      		<input type="text" class="form-control input-sm" id="finishedDateStart" name="procFinishedTimeStart" placeholder="请选择开始日期" />
+						    	</div>
+						    	<div class="col-lg-1 col-md-1 col-sm-1">
+						      		<input type="text" class="form-control input-sm" id="finishedDateEnd" name="procFinishedTimeEnd" placeholder="请选择结束日期" />
+						    	</div>
+						    	<div class="col-lg-3 col-md-3 col-sm-3">
+						    		<button id="btn-search" type="button"  class="btn btn-primary btn-sm">查询</button>
+						 		  	<button id="btn-reset" type="button"  class="btn btn-primary btn-sm">重置</button>
+						 		  	<button id="btn-export-all" type="button" class="btn btn-success btn-sm">导出</button>
+						    	</div>
+							</div>
+						</form>
+					</div>
+				</div>
+				<div class="panel panel-info">
+					<div class="panel-heading">
+						<h3 class="panel-title">流程列表</h3>
+					</div>
+					<table id='datagrid' class="table table-bordered table-hover">
+						<thead>
+							<tr>
+								<th field="ck"></th>
+								<th field="rn" align="text-center" class="text-center">序号</th>
+								<th field="procInstId" hidden="true">procInstId</th>
+								<th field="procDisplayurl" hidden="true">查看页面</th>
+								<th field="procOrgcode" hidden="true">机构代码</th>
+								<th field="procBiztype" hidden="true">业务类型</th>
+								<th field="procName" align="text-center" class="text-center">流程名称</th>
+								<th field="procBizId" align="text-center" class="text-center" formatter="IQB.wfProcessSummary.formatterOfSkipPage(val, row, rowIndex)">业务ID</th>
+								<th field="procCreatetime" align="text-center" class="text-center">流程创建时间</th>
+								<th field="procEndtime" align="text-center" class="text-center">流程完成时间</th>
+								<th field="procMemo" align="text-center" class="text-center">流程摘要</th>
+								<th field="procTaskname" align="text-center" class="text-center">任务名称</th>
+								<th field="procTaskCommitter" align="text-center" class="text-center">提交人</th>
+								<th field="procTaskAssignee" align="text-center" class="text-center">处理人/角色</th>
+								<th field="procLicensor" align="text-center" class="text-center">受托人</th>
+								<th field="procTaskCommittime" align="text-center" class="text-center">任务到达时间</th>
+								<th field="procTaskAssigntime" align="text-center" class="text-center">任务受理时间</th>
+								<th field="procStatusName" align="text-center" class="text-center">流程状态</th>
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
+					<div class="panel-footer">
+						<div id="paginator"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

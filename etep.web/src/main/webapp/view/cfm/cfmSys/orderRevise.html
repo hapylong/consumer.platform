@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	    <title>订单查询</title>
+	    <meta charset="UTF-8" />
+	    <meta name="Author" content="" />
+	    <meta name="Keywords" content="" />
+	    <meta name="Description" content="" />
+	    
+	    <!-- 样式库 -->
+	    <link rel="stylesheet" href="../../../js/ztree/css/zTreeStyle/zTreeStyle.css" />
+	    <link rel="stylesheet" href="../../../js/bootstrap/themes/default/bootstrap.css" />
+	    <link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+	    <link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+	    <link rel="stylesheet" href="../../../css/jquery.select2.css" />
+	    <link rel="stylesheet" href="../../../css/jquery.select2-bootstrap.css" />
+	    <link rel="stylesheet" href="../../../css/jquery.datetimepicker.css" />
+	    <link rel="stylesheet" href="../../../css/common/base2.css" />
+	    
+	    <!-- 插件库 -->
+	    <script src="../../../js/common/package.js"></script>
+		<script src="../../../js/common/url.js"></script>
+		<script src="../../../js/common/json2.js"></script>	
+		<script src="../../../js/common/jquery-1.11.3.min.js"></script>		
+		<script src="../../../js/bootstrap/bootstrap.js"></script>
+		<script src="../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+		<script src="../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+		<script src="../../../js/ztree/js/jquery.ztree.all.min.js"></script>
+		<script src="../../../js/common/jquery.select2.js"></script>
+		
+		<!-- 业务库 -->
+		<script src="../../../js/common/base.js"></script>
+		<script src="../../../js/common/datagrid2.js"></script>
+		<script src="../../../js/common/tree.js"></script>
+		<script src="../../../js/common/formatter.js"></script>	    
+	    <script src="../../../js/each/cfm/cfmSys/orderRevise.js"></script>
+	    <script src="../../../js/common/jquery.datetimepicker.js"></script>
+	    <script src="../../../js/each/cfm/merch/merch.js"></script>
+		
+		<!-- 页面样式 -->
+		<style type="text/css">
+			body {
+				font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif !important;
+				background:#eee url("../../../img/back.png") repeat;
+			}
+			.container-fluid {
+				padding:5px;
+			}
+			.left-part {
+				height:800px;
+			}
+			.modal-form {
+				margin:8px;
+				height:500px;
+				overflow-y:scroll;
+				overflow-x:hidden;
+			}
+		</style>
+	    
+	</head>   
+	<body>
+	
+		<div class="container-fluid" style='overflow-x:hidden;'>
+			<div class="row">				
+				<div class="col-md-12">
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<h4 class="panel-title">查询信息</h4>
+					  	</div>
+					  	<div class="panel-body">	
+					  		<form id="searchForm" class="form-horizontal">
+							  	<div class="form-group">
+							    	<label class="control-label col-lg-1 col-md-1 col-sm-1">商户名 </label>
+							    	<div class="col-lg-2 col-md-2 col-sm-2">
+							    	    <input id="merchNames" type="text" readonly value="全部商户" name="merchNames" class="form-control merch" onclick="showMenu(); return false;"/>
+							  	    </div>
+							  	    <label class="control-label col-lg-1 col-md-1 col-sm-1">手机号</label>
+							  	    <div class="col-lg-2 col-md-2 col-sm-2">
+							  	        <input name="regId" type="text" class="form-control input-sm" placeholder="请输入手机号" maxlength='11'>
+							  	    </div>
+							  	    <label class="control-label col-lg-1 col-md-1 col-sm-1">姓名</label>
+							  	    <div class="col-lg-2 col-md-2 col-sm-2">
+							  	        <input name="userName" type="text" class="form-control input-sm" placeholder="请输入姓名">
+							  	    </div>
+								</div>
+								<div class="form-group">
+								    <label class="control-label col-lg-1 col-md-1 col-sm-1">支付状态</label>
+								  	<div class="col-lg-2 col-md-2 col-sm-2">
+								  	    <select id="preAmtStatus" name="preAmtStatus" class="form-control" style='width:100%'>
+								    	    <option value=''>请选择</option>
+								    	    <option value='1'>已支付</option>
+								    	    <option value='2'>待支付</option>
+									    </select>
+									</div>	
+								    <label class="control-label col-lg-1 col-md-1 col-sm-1">订单状态</label>
+									<div class="col-lg-2 col-md-2 col-sm-2">
+									    <select id="riskStatus" name="riskStatus" class="form-control" style='width:100%'>
+								    	    <option value=''>请选择</option>
+								    	    <option value='0'>审核通过</option>
+								    	    <option value='1'>审核拒绝</option>
+								    	    <option value='2'>审核中</option>
+								    	    <option value='3'>已分期</option>
+								    	    <option value='5'>待确认</option>
+								    	    <option value='6'>已取消</option>
+								    	    <option value='10'>已结清</option>
+								    	    <option value='11'>已终止</option>
+									    </select>
+									</div>
+								    <label class="control-label col-lg-1 col-md-1 col-sm-1">工作流状态</label>
+									<div class="col-lg-2 col-md-2 col-sm-2">
+									    <select id="wfStatus" name="wfStatus" class="form-control" style='width:100%'>
+								    	    <option value=''>请选择</option>
+								    	    <option value='9'>流程结束</option>
+								    	    <option value='0'>流程拒绝</option>
+								    	    <option value='11'>待车价评估</option>
+								    	    <option value='12'>待车价复评</option>
+								    	    <option value='2'>待门店预处理</option>
+								    	    <option value='3'>待风控审批</option>
+								    	    <option value='31'>待人工风控</option>
+								    	    <option value='4'>待抵质押物估价</option>
+								    	    <option value='41'>待车秒贷审核</option>
+								    	    <option value='5'>待项目信息维护</option>
+								    	    <option value='6'>待内控审批</option>
+								    	    <option value='7'>待财务收款确认</option>
+								    	    <option value='8'>待项目初审</option>
+								    	    <option value='81'>待确认入库</option>
+								    	    <option value='82'>待终审</option>
+									    </select>
+									</div>
+								</div>
+								<div class="form-group">	
+								    <label class="control-label col-lg-1 col-md-1 col-sm-1">开始时间</label>
+								    <div class="col-lg-2 col-md-2 col-sm-2">
+								        <input name="startTime" id='startTime' type="text" class="form-control input-sm" placeholder="请输入开始时间">
+								    </div>
+								    <label class="control-label col-lg-1 col-md-1 col-sm-1">结束时间</label>
+								    <div class="col-lg-2 col-md-2 col-sm-2">
+								        <input name="endTime" id='endTime' type="text" class="form-control input-sm" placeholder="请输入结束时间">
+								    </div>
+								    <div class="col-lg-2 col-md-2 col-sm-2">
+									    <button id="btn-search" type="button" class="btn btn-default btn-sm">查询</button>
+									    <button id="btn-reset" type="button" class="btn btn-default btn-sm">重置</button>  
+									</div>
+							  	</div>
+							</form>	  												 	
+					  	</div>
+					</div>
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<h4 class="panel-title">订单信息</h4>
+					  	</div>
+					    <div class="panel-body">
+					    	<form id="listForm">					    		
+					    		<button id="btn-update" type="button" class="btn btn-warning btn-sm">修改订单</button>
+					    	</form>
+					  	</div>
+					  	<div class='scrollbar' style='width:100%;overflow-x:scroll'>
+						<table id='datagrid' class="table table-striped table-bordered table-hover table-condensed ">
+						    <thead>
+						    	<tr>						    		
+							    	<th field="ck"></th>
+							    	<th field="userName">姓名</th>	
+							    	<th field="regId">手机号</th>						    	
+							    	<!-- <th field="orderId" hidden="true">ID</th>
+							    	<th field="planId" hidden="true">ID</th> -->
+                                    <th field="orderId" idField="true" hidden="true">ID</th> 
+							    	<th field="orderName">订单名称</th>
+							    	<th field="createTime" formatter="Formatter.timeCfm(val)">订单时间</th>
+							    	<th field="orderAmt" formatter="Formatter.money(val)">金额</th>
+							    	<th field="orderItems">期数</th>
+							    	<th field="planShortName">方案</th>
+							    	<th field="downPayment" formatter="Formatter.money(val)">首付</th>
+							    	<th field="margin" formatter="Formatter.money(val)">保证金</th>
+							    	<th field="serviceFee" formatter="Formatter.money(val)">服务费</th>
+							    	<th field="monthInterest" formatter="Formatter.money(val)">月供</th>
+							    	<th field="feeAmount" formatter="Formatter.money(val)">上收息</th>
+							    	<th field="takePayment" formatter="Formatter.upPayment(val)">上收月供</th>
+							    	<th field="preAmt" formatter="Formatter.money(val)">预付款</th>
+							    	<th field="chargeWay" formatter="Formatter.chargeWay(val)">收取方式</th>
+                                    <th field="s" formatter="Formatter.orderStatu(val, row, rowIndex)">订单状态</th>
+                                    <th field="preAmtStatus" formatter="Formatter.preAmtStatus(val)">支付状态</th>
+                                    <th field="wfStatus" formatter="Formatter.wfStatus(val)">工作流状态</th>
+                                    <th field="riskRetRemark">风控建议</th>
+                                    <th field="merchName">商户号</th>
+						    	</tr>
+						    </thead>
+						    <tbody></tbody>
+						</table>
+						</div>
+					  	<div class="panel-footer">
+							<div id="paginator"></div>
+						</div>
+					</div>
+				</div>
+			</div>		 	
+		</div>
+		
+
+		<div id="update-win" class="modal fade" role="dialog" aria-labelledby="update-win-label" aria-describedby="……">
+			<div class="modal-dialog" role="document">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<h5 class="modal-title" id="update-win-label"></h5>
+		      		</div>
+	      			<div class="modal-form">
+	      				<form id="updateForm" class="form-horizontal">
+							<input name="orderId" type="text" class="hidden" />	
+							<input id="type" name="type" type="text" class="hidden" value="1" />
+							<div class="form-group">
+				    			<label class="col-sm-3 control-label">姓名</label>
+				    			<div class="col-sm-9">
+				    				<input name="userName" id='userName' type="text" class="form-control input-sm" readonly>
+				    			</div>
+				  			</div>	
+							<div class="form-group">
+				    			<label class="col-sm-3 control-label">手机号</label>
+				    			<div class="col-sm-9">
+				      				<input name="regId" id="regId" type="text" class="form-control input-sm" readonly/>
+				    			</div>
+				  			</div>		
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">订单名称</label>
+				    			<div class="col-sm-9">
+				    			    <input name="orderName" id='orderName' type="text" class="form-control input-sm easyui-validatebox" required="required"/>
+				    			</div>
+				  			</div>
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">金额</label>
+				    			<div class="col-sm-9">
+				    			    <input name="orderAmt" id='orderAmt' type="text" oninput='IQB.orderRevise.cal()' class="form-control input-sm easyui-validatebox" data-options="required:true, validType:['money']"/>
+				    			</div>
+				  			</div>
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">方案</label>
+				    			<div class="col-sm-9">
+				    			    <!-- <select id="planShortName" name="planShortName" class="form-control">
+								    </select> -->
+								    <select id="planId" name="planId" class="form-control easyui-validatebox" required="required">
+								    </select>
+				    			</div>
+				  			</div>
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">期数</label>
+				    			<div class="col-sm-9">
+				    			    <input name="orderItems" id='orderItems' type="text"  class="form-control input-sm" readonly/>
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">首付</label>
+				    			<div class="col-sm-9">
+				    			    <input name="downPayment" id='downPayment' type="text"   class="form-control input-sm" readonly/>
+				    			</div>
+				  			</div>
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">保证金</label>
+				    			<div class="col-sm-9">
+				    			    <input name="margin" id='margin' type="text"  class="form-control input-sm" readonly/>
+				    			</div>
+				  			</div>
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">服务费</label>
+				    			<div class="col-sm-9">
+				    			    <input name="serviceFee" id='serviceFee' type="text"  class="form-control input-sm" readonly/>
+				    			</div>
+				  			</div>
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">月供</label>
+				    			<div class="col-sm-9">
+				    			    <input name="monthInterest" id='monthInterest'  type="text" class="form-control input-sm" readonly/>
+				    			</div>
+				  			</div>
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">上收息</label>
+				    			<div class="col-sm-9">
+				    			    <input name="feeAmount" id='feeAmount'  type="text" class="form-control input-sm" readonly/>
+				    			</div>
+				  			</div>
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">上收月供</label>
+				    			<div class="col-sm-9">
+				    			    <select id="takePayment" name="takePayment" class="form-control" readonly disabled>
+				    			        <option value='1'>是</option>
+				    			        <option value='0'>否</option>
+								    </select>
+				    			</div>
+				  			</div>
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">收取方式</label>
+				    			<div class="col-sm-9">
+				    			    <select id="chargeWay" name="chargeWay" class="form-control easyui-validatebox" required="required">
+				    			        <option value='1'>线下收取</option>
+				    			        <option value='0'>线上收取</option>
+								    </select>
+				    			</div>
+				  			</div>
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">风控状态</label>
+				    			<div class="col-sm-9">
+				    			    <select id="riskStatus" name="riskStatus" class="form-control easyui-validatebox" required="required">
+							    	    <option value=''>请选择</option>
+							    	    <option value='0'>审核通过</option>
+							    	    <option value='1'>审核拒绝</option>
+							    	    <option value='2'>审核中</option>
+							    	    <option value='3'>已分期</option>
+							    	    <option value='4'>待支付</option>
+								    </select>
+				    			</div>
+				  			</div>
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">工作流状态</label>
+				    			<div class="col-sm-9">
+				    			    <select id="wfStatus" name="wfStatus" readonly disabled class="form-control easyui-validatebox" required="required">
+							    	    <option value=''>请选择</option>
+							    	    <option value='0'>流程结束</option>
+							    	    <option value='2'>待门店预处理</option>
+							    	    <option value='3'>待风控审批</option>
+							    	    <option value='4'>待抵质押物估价</option>
+							    	    <option value='5'>待项目信息维护</option>
+							    	    <option value='6'>待内控审批</option>
+							    	    <option value='7'>待财务收款确认</option>
+							    	    <option value='8'>待项目初审</option>
+								    </select>
+				    			</div>
+				  			</div>
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">风控建议</label>
+				    			<div class="col-sm-9">
+				    			    <input name="riskRetRemark" id='riskRetRemark' type="text" class="form-control input-sm" />
+				    			</div>
+				  			</div>
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">预付款</label>
+				    			<div class="col-sm-9">
+				    			    <input name="preAmt" id='preAmt' type="text" class="form-control input-sm" readonly/>
+				    			</div>
+				  			</div>
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">商户号</label>
+				    			<div class="col-sm-9">
+				    			    <!-- <select id="merchCode" name="merchCode" class="form-control" readonly disabled>
+				    			       
+								    </select> -->
+								    <input id="merchCode" type="text" readonly  value="" name="merchCode" class="form-control"/>
+				    			</div>
+				  			</div>
+						</form>
+	      			</div>		      		
+		      		<div class="modal-footer">
+				        <button id="btn-save" type="button" class="btn btn-success btn-sm">保存</button>
+				        <button id="btn-close" type="button" class="btn btn-default btn-sm">关闭</button>		        
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+		<div id="menuContent" class="menuContent" style="max-height:500px;overflow:scroll;display:none; position: absolute;background:#fff;border:1px solid #ccc;">
+	        <ul id="treeDemo" class="ztree" style="margin-top:0;"></ul>
+        </div>	
+	</body>
+</html>

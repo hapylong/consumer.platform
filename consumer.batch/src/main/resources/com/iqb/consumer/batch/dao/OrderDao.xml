@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+	Apache License, Version 2.0 (the "License"); you may not use this file except 
+	in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.batch.dao.OrderDao">
+
+	<sql id="table">inst_orderinfo</sql>
+
+	<!-- 配置映射字段 -->
+	<resultMap type="com.iqb.consumer.batch.data.pojo.OrderBean"
+		id="OrderBeanResultMap">
+		<result property="orderId" column="orderId" />
+		<result property="userId" column="userId" />
+		<result property="regId" column="regId" />
+		<result property="merchantNo" column="merchantNo" />
+		<result property="orderName" column="orderName" />
+		<result property="orderAmt" column="orderAmt" />
+		<result property="orderItems" column="orderItems" />
+		<result property="orderRemark" column="orderRemark" />
+		<result property="preAmt" column="preAmt" />
+		<result property="preAmtStatus" column="preAmtStatus" />
+		<result property="status" column="status" />
+		<result property="riskStatus" column="riskStatus" />
+		<result property="riskRetRemark" column="riskRetRemark" />
+		<result property="refundFlag" column="refundFlag" />
+		<result property="margin" column="margin" />
+		<result property="downPayment" column="downPayment" />
+		<result property="serviceFee" column="serviceFee" />
+		<result property="planId" column="planId" />
+		<result property="qrCodeId" column="qrcodeId" />
+		<result property="takePayment" column="takepayment" />
+		<result property="feeYear" column="feeYear" />
+		<result property="feeAmount" column="feeAmount" />
+		<result property="monthInterest" column="monthInterest" />
+		<result property="chargeWay" column="chargeWay" />
+		<result property="procInstId" column="procInstId" />
+		<result property="fee" column="fee" />
+		<result property="sumMoney" column="sumMoney" />
+		<result property="applyAmt" column="applyAmt" />
+		<result property="gpsAmt" column="gpsAmt" />
+		<result property="assessPrice" column="assessPrice" />
+		<result property="wfStatus" column="wfStatus" />
+		<result property="bizType" column="bizType" />
+		<result property="version" column="version" />
+		<result property="createTime" column="createTime" />
+		<result property="updateTime" column="updateTime" />
+	</resultMap>
+
+    <!-- 查询所有订单 -->
+    <select id="selectAllOrderList" resultMap="OrderBeanResultMap">
+       select A.orderId,
+            A.regId,
+            A.orderName,
+            A.orderAmt,
+            A.orderItems,
+            A.createTime,
+            A.downPayment,
+            A.margin,
+            A.serviceFee,
+            A.monthInterest,
+            A.feeAmount,
+            A.takePayment,
+            A.preAmt,
+            A.riskStatus,
+            A.loanDate
+             FROM inst_orderinfo A
+    </select>
+    
+	<!-- 通过订单号修改剩余期数-->
+    <update id="updateOrderItemsByOrderId" parameterType="java.lang.String">
+        UPDATE
+        inst_orderinfo
+        SET leftInstIMonth = orderItems - IFNULL(
+		    (
+		        SELECT
+		            SUM(APPLYITEMS)
+		        FROM
+		            cf_requestmoney
+		        WHERE
+		            ORDERID = #{orderId}
+		    ),
+		    0
+		),
+		 leftInstIDay = 0
+		WHERE
+		    orderId = #{orderId}
+    </update>
+    <select id="queryBillLastDateThree" resultType="com.iqb.consumer.batch.data.pojo.InstallmentBillPojo">
+       select A.orderId,
+            A.curItems as repayNo,
+            A.lastrepaydate,
+            A.curRepayAmt,
+            A.overdueDays,
+            A.createTime,
+            A.perOverdueAmt as curRepayOverdueInterest,
+            A.status
+             FROM inst_remind_phone A where A.flag=2 and A.status &lt; 3
+    </select>
+    <select id="queryBillInfoOne" parameterType="com.iqb.consumer.batch.data.pojo.InstallmentBillPojo" resultType="com.iqb.consumer.batch.data.pojo.InstallmentBillPojo">
+       select A.orderId,
+            A.curItems as repayNo,
+            A.lastrepaydate,
+            A.curRepayAmt,
+            A.overdueDays,
+            A.createTime,
+            A.perOverdueAmt as curRepayOverdueInterest,
+            A.status
+       FROM inst_remind_phone A where A.flag=2 AND
+       orderId = #{orderId} and curItems = #{repayNo}
+    </select>
+    <select id="getInstallmentBillPojoByOrderId" parameterType="java.lang.String" resultType="com.iqb.consumer.batch.data.pojo.InstallmentBillPojo">
+       select A.orderId,
+            A.curItems as repayNo,
+            A.lastrepaydate,
+            A.curRepayAmt,
+            A.overdueDays,
+            A.createTime,
+            A.perOverdueAmt as curRepayOverdueInterest,
+            A.status
+       FROM inst_remind_phone A where A.flag=2 AND
+       orderId = #{orderId} and curItems = #{repayNo}
+    </select>
+    <update id="updateBillLastDate" parameterType="com.iqb.consumer.batch.data.pojo.InstallmentBillPojo">
+        UPDATE
+        inst_remind_phone
+        <set>
+			<if test="curRepayAmt != null and curRepayAmt != ''">
+				curRepayAmt = #{curRepayAmt},
+			</if>
+			<if test="overdueDays != null and overdueDays != ''">
+				overdueDays = #{overdueDays},
+			</if>
+			<if test="curRepayOverdueInterest != null and curRepayOverdueInterest != ''">
+				perOverdueAmt = #{curRepayOverdueInterest},
+			</if>
+			<if test="status != null">
+				status = #{status,jdbcType=INTEGER},
+			</if>
+			updateTime =NOW()
+		</set>
+		WHERE
+		    orderId = #{orderId} and curItems = #{repayNo} and flag = 2
+    </update>
+    <select id="getOrderAllInfoByOrderId" parameterType="java.lang.String" resultType="com.iqb.consumer.batch.data.pojo.OrderBean">
+	 	SELECT
+			A.orderId as orderId,
+			B.realName as realName,
+			C.merchantFULLNAME as merchantFullName,
+			A.orderItems as orderItems,
+			A.merchantNo,
+            A.regId
+		FROM
+			inst_orderinfo A
+		LEFT JOIN inst_user B ON A.userId = B.id
+		LEFT JOIN inst_merchantinfo C ON A.merchantNo = C.MERCHANTNO
+		WHERE
+		    A.orderId = #{orderId}
+		    limit 1
+    </select>
+    <insert id="insertBillLastDate" parameterType="com.iqb.consumer.batch.data.pojo.InstallmentBillPojo" keyProperty="id"
+        useGeneratedKeys="true">
+       INSERT INTO inst_remind_phone (
+        orderId, realName, regId, merchantNo, curItems,
+        orderItems, lastrepaydate, curRepayAmt, perOverdueAmt, overdueDays,
+        overdueAmt,billDate,status,createTime,flag,billInfoStatus
+    )
+    VALUES
+        (
+           #{orderId}, #{realName}, #{regId}, #{merchantFullName}, #{repayNo},
+	        #{orderItems}, #{lastRepayDate}, #{curRepayAmt}, #{curRepayOverdueInterest}, #{overdueDays},
+	        #{fixedOverdueAmt},#{lastRepayDate},1,NOW(),2,#{status}
+        );
+    </insert>
+    <select id="queryBillLastDateFive" resultType="com.iqb.consumer.batch.data.pojo.ManageCarInfoBean">
+      select
+			orderId,
+			STATUS as status,
+			after_loan_date as afterLoanDate,
+			trailer_reason as trailerReason,
+			into_garage_date as intoGarageDate,
+			into_garage_remark as intoGarageRemark,
+			lost_contact_reason as lostContactReason,
+			assess_amt as assessAmt,
+			dealer_evaluates_info as dealerEvaluatesInfo,
+			sale_remark as saleRemark,
+			hq_evaluates_amt as hqEvaluatesAmt,
+			hq_check_amt as hqCheckAmt,
+			evaluates_remark as evaluatesRemark,
+			should_pay_amt as	shouldPayAmt,
+			deal_amt as dealAmt,
+			received_amt as receivedAmt,
+			serial_number as serialNumber,
+			sublease_remark as subleaseRemark,
+			sublease_info as subleaseInfo,
+			return_info as returnInfo
+		from inst_managecar_info
+    </select>
+    <insert id="insertManageCarInfoBean" parameterType="com.iqb.consumer.batch.data.pojo.ManageCarInfoBean" keyProperty="id"
+        useGeneratedKeys="true">
+       INSERT INTO inst_managecar_info (
+        orderId, after_loan_date,status,processStatus
+    )
+    VALUES
+        (
+           #{orderId}, NOW(),'70',5
+        );
+    </insert>
+    <!-- 通过订单号修改是否存入inst_managecar_info状态标识-->
+    <update id="updateOrderCarStatusByOrderId" parameterType="java.lang.String">
+        UPDATE
+        inst_orderinfo
+        SET carstatus = '1'
+		WHERE
+		    orderId = #{orderId}
+    </update>
+    <select id="queryInstManagecarInfoOne" resultType="com.iqb.consumer.batch.data.pojo.ManageCarInfoBean">
+      select
+			orderId,
+			STATUS as status,
+			after_loan_date as afterLoanDate,
+			trailer_reason as trailerReason,
+			into_garage_date as intoGarageDate,
+			into_garage_remark as intoGarageRemark,
+			lost_contact_reason as lostContactReason,
+			assess_amt as assessAmt,
+			dealer_evaluates_info as dealerEvaluatesInfo,
+			sale_remark as saleRemark,
+			hq_evaluates_amt as hqEvaluatesAmt,
+			hq_check_amt as hqCheckAmt,
+			evaluates_remark as evaluatesRemark,
+			should_pay_amt as	shouldPayAmt,
+			deal_amt as dealAmt,
+			received_amt as receivedAmt,
+			serial_number as serialNumber,
+			sublease_remark as subleaseRemark,
+			sublease_info as subleaseInfo,
+			return_info as returnInfo
+		from inst_managecar_info
+		where orderId = #{orderId}  LIMIT 1
+    </select>
+    <!-- 通过订单号修改是否存入inst_managecar_info状态-->
+    <update id="updateInstManageCatStatusByOrderId" parameterType="java.lang.String">
+        UPDATE  inst_managecar_info SET processStatus = 5, after_loan_date = NOW() WHERE  processStatus=30 and orderId = #{orderId}
+    </update>
+    <!-- 根据订单号 当前期数 处理意见查询数据信息 -->
+    <select id="getInstRemindRecordInfoOne" parameterType="java.util.Map" resultType="com.iqb.consumer.batch.data.pojo.ManageCarInfoBean">
+        SELECT orderId from inst_remind_record WHERE flag=2  and orderId=#{orderId} and curItems=#{curItems} and mobileDealOpinion=1 LIMIT 1
+    </select>
+</mapper>

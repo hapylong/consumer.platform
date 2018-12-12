@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>用户</title>
+		<meta charset="UTF-8" />
+		<meta name="Author" content="" />
+		<meta name="Keywords" content="" />
+		<meta name="Description" content="" />
+
+  		<link rel="stylesheet" href="../../../../js/bootstrap/themes/default/bootstrap.css"/>
+	    <link rel="stylesheet" href="../../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css"/>
+	    <link rel="stylesheet" href="../../../../css/common/base.css" />
+	    <link rel="stylesheet" href="../../../../css/common/scrollbar.css" />
+	    
+	    <link rel="stylesheet" href="../../../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css"/>
+	    <link rel="stylesheet" href="../../../../js/ztree/css/zTreeStyle/zTreeStyle.css"/>
+	    <link rel="stylesheet" href="../../../../css/jquery.select2.css" />
+	    <link rel="stylesheet" href="../../../../css/jquery.select2-bootstrap.css" />
+        
+        
+        
+        <script src="../../../../js/common/package.js"></script>
+		<script src="../../../../js/common/url.js"></script>
+		<script src="../../../../js/common/jquery-1.11.3.min.js"></script>
+		<script src="../../../../js/common/formatter.js"></script>
+		<script src="../../../../js/bootstrap/bootstrap.js"></script>
+		<script src="../../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+		<script src="../../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+		<script src="../../../../js/ztree/js/jquery.ztree.all.min.js"></script>
+	   	<script src="../../../../js/common/json2.js"></script>	
+		<script src="../../../../js/common/base.js"></script>
+		<script src="../../../../js/common/datagrid2.js"></script>
+		<script src="../../../../js/common/tree.js"></script>
+		<script src="../../../../js/common/jquery.select2.js"></script>
+  		<script src="../../../../js/each/main/main.js"></script>
+      	<script src="../../../../js/common/script.js"></script>
+ 		<script src="../../../../js/each/etep/sys/user/userlock.js"></script>
+
+		<!-- 页面样式 -->
+		<style type="text/css">
+			.container-fluid {
+				padding-top: 4px;
+			}
+			.modal-form {
+				margin: 15px 30px 15px 30px;				
+			}
+		</style>
+
+	</head>
+	<body>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="panel panel-info">
+					<div class="panel-heading">
+						<h3 class="panel-title">查询栏</h3>
+					</div>
+					<div class="panel-body">
+						<form id="searchForm" class="form-horizontal">
+						 <div class="form-group">
+						    <label class="control-label col-lg-1 col-md-1 col-sm-1">用户编码</label>
+						    <div class="col-lg-2 col-md-2 col-sm-2">	
+						        <input type="text" name="userCode"  class="form-control input-sm easyui-validatebox"  data-options="validType:['code','length[4,30]']" placeholder="请输入用户编码">
+						    </div>
+						    <div class="col-lg-3 col-md-3 col-sm-3">	
+							    <button id="btn-search" type="button" class="btn btn-default btn-sm">查询</button>
+								<button id="btn-reset" type="button" class="btn btn-default btn-sm">重置</button>
+							</div>
+						 </div>
+						</form>
+					</div>
+				</div>
+
+				<div class="panel panel-info">
+					<div class="panel-heading">
+						<h3 class="panel-title">信息栏</h3>
+					</div>
+					<div class="panel-body">
+						<form id="listForm">
+									
+							<button id="btn-unlock" type="button"
+								class="btn btn-primary btn-sm">用户解锁</button>
+					
+						</form>
+					</div>
+					<table id="datagrid" class="table table-bordered table-hover" style="text-align:center">
+						<thead  >
+							<tr >
+						   		<th field="ck"></th>
+								<th field="rn" style="text-align:center">序号</th>								
+						     	<th field="id" idField="true" hidden="true"> 主键号</th>
+								<th field="userCode" style="text-align:center">用户编码</th>
+								<th field="userName" style="text-align:center">用户名</th>
+                                <th field="count"  style="text-align:center" >错误次数</th>
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
+					<div class="panel-footer">
+						<div id="paginator"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	
+</body>
+</html>

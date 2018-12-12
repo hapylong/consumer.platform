@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	    <title>用户鉴权</title>
+	    <meta charset="UTF-8" />
+	    <meta name="Author" content="" />
+	    <meta name="Keywords" content="" />
+	    <meta name="Description" content="" />
+	    
+	    <!-- 样式库 -->
+	    <link rel="stylesheet" href="../../../js/ztree/css/zTreeStyle/zTreeStyle.css" />
+	    <link rel="stylesheet" href="../../../js/bootstrap/themes/default/bootstrap.css" />
+	    <link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+	    <link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+	    <link rel="stylesheet" href="../../../css/jquery.select2.css" />
+	    <link rel="stylesheet" href="../../../css/jquery.select2-bootstrap.css" />
+	    <link rel="stylesheet" href="../../../css/jquery.datetimepicker.css" /> 
+	    
+	    
+	    <!-- 插件库 -->
+	    <script src="../../../js/common/package.js"></script>
+		<script src="../../../js/common/url.js"></script>
+		<script src="../../../js/common/json2.js"></script>	
+		<script src="../../../js/common/jquery-1.11.3.min.js"></script>		
+		<script src="../../../js/bootstrap/bootstrap.js"></script>
+		<script src="../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+		<script src="../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+		<script src="../../../js/ztree/js/jquery.ztree.all.min.js"></script>
+		<script src="../../../js/common/jquery.select2.js"></script>
+		<script src="../../../js/common/jquery.datetimepicker.js"></script>
+		
+		<!-- 业务库 -->
+		<script src="../../../js/common/base.js"></script>
+		<script src="../../../js/common/datagrid2.js"></script>
+		<script src="../../../js/common/tree.js"></script>
+		<script src="../../../js/common/formatter.js"></script>	    
+	    <script src="../../../js/each/cfm/warrants/userAuthentication.js"></script>
+		
+		<!-- 页面样式 -->
+		<style type="text/css">
+			body {
+				font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif !important;
+				background:#eee url("../../../img/back.png") repeat;
+			}
+			.container-fluid {
+				padding:5px;
+			}
+			.left-part {
+				height:800px;
+			}
+			.modal-form {
+				margin:8px;
+			}
+		</style>
+	    
+	</head>   
+	<body>
+		<div class="row gc_seperate_bottom_double gc_section">
+                    <div class="row gc_operation_section_operation">
+                        <div class="form-horizontal col-xs-12">
+                            </br>
+                            </br>
+                            </br>
+                            <div class="form-group">
+                                <label class="col-xs-2 control-label">鉴权渠道</label>
+                                <div class="col-xs-2">
+                                    <select size='1' id='channal' class='form-control'>
+                                        <option value='rongbao'>融宝</option>
+                                    </select>
+                                </div>
+                                <label class="col-xs-2 control-label">鉴权要素</label>
+                                <div class="col-xs-2">
+                                    <select size='1' id='factor' class='form-control'>
+                                        <option value='threeYards'>三要素</option>
+                                        <option value='fourYards'>四要素</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-xs-2 control-label">姓名</label>
+                                <div class="col-xs-2">
+                                    <input type="text" class="form-control easyui-validatebox" id="owner" required/>
+                                </div>
+                                <label class="col-xs-2 control-label">身份证号</label>
+                                <div class="col-xs-2">
+                                    <input type="text" class="form-control easyui-validatebox" id="cert_no" required/>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="col-xs-2 control-label">银行卡号</label>
+                                <div class="col-xs-2">
+                                    <input type="text" class="form-control easyui-validatebox" id="card_no" required/>
+                                </div>
+                                <div id='changeDiv' style="display:none">
+	                                <label class="col-xs-2 control-label">银行预留手机号</label>
+	                                <div class="col-xs-2">
+	                                    <input type="text" class="form-control easyui-validatebox" id="phone" required/>
+	                                </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-xs-2 control-label"></label>
+                                <div class="col-xs-2"><!--  style="top: 50%; left: 50%;" -->
+                                    <button id="submit" type="button" class="btn btn-primary">鉴权</button>
+                                </div>
+                                <label class="col-xs-2 control-label"></label>
+                                <div class="col-xs-6"><!--  style="top: 50%; left: 50%;" -->
+                                    <button id="reset" type="button" class="btn btn-primary">重置</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+	</body>
+</html>

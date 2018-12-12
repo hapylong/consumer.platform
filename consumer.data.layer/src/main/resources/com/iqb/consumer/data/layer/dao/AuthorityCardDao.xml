@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+	Apache License, Version 2.0 (the "License"); you may not use this file except 
+	in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- author gxy -->
+<mapper namespace="com.iqb.consumer.data.layer.dao.AuthorityCardDao">
+	<!-- 配置映射字段 -->
+	<resultMap
+		type="com.iqb.consumer.data.layer.bean.authoritycard.AuthorityCardBean"
+		id="authorityCardBean">
+		<result property="id" column="id" />
+		<result property="orderId" column="orderId" />
+		<result property="carNo" column="carNo" />
+		<!-- 需求风控接口升级 start-->
+		<result property="plate" column="plate" />
+		<result property="plateType" column="plateType" />
+		<!-- 需求风控接口升级 end-->
+		<result property="engine" column="engine" />
+		<result property="hasCar" column="hasCar" />
+		<result property="getCarDate" column="getCarDate" />
+		<result property="checkDate" column="checkDate" />
+		<result property="gpsInstDate" column="gpsInstDate" />
+		<result property="insuranceStart" column="insuranceStart" />
+		<result property="insuranceEnd" column="insuranceEnd" />
+		<result property="lineGpsNo" column="lineGpsNo" />
+		<result property="nolineGpsNo" column="nolineGpsNo" />
+		<result property="bizRisksStart" column="bizRisksStart" />
+		<result property="bizRisksEnd" column="bizRisksEnd" />
+		<result property="uploadStatus" column="uploadStatus" />
+		<result property="status" column="status" />
+		<result property="lineGpsInstAdd" column="lineGpsInstAdd" />
+		<result property="noLineGpsInstAdd" column="noLineGpsInstAdd" />
+		<result property="mortgageFlag" column="mortgageFlag" />
+		<result property="mortgageDate" column="mortgageDate" />
+		<result property="version" column="version" />
+		<result property="createTime" column="createTime" />
+		<result property="updateTime" column="updateTime" />
+		
+		<result property="carConfig" 		column="carConfig" />
+		<result property="carAge" 			column="carAge" />
+		<result property="carColor" 		column="carColor" />
+		<result property="carEmissions" 	column="carEmissions" />
+		<result property="passengerNum" 	column="passengerNum" />
+		<result property="mileage" 			column="mileage" />
+		<result property="firstBuyAmt" 		column="firstBuyAmt" />
+		<result property="regOrg" 			column="regOrg" />
+		<result property="firstRegDate" 	column="firstRegDate" />
+		<result property="transferNum" 		column="transferNum" />
+		
+        <result property="carBrand"         column="carBrand" />
+        <result property="carDetail"        column="carDetail" />
+        <result property="mortgageCompany"  column="mortgageCompany" />
+        <result property="buyWays"          column="buyWays" />
+        <result property="assessPrice"      column="assessPrice" />
+         <!-- chengzhen 2017年12月22日 11:35:34 FINANCE-2689 以租代购：添加 驾驶证编号 -->
+        <result property="driverLicenseNum"      column="driverLicenseNum" />
+        
+        
+	</resultMap>
+
+	<sql id="table">inst_authoritycard</sql>
+
+	<!-- 替代，语句中的内容,简写 -->
+	<sql id="cols">
+		orderId,carNo,plate,plateType,engine,hasCar,getCarDate,checkDate,gpsInstDate,insuranceStart,insuranceEnd,
+		lineGpsNo,nolineGpsNo,bizRisksStart,bizRisksEnd,version,createTime,updateTime,uploadStatus,status,lineGpsInstAdd,noLineGpsInstAdd,mortgageFlag,mortgageDate,
+		carConfig,carAge,carColor,carEmissions,passengerNum,mileage,firstBuyAmt,regOrg,firstRegDate,transferNum,carBrand,carDetail,mortgageCompany,buyWays,driverLicenseNum																											   
+	</sql>
+
+	<insert id="insertAuthorityCard" parameterType="com.iqb.consumer.data.layer.bean.authoritycard.AuthorityCardBean" keyProperty="id" useGeneratedKeys="true">
+		INSERT INTO
+		<include refid="table"></include>
+		(
+		<include refid="cols"></include>
+		)
+		VALUES
+		(
+		#{orderId},
+		#{carNo},
+		#{plate},
+		#{plateType},
+		#{engine},
+		#{hasCar},
+		#{getCarDate},
+		#{checkDate},
+		#{gpsInstDate},
+		#{insuranceStart},
+		#{insuranceEnd},
+		#{lineGpsNo},
+		#{nolineGpsNo},
+		#{bizRisksStart},
+		#{bizRisksEnd},
+		#{version},
+		#{createTime},
+		#{updateTime},
+		#{uploadStatus},
+		#{status},
+		#{lineGpsInstAdd},
+		#{noLineGpsInstAdd},
+		#{mortgageFlag},
+		#{mortgageDate},
+		#{carConfig},
+		#{carAge},
+		#{carColor},
+		#{carEmissions},
+		#{passengerNum},
+		#{mileage},
+		#{firstBuyAmt},
+		#{regOrg},
+		#{firstRegDate},
+		#{transferNum},
+		#{carBrand},
+		#{carDetail},
+		#{mortgageCompany},
+		#{buyWays},
+		#{driverLicenseNum}
+		);
+	</insert>
+
+	<select id="selectOneByOrderId" resultMap="authorityCardBean" parameterType="String">
+		SELECT
+		    A.orderId,
+		    A.carNo,
+		    A.plate,
+		    A.plateType,
+		    A. ENGINE,
+		    A.hasCar,
+		    A.getCarDate,
+		    A.checkDate,
+		    A.gpsInstDate,
+		    A.insuranceStart,
+		    A.insuranceEnd,
+		    A.lineGpsNo,
+		    A.nolineGpsNo,
+		    A.bizRisksStart,
+		    A.bizRisksEnd,
+		    A.version,
+		    A.createTime,
+		    A.updateTime,
+		    A.uploadStatus,
+		    A. STATUS,
+		    A.lineGpsInstAdd,
+		    A.noLineGpsInstAdd,
+		    A.mortgageFlag,
+		    A.mortgageDate,
+		    A.carConfig,
+		    A.carAge,
+		    A.carColor,
+		    A.carEmissions,
+		    A.passengerNum,
+		    A.mileage,
+		    A.firstBuyAmt,
+		    A.regOrg,
+		    A.firstRegDate,
+		    A.transferNum,
+		    A.carBrand,
+		    A.carDetail,
+		    A.mortgageCompany,
+		    A.buyWays,
+		    B.assessPrice,
+		    <!-- chengzhen 2017年12月22日 11:35:34 FINANCE-2689 以租代购：添加 驾驶证编号 -->
+		    A.driverLicenseNum,
+		    A.carKeyFlag
+		FROM
+		    inst_authoritycard A,
+		    inst_orderinfo B
+
+		<where>
+		  A.orderId = B.orderId
+			<if test="orderId != null and orderId != '' ">
+				and A.orderId = #{orderId} 
+			</if>
+		</where>
+		LIMIT 1
+	</select>
+
+	<update id="updateAuthorityCard"
+		parameterType="com.iqb.consumer.data.layer.bean.authoritycard.AuthorityCardBean">
+		UPDATE
+		<include refid="table"></include>
+		<set>
+			version = #{version,jdbcType=INTEGER} + 1,
+			carNo= #{carNo},
+			plate = #{plate},
+		    engine= #{engine},
+		    driverLicenseNum= #{driverLicenseNum},
+			<if test="plateType != null and plateType !=''">
+				plateType = #{plateType},
+			</if>
+			<if test="hasCar != null and hasCar !=''">
+				hasCar= #{hasCar},
+			</if>
+			<if test="getCarDate != null and getCarDate !=''">
+				getCarDate= #{getCarDate},
+			</if>
+			<if test="checkDate != null and checkDate !=''">
+				checkDate= #{checkDate},
+			</if>
+			<if test="gpsInstDate != null and gpsInstDate !=''">
+				gpsInstDate= #{gpsInstDate},
+			</if>
+			<if test="insuranceStart != null and insuranceStart !=''">
+				insuranceStart= #{insuranceStart},
+			</if>
+			<if test="insuranceEnd != null and insuranceEnd !=''">
+				insuranceEnd= #{insuranceEnd},
+			</if>
+			<if test="lineGpsNo != null and lineGpsNo !=''">
+				lineGpsNo= #{lineGpsNo},
+			</if>
+			<if test="nolineGpsNo != null and nolineGpsNo !=''">
+				nolineGpsNo= #{nolineGpsNo},
+			</if>
+			<if test="bizRisksStart != null and bizRisksStart !=''">
+				bizRisksStart= #{bizRisksStart},
+			</if>
+			<if test="bizRisksEnd != null and bizRisksEnd !=''">
+				bizRisksEnd= #{bizRisksEnd},
+			</if>
+			<if test="uploadStatus != null and uploadStatus !=''">
+				uploadStatus= #{uploadStatus},
+			</if>
+			<if test="status != null and status !=''">
+				status= #{status},
+			</if>
+			<if test="lineGpsInstAdd != null and lineGpsInstAdd !=''">
+                linegpsinstadd= #{lineGpsInstAdd},
+            </if>
+            <if test="noLineGpsInstAdd != null and noLineGpsInstAdd !=''">
+                nolinegpsinstadd= #{noLineGpsInstAdd},
+            </if>
+            <if test="mortgageFlag != null and mortgageFlag !=''">
+                mortgageFlag= #{mortgageFlag},
+            </if>
+            <if test="mortgageDate != null and mortgageDate !=''">
+                mortgageDate= #{mortgageDate},
+            </if>
+            <if test="carConfig != null and carConfig !=''">
+                carConfig= #{carConfig},
+            </if>
+            <if test="carColor != null and carColor !=''">
+                carColor= #{carColor},
+            </if>
+            <if test="carEmissions != null and carEmissions !=''">
+                carEmissions= #{carEmissions},
+            </if>
+            <if test="passengerNum != null and passengerNum !=''">
+                passengerNum= #{passengerNum},
+            </if>
+            <if test="mileage != null and mileage !=null">
+                mileage= #{mileage},
+            </if>
+            <if test="firstBuyAmt != null and firstBuyAmt !=''">
+                firstBuyAmt= #{firstBuyAmt},
+            </if>
+            <if test="regOrg != null and regOrg !=''">
+                regOrg= #{regOrg},
+            </if>
+            <if test="firstRegDate != null and firstRegDate !=''">
+                firstRegDate= #{firstRegDate},
+            </if>
+            <if test="transferNum != null and transferNum !=''">
+                transferNum= #{transferNum},
+            </if>
+            <if test="gpsDeviceNum != null and gpsDeviceNum !=''">
+                gpsDeviceNum= #{gpsDeviceNum},
+            </if>
+            <if test="gpsDeviceAddress != null and gpsDeviceAddress!=''">
+                gpsDeviceAddress= #{gpsDeviceAddress},
+            </if>
+            <if test="gpsNum != null">
+                gpsNum= #{gpsNum},
+            </if>
+            <if test="carKeyFlag != null and carKeyFlag!=''">
+                carKeyFlag= #{carKeyFlag},
+            </if>
+			updateTime = NOW()
+		</set>
+		where orderId = #{orderId}
+	</update>
+	
+	<select id="getPIPByOid" parameterType="java.lang.String"  resultType="com.iqb.consumer.data.layer.bean.api.PicInformationPojo">
+        SELECT
+            plate AS cph,
+            carNo AS cjh,
+            engine AS fdjh
+        FROM
+            inst_authoritycard
+        WHERE
+            orderid = #{orderId}
+        ORDER BY id DESC 
+        LIMIT 1
+    </select>
+    
+    <select id="getCFPByOid" parameterType="java.lang.String"  resultType="com.iqb.consumer.data.layer.bean.api.CfImagePojo">
+        SELECT
+            imgType, imgPath
+        FROM
+            cf_image
+        WHERE
+            orderid = #{orderId}
+    </select>
+    <!-- 更新车辆信息表状态 -->
+    <update id="updateAuthorityCardStatus" parameterType="com.iqb.consumer.data.layer.bean.authoritycard.AuthorityCardBean">
+        UPDATE inst_authoritycard set
+                uploadStatus= #{uploadStatus},
+	            status= #{status},
+	            updateTime = NOW()      
+        where orderId = #{orderId}
+    </update>
+    <update id="updateAuthorityCardInfo" parameterType="com.iqb.consumer.data.layer.bean.authoritycard.AuthorityCardBean">
+        UPDATE inst_authoritycard 
+            <set>
+                <if test="carColor != null and carColor !=''">
+	                carColor= #{carColor},
+	            </if>
+                <if test="mileage != null and mileage !=null">
+	                mileage= #{mileage},
+	            </if>
+	            <if test="carKeyFlag != null and carKeyFlag!=''">
+	                carKeyFlag= #{carKeyFlag},
+	            </if>
+                updateTime = NOW()  
+            </set>
+                    
+        where orderId = #{orderId}
+    </update>
+</mapper>

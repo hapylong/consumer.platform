@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the Apache License, Version 2.0 (the "License"); 
+    you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+    Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS 
+    IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language 
+    governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.cheegu.InstCarReportDao">
+    <!-- 配置映射字段 -->
+    <resultMap type="com.iqb.consumer.data.layer.bean.cheegu.InstCarReportBean" id="InstCarReportBeanMap">
+        <result property="id"                   column="id" />
+        <result property="orderId"              column="orderId" />
+        <result property="vin"                  column="vin" />
+        <result property="carColor"             column="carColor" />
+        <result property="engineNo"             column="engineNo" />
+        
+        <result property="ownerName"            column="ownerName" />
+        <result property="appraisePrice"        column="appraisePrice" />
+        <result property="releaseDate"          column="releaseDate" />
+        <result property="regDate"              column="regDate" />        
+        <result property="actualKM"             column="actualKM" />
+        
+        <result property="blowdown"             column="blowdown" />
+        <result property="power"                column="power" />
+        <result property="carType"              column="carType" />
+        <result property="replacementPrice1"    column="replacementPrice1" />
+        <result property="usedMonth"            column="usedMonth" />
+        <result property="reportUrl"            column="reportUrl" />
+        
+        <result property="refuseMsg"            column="refuseMsg" />        
+        <result property="version"              column="version" />
+        <result property="createTime"           column="createTime" />
+        <result property="updateTime"           column="updateTime" />
+    </resultMap>
+    
+    <!-- 保存打包信息 -->
+    <insert id="insertInstCarReport" parameterType="com.iqb.consumer.data.layer.bean.cheegu.InstCarReportBean" keyProperty="id"
+        useGeneratedKeys="true">
+        INSERT INTO inst_car_report 
+            (
+	            orderId, vin, carColor, plate,engineNo,
+	            ownerName, appraisePrice, releaseDate, regDate,actualKM,
+	            blowdown,power,carType,replacementPrice1,usedMonth,
+	            convertMonth,reportUrl,refuseMsg,version, createTime, updateTime
+            ) 
+        VALUES 
+            (   
+                #{orderId}, #{vin}, #{carColor}, #{plate},#{engineNo}, 
+                #{ownerName}, #{appraisePrice}, #{releaseDate}, #{regDate}, #{actualKM},
+                #{blowdown}, #{power}, #{carType}, #{replacementPrice1}, #{usedMonth},
+                #{convertMonth}, #{reportUrl}, #{refuseMsg},#{version}, #{createTime}, #{updateTime}
+            )
+    </insert>
+    <!-- 根据车架号查询车辆评估报告 -->
+    <select id="getInstCarReportByOrderId" parameterType="java.lang.String" resultType="com.iqb.consumer.data.layer.bean.cheegu.InstCarReportBean">
+        SELECT
+		    A.orderId,
+		    A.vin,
+		    A.refuseMsg,
+		    A.reportUrl
+		FROM
+		    inst_car_report A
+        where A.vin = #{vin}
+    </select>
+    <!-- 批量保存车辆评估报告图片信息 -->
+    <insert id="batchInsertCarReportImage" parameterType="java.util.List">
+        INSERT INTO inst_car_report_image
+        (
+            ORDERID, VIN, SEQ, TAG,URL, VERSION,CREATETIME, UPDATETIME
+        )
+        VALUES
+        <foreach collection="list" item="item" index="index"
+            separator=",">
+            (
+                #{item.orderId}, #{item.vin}, #{item.seq}, #{item.tag}, #{item.url},1, NOW(), NOW()
+            )
+        </foreach>
+    </insert>
+</mapper>

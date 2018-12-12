@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iqb.consumer.batch.dao.ScheduleTaskRepository" >
+
+    <resultMap type="com.iqb.consumer.batch.data.entity.InstScheduleTaskEntity"
+        id="ISTEMap">
+        <result property="id" column="id" />
+        <result property="orderId" column="order_id" />
+        <result property="url" column="url" />
+        <result property="nextSendTime" column="next_send_time" />
+        <result property="createTime" column="create_time" />
+        <result property="sendNum" column="send_num" />
+        <result property="sendPolicy" column="send_policy" />
+        <result property="state" column="state" />
+        <result property="jsonData" column="json_data" />
+    </resultMap>
+    
+    <select id="getChatIds" resultType="String">
+        SELECT 
+            r.ORDERID 
+        FROM 
+            cf_requestmoney r,inst_orderinfo o 
+        WHERE 
+            r.ORDERID = o.orderId 
+        AND 
+            o.bizType = 2200 
+        AND 
+            r.`STATUS` = 1;
+    </select>
+    
+    <select id="getDetailsByOid" parameterType="String" resultType="com.iqb.consumer.batch.data.pojo.InstOrderInfoEntity">
+        SELECT 
+            a.createtime, a.regid, a.biztype, a.merchantno, a.orderamt, a.orderitems, 
+            b.planid
+        FROM 
+            inst_orderinfo a
+        LEFT JOIN
+            inst_plan b
+        ON 
+            a.planid = b.id
+        WHERE 
+            a.orderid = #{orderId}
+    </select>
+    
+    
+    <update id="removeChatId" parameterType="com.iqb.consumer.batch.data.schedule.pojo.CfRequestMoneyPojo">
+        UPDATE
+            cf_requestmoney
+        SET
+            deadline = #{deadLine},
+            pushid = #{pushId},
+            loantime = #{loanTime},
+            status = #{status},
+            updatetime = #{updateTime}
+        WHERE 
+            orderid = #{orderId}
+    </update>
+
+    <update id="updateOrderInfo" >
+        UPDATE
+            inst_orderinfo
+        SET
+            riskstatus = 3, updatetime = #{updateTime}
+        WHERE 
+            orderid = #{orderId}
+    </update>
+    
+    <select id="cgetISTE" parameterType="Map" resultMap="ISTEMap">
+        SELECT 
+            *
+        FROM 
+            inst_schedule_task
+        WHERE
+            state = 0
+        AND
+            next_send_time &gt;= #{start}
+        AND 
+            next_send_time &lt; #{end}
+        AND 
+            create_time &gt;= #{createTime}
+    </select>
+    
+    <update id="updateISTEById" parameterType="com.iqb.consumer.batch.data.entity.InstScheduleTaskEntity">
+        UPDATE
+            inst_schedule_task
+        SET
+            next_send_time = #{nextSendTime}, send_num = #{sendNum}, state = #{state}
+        WHERE 
+            id = #{id}
+    </update>
+    <!-- FINANCE-3721 中阁系统中，已入库车辆账单，不再向结算平台发送划扣 -->
+    <select id="getAllISRE" parameterType="Map" resultType="com.iqb.consumer.batch.data.entity.InstSettlementResultEntity">
+        SELECT 
+            *
+        FROM 
+            inst_settlementresult
+        WHERE
+            status = 1 
+        AND 
+            number = 0
+        AND flag = 2
+        AND
+            createtime &gt;= #{start}
+        AND 
+            createtime &lt; #{end}
+        AND orderId NOT IN (
+		    SELECT
+		        orderId
+		    FROM
+		        inst_managecar_info
+		    WHERE
+		        `status` = 30
+		)
+        LIMIT 1000
+    </select>
+    
+    <select id="createBuckleBaseMsg" parameterType="java.lang.String" resultType="com.iqb.consumer.batch.data.pojo.SettlementCenterBuckleRequestMessage">
+        SELECT 
+            a.regid AS phone,
+            <!--  FINANCE-2617 中阁推送至结算平台的信息中，增加“业务类型”项 -->
+            a.bizType AS businessType,
+            b.realName AS customerName, b.idno AS idNum ,
+            c.bankcardno AS bankNo, c.bankname 
+        FROM 
+            inst_orderinfo a
+        LEFT JOIN
+            inst_user b
+        ON 
+            a.userid = b.id
+        LEFT JOIN
+            (SELECT * FROM inst_bankcard GROUP BY userid)  c
+        ON
+            a.userid = c.userid
+        WHERE 
+            a.orderid = #{orderId}
+    </select>
+    
+    <update id="updateISREById" parameterType="com.iqb.consumer.batch.data.entity.InstSettlementResultEntity">
+        UPDATE
+            inst_settlementresult a
+        <set>
+            <if test="describe != null and describe != ''">
+                a.describe = #{describe},
+            </if>
+            <if test="status != null and status != ''">
+                a.status = #{status},
+            </if>
+            <if test="tradeNo != null and tradeNo != ''">
+                a.tradeNo = #{tradeNo},
+            </if>
+            <if test="number != null and number != ''">
+                a.number = #{number},
+            </if>
+            a.sendTime = NOW(),
+            a.updateTime = NOW()
+        </set>
+        WHERE 
+            a.id = #{id}
+    </update>
+    
+    <select id="getSpecialTime30OrdersByCST" parameterType="java.util.Date" resultType="com.iqb.consumer.batch.data.pojo.SpecialTimeOrderPojo">
+        SELECT 
+            a.procInstId, a.orderId AS procBizId,
+            b.id AS procOrgCode
+        FROM 
+            inst_orderinfo a
+        LEFT JOIN
+            inst_merchantinfo b
+        ON 
+            a.merchantno = b.merchantno
+        WHERE 
+            a.specialtime &lt; #{cst}
+        AND
+            a.wfstatus NOT IN (9,0)
+        AND
+            a.status != 2
+    </select>
+    
+    <update id="updateSpecialIOIEByOid" parameterType="java.lang.String">
+        UPDATE
+            inst_orderinfo
+        SET
+            status = 2, updatetime = NOW()
+        WHERE 
+            orderid = #{orderId}
+    </update>
+</mapper>

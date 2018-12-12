@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+    Apache License, Version 2.0 (the "License"); you may not use this file except 
+    in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+    Unless required by applicable law or agreed to in writing, software distributed 
+    under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+    OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+    the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.afterLoan.InstReceivedPaymentDao">
+     
+     <insert id="batchSaveInstReceivedPayment" parameterType="java.util.List">
+        INSERT INTO 
+            inst_order_received_payment
+            (
+                caseId,orderId,receivedPayment,receivedPaymentDate,version,createTime
+            )
+        VALUES
+	        <foreach collection="list" item="item" index="index"
+	            separator=",">
+	            (
+	                #{item.caseId},#{item.orderId}, #{item.receivedPayment}, #{item.receivedPaymentDate}, 1, NOW()
+	            )
+	        </foreach>
+    </insert>
+    <!-- 根据订单号查询法务回款列表信息 -->
+    <select id="selectInstReceivedPaymentList" resultType="com.iqb.consumer.data.layer.bean.afterLoan.InstReceivedPaymentBean">
+        SELECT
+	        caseId,
+		    orderId,
+		    receivedPayment,
+		    DATE_FORMAT(
+		        receivedPaymentDate,
+		        '%Y-%m-%d'
+		    ) as receivedPaymentDate
+	FROM
+	    inst_order_received_payment
+	WHERE
+	    orderId = #{orderId}
+	    and caseId=#{caseId}
+    </select>
+    <!-- 根据caseId删除法务回款信息 -->
+    <delete id="deleteReceivedPayInfoByCaseId" parameterType="java.lang.String">
+        DELETE from inst_order_received_payment WHERE caseId = #{caseId}
+    </delete>
+</mapper>

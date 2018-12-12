@@ -1,0 +1,101 @@
+/*閫氱敤鏍峰紡*/
+*{margin:0px;padding:0px;list-style-type:none;text-decoration:none;outline: none;font-family:"Microsoft YaHei";}
+.wb100{width: 100%}
+.dis-b{display:block;}
+.dib{display: inline-block;}
+.tc{text-align:center;}
+.vm{vertical-align:middle;}
+.pr{position: relative;}
+.pa{position: absolute;}
+
+/*澶撮儴*/
+.header{width:100%;height:94px;position:relative;margin: 0 auto;overflow: hidden;}
+.header {
+	background: linear-gradient(top,#ffffff,#bfcdff);
+	background: -moz-linear-gradient(top,#ffffff,#bfcdff);
+	background: -webkit-linear-gradient(top,#ffffff,#bfcdff);				
+	background: -o-linear-gradient(top,#ffffff,#bfcdff);
+	background:  -ms-linear-gradient(top,#ffffff,#bfcdff);
+}
+.topTit{padding-left: 28%;font-size: 40px;letter-spacing: 5px;color:#fff;}
+.backLogin{display: inline-block;/* width: 200px; */position: absolute;right: 0;top: 0;padding: 20px 20px 20px 19px; border-left: 1px solid #a6bcfc; }
+.logo{	width: 236px; padding: 23px 25px;margin-left: 15px;border-right: 1px solid #a6bcfc;}
+.admin{display:inline-block;/* width:110px */;margin:0 5px;color:#fff;overflow:hidden;text-overflow:ellipsis; -o-text-overflow:ellipsis;white-space:nowrap;}
+.admin font{font-size:14px;line-height:30px;margin:0 5px;color:#fff;}
+.fly{width:50px;}
+
+/*寮圭獥鏍峰紡*/
+.tanchuang{height: 6%;right: 0px;width: 9%;background-color:#ed6c44;display:none;}
+.out{left: 20%;top: 18%;font-size: 21px;color: white;}
+.exit{right: -26%;top: 18%;}
+/*鑳屾櫙鏍峰紡*/
+.bg{width:100%;}
+/*宸︿晶鏍戞牱寮�/
+.left-tree{width:100%;height:100%;background-color:#5e75c3;float:left;}
+.tree i{float: left;margin-left: 6%;margin-top: 12%;}
+.er i{float: left;margin-left: 12%;margin-top: 14%;}
+.tree{width:100%;background:#4c4743;float:left;}
+.tree li{border-bottom: 1px solid #7e95e2;}
+.tree li a{text-align:center;padding:15%;color:#ffb230;display:block;cursor:pointer;font-size:18px;}
+.er{display:none;}
+.er li{width:100%;border-bottom: 0px solid#524c48;}
+.er li a{display:block;padding:12%;color:#ffb230;background:#3e3a37;font-size: 17px;border-bottom: 2px solid#524c48;}
+.thr{display:none;}
+.th{display:none;}
+.thr li{width:100%;}
+.thr li a{text-align:left;display:block;padding: 9%;color:#ffb230;background: #3b342f;font-size: 16px;}
+.th li{width:100%;}
+.th li a{text-align:left;display:block;padding: 9%;color:#ffb230;background: #3b342f;font-size: 16px;}
+/*琛ㄦ牸鏍峰紡*/
+.form {margin-left:auto;margin-right:auto;margin-top: 6%;max-width: 850px;background: #F7F7F7;padding: 25px 15px 25px 10px;font: 12px Georgia, "Times New Roman", Times, serif;color: #888;text-shadow: 1px 1px 1px #FFF;border:1px solid #E4E4E4;}
+.form h1 {font-size: 25px;padding: 0px 0px 10px 40px;display: block;border-bottom:1px solid #E4E4E4;margin: -10px -15px 30px -10px;;color: #888;}
+.form h1>span {display: block;font-size: 11px;}
+.form label {display: block;margin: 0px;}
+.form label>span {float: left;width: 20%;text-align: right;padding-right: 10px;margin-top: 10px;margin-bottom: 10px;color: #888;}
+.form input[type="password"],.form input[type="text"],.form input[type="date"], .form select {border: 1px solid #DADADA;color: #888;height: 30px;margin-bottom: 16px;margin-right: 6px;margin-top: 2px;outline: 0 none;padding: 3px 3px 3px 5px;width: 70%;font-size: 12px;line-height:15px;box-shadow: inset 0px 1px 4px #ECECEC;-moz-box-shadow: inset 0px 1px 4px #ECECEC;-webkit-box-shadow: inset 0px 1px 4px #ECECEC;}
+.form textarea{padding: 5px 3px 3px 5px;height:100px;width: 70%}
+.form .button {background: #E27575;border: none;padding: 10px 25px 10px 25px;color: #FFF;box-shadow: 1px 1px 5px #B6B6B6;border-radius: 3px;text-shadow: 1px 1px 1px #9E3F3F;cursor: pointer;margin-top: 0%;text-align: center;margin: 0 auto;}
+.form .button:hover {background: #CF7A7A}
+/*鎸夐挳鏍峰紡*/
+.add{background: #fa7c29;border: 1px solid #816553;color: #ffffff;padding: 4px 10px;cursor:pointer;border-radius: 3px;margin-left: 33px;}
+.add:hover{background-color: #f9ac8a;transition: all 1s linear;}
+.sub{background: #918f8d;border: 1px solid #816553;color: #ffffff;padding: 4px 10px;cursor:pointer;border-radius: 3px;margin-left: 33px;}
+.sub:hover{background-color: #000000;transition: all 1s linear;}
+.new{background: #f86402;border:1px solid #DCE2E7;color: #fff;padding:6px 20px;margin-right:5px;cursor:pointer;border-radius: 5px;}
+.new:hover{background-color: #f9ac8a;transition: all 1s linear;}
+/*閫夋嫨妗嗘牱寮�/
+.simple-select{width: 144px;border:1px solid #ddd;padding: 6px 36px;font-size: 15px;}
+/*鏂囨湰鏍峰紡*/
+.search-span{margin-left: 36px;margin-right: 9px;font-size: 15px;}
+.simple{padding: 8px;border:1px solid #ddd;width: 144px;}
+.time{width: 144px;height: 29px;border: 1px solid #ddd;}
+/*琛ㄦ牸鏍峰紡*/
+table{background:#fefefe;width: 90%;font-size:15px;box-shadow:0 0 4px rgba(0, 0, 0, 0.2);margin-left: 33px;margin-top: 2%;}   
+th, td{padding: 15px 6px 15px;text-align:center;color: #4c362c;} 
+th{background: #fef1ea;color: #f86402;font-weight:normal;}   
+td{border-top:1px solid #e0e0e0; }    
+tr:hover{background-color:#eedbcc;transition: all 1s linear;}
+/*鍒嗛〉鏍峰紡*/
+.search-page{float: right;margin-top: 2%}
+#fenye {overflow: hidden}
+#fenye li { border:0; margin:0; padding:0; font-size:11px; list-style:none;float:left; }
+#fenye a { border:solid 1px #DDDDDD; margin-right:2px; }
+#fenye .previous-off,#fenye .next-off { color:#666666; display:block; float:left; font-weight:bold; padding:3px 4px; }
+#fenye .next a,#fenye .previous a { font-weight:bold; border:solid 1px #FFFFFF;}   
+#fenye .active { color:#ff0084; font-weight:bold; display:block; float:left; padding:4px 6px; }
+#fenye a:link, 
+#fenye a:visited { color:#0063e3; display:block; float:left; padding:3px 6px; text-decoration:none; }
+#fenye a:hover { border:solid 1px #000; background:#0063DC; color:#FFF; }
+/*澧炲姞寮圭獥*/
+.tanform{position: relative;right: -51px;top: -360px;opacity: 0.9;margin-top: 0;display: none;z-index: 1500}
+.zhezhao {width:100%; height:100%; background-color:#000;opacity:0.5; position:absolute; left:0px; top:0px; display:none; z-index:1000;} 
+/*涓ゅ垪鍒楄〃*/
+.form1 {margin-left:auto;margin-right:auto;max-width: 850px;background: #F7F7F7;padding: 25px 15px 25px 10px;font: 12px Georgia, "Times New Roman", Times, serif;color: #888;text-shadow: 1px 1px 1px #FFF;border:1px solid #E4E4E4;}
+.form1 h1 {font-size: 25px;padding: 0px 0px 10px 40px;display: block;border-bottom:1px solid #E4E4E4;margin: -10px -15px 30px -10px;;color: #888;}
+.form1 h1>span {display: block;font-size: 11px;}
+.form1 label {display: block;margin: 0px;}
+.form1 label>span {width: 20%;text-align: right;padding-right: 10px;margin-top: 10px;margin-bottom: 10px;color: #888;display: inline-block;}
+.form1 input[type="text"],.form1 input[type="date"], .form1 select {border: 1px solid #DADADA;color: #888;height: 30px;margin-bottom: 16px;margin-right: 6px;margin-top: 2px;outline: 0 none;padding: 3px 3px 3px 5px;width: 27%;font-size: 12px;line-height:15px;box-shadow: inset 0px 1px 4px #ECECEC;-moz-box-shadow: inset 0px 1px 4px #ECECEC;-webkit-box-shadow: inset 0px 1px 4px #ECECEC;}
+.form1 textarea{padding: 5px 3px 3px 5px;height:100px;width: 70%}
+.form1 .button {background: #E27575;border: none;padding: 10px 25px 10px 25px;color: #FFF;box-shadow: 1px 1px 5px #B6B6B6;border-radius: 3px;text-shadow: 1px 1px 1px #9E3F3F;cursor: pointer;margin-top: 0%;text-align: center;margin: 0 auto;}
+.form1 .button:hover {background: #CF7A7A}

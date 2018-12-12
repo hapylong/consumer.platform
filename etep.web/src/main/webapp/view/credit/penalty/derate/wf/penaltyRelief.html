@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	<title>罚息减免申请</title>
+	  <meta charset="UTF-8" />
+	<meta name="Author" content="" />
+	<meta name="Keywords" content="" />
+	<meta name="Description" content="" />
+	<!-- 样式库 -->
+	<link rel="stylesheet" href="../../../../../js/bootstrap/themes/default/bootstrap.css" />
+	<link rel="stylesheet" href="../../../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+	<link rel="stylesheet" href="../../../../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+	<link rel="stylesheet" href="../../../../../css/jquery.select2.css" />
+	<link rel="stylesheet" href="../../../../../css/jquery.select2-bootstrap.css" />
+	<link rel="stylesheet" href="../../../../../css/jquery.datetimepicker.css" />
+	
+	<!-- 插件库 -->
+	<script src="../../../../../js/common/package.js"></script>
+	<script src="../../../../../js/common/url.js"></script>
+	<script src="../../../../../js/common/jquery-1.11.3.min.js"></script>
+	<script src="../../../../../js/bootstrap/bootstrap.js"></script>
+	<script src="../../../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+	<script src="../../../../../js/common/jquery.datetimepicker.js"></script>
+	<script src="../../../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+	<script src="../../../../../js/common/json2.js"></script>
+	<script src="../../../../../js/common/base.js"></script>
+	<script src="../../../../../js/common/jquery.select2.js"></script>
+	<script src="../../../../../js/common/datagrid2.js"></script>
+	<script src="../../../../../js/common/formatter.js"></script>
+	
+	<link rel="stylesheet" href="../../../../../css/each/main/derate.css" />
+	<script type="application/javascript" src="../../../../../js/each/credit/penalty/derate/wf/penaltyRelief.js"></script>
+	<script src="../../../../../js/common/status.js"></script>
+	<style type="text/css">
+	body {
+		background: #eee url("../../../../../img/back.png") repeat;
+	}
+	
+	.container-fluid {
+		padding: 5px;
+	}
+	</style>
+	</head>
+	<body>
+		<div class="container-fluid">
+			<div class="col-md-12">
+				<div class="panel panel-info">
+					<div class="panel-heading">
+						<h3 class="panel-title">查询栏</h3>
+					</div>
+					<div class="panel-body">
+						<form id="searchForm" class="form-inline" role="form">
+							<div class="search-info">
+								<div class="col-hr3">
+									<label class="lable-hr3" for="merchantNo">商户名称:</label>
+									<div class="input-hr3">
+										<input name="merchantNo" id="merchantNo"
+											type="text" class="form-control" placeholder="请输入商户名称">
+									</div>
+									<label class="lable-hr3" for="orderId">订单号:</label>
+									<div class="input-hr3">
+										<input name="orderId" id="orderId" type="text"
+											class="form-control" placeholder="请输入订单号">
+									</div>
+									<label class="lable-hr3" for="realName">客户姓名:</label>
+									<div class="input-hr3">
+										<input name="realName" id="realName" class="form-control"
+											placeholder="请输入客户姓名">
+									</div>
+									<label class="lable-hr3" for="regId">手机号:</label>
+									<div class="input-hr3">
+										<input name="regId" id="regId" type="text" class="form-control"
+											placeholder="请输入手机号">
+									</div>
+								</div>
+								<div class="col-hr3">
+									<label class="lable-hr3" for="createDateStart">开始时间:</label>
+									<div class="input-hr3">
+										<input type="text" class="form-control input-sm"
+											id="createDateStart" name="applyDateStart"
+											placeholder="请选择开始时间" /> &nbsp;-&nbsp; <input type="text"
+											class="form-control input-sm" id="createDateEnd"
+											name="applyDateEnd" placeholder="请选择结束时间" />
+									</div>
+									<label class="lable-hr3" for="applyStatus">申请状态:</label>
+									<div class="input-hr3">
+										<select class="form-control" name="applyStatus"
+											id="applyStatus" style="width: 100%">
+											<option value=""></option>
+											<option value="1">申请中</option>
+											<option value="2">已通过</option>
+											<option value="3">已拒绝</option>
+										</select>
+									</div>
+									<label class="lable-hr3" for="derateType">减免类型:</label>
+									<div class="input-hr3">
+										<select class="form-control" name="derateType" id="derateType"
+											style="width: 100%">
+											<option value=""></option>
+											<option value="1">有责减免</option>
+											<option value="2">无责减免</option>
+										</select>
+									</div>
+									<div class="bottom-hr3">
+										<button id="btn-search" class="btn btn-primary btn-sm" type="button">查询</button>
+										&nbsp;&nbsp;
+										<button id="btn-reset" class="btn btn-primary btn-sm" type="button">重置</button>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+				<div class="panel panel-info">
+					<div class="panel-heading">
+						<h3 class="panel-title">减免历史</h3>
+					</div>
+					<div class="panel-body">
+						<form id="listForm">
+							<button id="btn-suspend" type="button" class="btn btn-primary btn-sm" >减免申请</button>
+						</form>
+					</div>
+					<table id='datagrid' class="table table-bordered table-hover">
+						<thead>
+							<tr>
+								<th field="rn" align="text-center" class="text-center">序号</th>
+								<th field="id" hidden="true">ID</th>
+								<th field="merchantNo" align="text-center"
+									class="text-center">商户名称</th>
+								<th field="derateType" formatter="STATUS.formatter.derateType(val)" class="text-center">减免类型</th>
+								<th field="orderId" class="text-center">订单号</th>
+								<th field="regId" class="text-center">手机号</th>
+								<th field="realName" class="text-center">客户名称</th>
+								<th field="installTerms" class="text-center">总期数</th>
+								<th field="repayNo"  class="text-center">当前期数</th>
+								<th field="curRepayAmt" formatter="Formatter.money(val)" class="text-center">月供</th>
+								<th field="lastRepayDate" align="text-center" formatter="Formatter.timeCfm2(val)" class="text-center">最后还款日</th>
+								<th field="overdueDays" align="text-center" class="text-center">逾期天数</th>
+								<th field="cutOverdueInterestAfter" align="text-center"
+									class="text-center">减免后罚息</th>
+								<th field="cutFixedOverdueAmtAfter" formatter="Formatter.money(val)"
+									class="text-center">减免后滞纳金</th>
+								<th field="cutReason" align="text-center" class="text-center">调整原因</th>
+								<th field="remark" align="text-center" class="text-center">备注</th>
+								<th field="applyStatus" formatter="STATUS.formatter.applyStatus(val)" class="text-center">申请状态</th>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+					<div class="panel-footer">
+						<div id="paginator"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

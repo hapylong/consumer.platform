@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+	Apache License, Version 2.0 (the "License"); you may not use this file except 
+	in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.UserBeanDao">
+
+	<!-- 用户返回信息映射 -->
+	<resultMap type="com.iqb.consumer.data.layer.bean.user.UserBean"
+		id="userBean">
+		<result property="id" column="id" />
+		<result property="realName" column="realName" />
+		<result property="regId" column="regId" />
+		<result property="passWord" column="passWord" />
+		<result property="smsMobile" column="smsMobile" />
+		<result property="idNo" column="idNo" />
+		<result property="status" column="status" />
+		<result property="openId" column="openId" />
+		<result property="autoLogin" column="autoLogin" />
+		<result property="lastLoginTime" column="lastLoginTime" />
+		<result property="loginIp" column="loginIp" />
+		<result property="version" column="version" />
+		<result property="createTime" column="createTime" />
+		<result property="updateTime" column="updateTime" />
+		<result property="checkInfo" column="checkInfo" />
+	</resultMap>
+
+	<sql id="table">inst_user</sql>	
+
+	<!-- 用户表中的字段 -->
+	<sql id="userCols">
+		id, realName, regId, passWord, smsMobile, idNo, status, openId, 
+		autoLogin, lastLoginTime, loginIp, version, createTime, updateTime
+	</sql>
+
+	<!-- 根据注册id获取用户信息 -->
+	<select id="selectOneByRegId" resultMap="userBean"
+		parameterType="String">
+		select
+		<include refid="userCols" />
+		from <include refid="table" /> where regId = #{regId}
+	</select>
+
+	<!-- 根据id查询用户 -->
+	<select id="getUserInfo" parameterType="java.util.Map" resultMap="userBean">
+		SELECT <include refid="userCols"></include> FROM inst_user WHERE id = #{id}
+	</select>
+	
+	<insert id="batchInsertJysUser"  parameterType="java.util.List">
+		INSERT INTO jys_user (
+			regId, realName, status, bankName, bankCardNo, idNo, createTime
+		)
+		VALUES
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(
+				#{item.regId}, #{item.realName}, #{item.status}, #{item.bankName}, #{item.bankCardNo} , #{idNo}, NOW()
+			)
+		</foreach>
+	</insert>
+	
+	<!-- 保存用户信息 -->
+	<insert id="saveUserBean" parameterType="com.iqb.consumer.data.layer.bean.user.UserBean"
+			useGeneratedKeys="true"  keyProperty="id">
+		INSERT INTO inst_user (realName, regId, smsMobile, idNo, status, version, createTime, updateTime) VALUES (#{realName},#{regId},#{smsMobile},#{idNo},#{status},#{version},#{createTime},#{updateTime});
+	</insert>
+	
+	<insert id="insertJysUser" parameterType="com.iqb.consumer.data.layer.bean.jys.JYSUserBean"
+			useGeneratedKeys="true"  keyProperty="id">
+		INSERT INTO jys_user (
+			regId,
+			realName,
+			STATUS,
+			bankName,
+			bankCardNo,
+			idNo,
+			createTime
+		)
+		VALUE
+		(
+			#{regId},
+			#{realName},
+			#{status},
+			#{bankName},
+			#{bankCardNo},
+			#{idNo},
+			NOW()
+		) 
+	</insert>
+	
+	<!-- 用户返回信息映射 -->
+	<resultMap type="com.iqb.consumer.data.layer.bean.jys.JYSUserBean"
+		id="JYSUserBean">
+		<result property="id" column="id" />
+		<result property="realName" column="realName" />
+		<result property="regId" column="regId" />
+		<result property="passWord" column="passWord" />
+		<result property="smsMobile" column="smsMobile" />
+		<result property="idNo" column="idNo" />
+		<result property="status" column="status" />
+		<result property="openId" column="openId" />
+		<result property="autoLogin" column="autoLogin" />
+		<result property="lastLoginTime" column="lastLoginTime" />
+		<result property="loginIp" column="loginIp" />
+		<result property="bankName" column="bankName" />
+		<result property="bankCardNo" column="bankCardNo" />
+		<result property="version" column="version" />
+		<result property="createTime" column="createTime" />
+		<result property="updateTime" column="updateTime" />
+	</resultMap>
+	
+	<select id="selectJysUser" parameterType="com.iqb.consumer.data.layer.bean.jys.JYSUserBean" resultMap="JYSUserBean">
+		select * from jys_user where regId = #{regId} and idNo = #{idNo}
+	</select>
+	
+	<select id="getRegIdByName" parameterType="String" resultType="String">
+        select regid from inst_user where realname = #{realName} limit 1
+    </select>
+    
+    <select id="selectAllByRegId" resultMap="userBean">
+    	select u.*,r.checkInfo from inst_user u
+		INNER JOIN (
+				select s.* 
+				from (select MAX(id) as id from inst_riskinfo WHERE regId =#{regId} and riskType = 3 ) t 
+				left join `inst_riskinfo` as s on t.id=s.id
+			) r on r.regId = u.regId
+    </select>
+    
+    <select id="getJUBByRegId" parameterType="String" resultMap="JYSUserBean">
+        SELECT 
+            * 
+        FROM 
+            jys_user 
+        WHERE 
+            regId = #{regId}
+            limit 1
+    </select>
+    <!-- 姓名、身份证、手机号、住址、婚姻状态。 -->
+    <select id="getInfoByRegId" parameterType="String" resultType="java.util.Map">
+        SELECT 
+            id,realName, regId, idNo
+        FROM 
+            inst_user 
+        WHERE 
+            regId = #{regId}
+        ORDER BY id desc LIMIT 1
+    </select>
+    
+    <!-- 更新userInfo -->
+	<update id="updateUserInfo" parameterType="com.iqb.consumer.data.layer.bean.user.UserBean">
+		update
+		<include refid="table" />
+		a
+		<set>
+			<if test="realName != null and realName != ''">
+				a.realName = #{realName},
+			</if>
+			<if test="regId != null and regId != ''">
+				a.regId = #{regId},
+			</if>
+			<if test="smsMobile != null and smsMobile != ''">
+				a.smsMobile = #{smsMobile},
+			</if>
+			<if test="idNo != null and idNo != ''">
+				a.idNo = #{idNo},
+			</if>
+			a.updateTime = NOW()
+		</set>
+		where a.id = #{id}
+	</update>
+	
+	<select id="getUBByRegIdOrIdNo" parameterType="com.iqb.consumer.data.layer.bean.user.UserBean" resultType="com.iqb.consumer.data.layer.bean.user.UserBean">
+        SELECT 
+            * 
+        FROM 
+            inst_user 
+        <where>
+            <choose>
+                <when test="regId != null and regId != ''">
+                    regId = #{regId}
+                </when>
+                <otherwise>
+                    idNo = #{idNo}
+                </otherwise>
+            </choose>
+        </where>
+    </select>
+    <!-- 根据手机号码获取系统用户id -->
+    <select id="getSysUserByRegId" parameterType="java.util.Map" resultType="com.iqb.consumer.data.layer.bean.user.UserBean">
+        SELECT id,USER_PHONE as regId,REAL_NAME as realName	 from iqb_sys_user WHERE USER_PHONE= #{regId} and USER_CODE = #{userCode} and DELETE_FLAG=1;
+    </select>
+    <!--根据身份证号码 手机号查询用户信息  -->
+    <select id="selectInstUser" parameterType="java.util.Map" resultType="com.iqb.consumer.data.layer.bean.user.UserBean">
+        select * from inst_user where regId = #{regId} and idNo = #{idNo} limit 1
+    </select>
+    <!-- 批量插入用户信息 -->
+    <insert id="batchInsertUser"  parameterType="java.util.List">
+        INSERT INTO inst_user (
+            regId, realName, smsMobile, idNo, createTime
+        )
+        VALUES
+        <foreach collection="list" item="item" index="index"
+            separator=",">
+            (
+                #{item.regId}, #{item.realName}, #{item.smsMobile}, #{item.idNo}, NOW()
+            )
+        </foreach>
+    </insert>
+    <!-- 获取用户信息 -->
+    <select id="selectInstUserInfo" parameterType="java.util.Map" resultType="com.iqb.consumer.data.layer.bean.user.UserBean">
+        SELECT
+        A.id,
+	    A.realName,
+	    A.regId,
+	    A.idNo,
+	    B.bankName,
+	    B.bankCardNo
+	FROM
+	    inst_user A
+	LEFT JOIN inst_bankcard B ON A.id = B.userId
+	where 1=1
+        <if test="regId != null and regId != ''">
+            AND a.regId = #{regId}
+        </if>
+        <if test="idNo !=null and idNo != ''">
+            AND a.idNo = #{idNo}
+        </if>
+        <if test="realName != null and realName != ''">
+            AND A.realName LIKE '%${realName}%'
+        </if>
+    </select>
+    <!-- FINANCE-2784  FINANCE-2690 蒲公英个人客户信息查询   -->
+     <select id="getDandelionCustomerList" parameterType="com.alibaba.fastjson.JSONObject" resultMap="userBean">
+       		select 
+       		c.checkInfo AS checkInfo,
+       		c.id AS id
+       		from 
+			inst_orderinfo a
+			LEFT JOIN inst_user b	on a.regId = b.regId
+			LEFT JOIN inst_riskinfo c on a.regId = c.regId 
+			where c.riskType = "4"
+			 <if test="regId != null and regId != ''">
+            AND a.regId = #{regId}
+        </if>
+        <if test="realName != null and realName != ''">
+            AND b.realName LIKE '%${realName}%'
+        </if>
+			AND NOT EXISTS(SELECT 1 FROM inst_riskinfo d WHERE d.regId = c.regId AND d.id>c.id)
+			GROUP  BY b.regId
+    </select>
+    
+    <!-- FINANCE-2784  FINANCE-2690 蒲公英个人客户信息明细查询   -->
+     <select id="getDandelionCustomerDetail" parameterType="com.alibaba.fastjson.JSONObject" resultType="com.iqb.consumer.data.layer.bean.user.UserBean">
+       		select 
+       		c.checkInfo AS checkInfo
+       		from 
+			inst_orderinfo a
+			LEFT JOIN inst_user b	on a.regId = b.regId
+			LEFT JOIN inst_riskinfo c on a.regId = c.regId 
+			where c.riskType = "4"
+			 <if test="regId != null and regId != ''">
+            AND a.regId = #{regId}
+        </if>
+			AND NOT EXISTS(SELECT 1 FROM inst_riskinfo d WHERE d.regId = c.regId AND d.id>c.id)
+			GROUP  BY b.regId
+    </select>
+    
+</mapper>

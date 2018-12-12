@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	    <title>还款代扣</title>
+	    <meta charset="UTF-8" />
+	    <meta name="Author" content="" />
+	    <meta name="Keywords" content="" />
+	    <meta name="Description" content="" />
+	    
+	    <!-- 样式库 -->
+	    <link rel="stylesheet" href="../../../js/ztree/css/zTreeStyle/zTreeStyle.css" />
+	    <link rel="stylesheet" href="../../../js/bootstrap/themes/default/bootstrap.css" />
+	    <link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+	    <link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+	    <link rel="stylesheet" href="../../../css/jquery.select2.css" />
+	    <link rel="stylesheet" href="../../../css/jquery.select2-bootstrap.css" />
+	    <link rel="stylesheet" href="../../../css/jquery.datetimepicker.css" />
+	    
+	    <!-- 插件库 -->
+	    <script src="../../../js/common/package.js"></script>
+		<script src="../../../js/common/url.js"></script>
+		<script src="../../../js/common/json2.js"></script>	
+		<script src="../../../js/common/jquery-1.11.3.min.js"></script>		
+		<script src="../../../js/bootstrap/bootstrap.js"></script>
+		<script src="../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+		<script src="../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+		<script src="../../../js/ztree/js/jquery.ztree.all.min.js"></script>
+		<script src="../../../js/common/jquery.select2.js"></script>
+		
+		<!-- 业务库 -->
+		<script src="../../../js/common/base.js"></script>
+		<script src="../../../js/common/datagrid2.js"></script>
+		<script src="../../../js/common/tree.js"></script>
+		<script src="../../../js/common/formatter.js"></script>	    
+	    <script src="../../../js/each/cfm/creditSys/withholdPayment.js"></script>
+	    <script src="../../../js/common/jquery.datetimepicker.js"></script>
+	    <script src="../../../js/each/cfm/merch/merch.js"></script>
+		
+		<!-- 页面样式 -->
+		<style type="text/css">
+			body {
+				font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif !important;
+				background:#eee url("../../../img/back.png") repeat;
+			}
+			.container-fluid {
+				padding:5px;
+			}
+			.left-part {
+				height:800px;
+			}
+			.modal-form {
+				margin:8px;
+			}
+		</style>
+	    
+	</head>
+	<body>
+	
+		<div class="container-fluid">
+			<div class="row">				
+				<div class="col-md-12">
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<h4 class="panel-title">查询信息</h4>
+					  	</div>
+					  	<div class="panel-body">	
+					  		<form id="searchForm" class="form-horizontal">
+							  	<div class="form-group">
+							    	<label class="control-label col-lg-1 col-md-1 col-sm-1">商户名 </label>
+							    	<div class="col-lg-2 col-md-2 col-sm-2">
+							    	    <input id="merchantNo" type="text" readonly value="全部商户" name="merchantNo" class="form-control merch" onclick="showMenu(); return false;"/>
+							    	</div>
+							    	<label class="control-label col-lg-1 col-md-1 col-sm-1">订单号</label>
+								    <div class="col-lg-2 col-md-2 col-sm-2">
+								        <input name="orderId" id='orderId' type="text" class="form-control input-sm" placeholder="请输入订单号">
+								    </div>
+								    <label class="control-label col-lg-1 col-md-1 col-sm-1">客户姓名</label>
+								    <div class="col-lg-2 col-md-2 col-sm-2">
+								        <input name="realName" id='realName' type="text" class="form-control input-sm" placeholder="请输入姓名">
+								    </div>
+								 </div>   
+								 <div class="form-group">
+								     <label class="control-label col-lg-1 col-md-1 col-sm-1">手机号</label>
+								     <div class="col-lg-2 col-md-2 col-sm-2">
+								        <input name="regId" id='regId' type="text" class="form-control input-sm" placeholder="请输入手机号">
+								     </div>
+								     <label class="control-label col-lg-1 col-md-1 col-sm-1">开始时间</label>
+								     <div class="col-lg-2 col-md-2 col-sm-2">
+								        <input name="startTime" id='startTime' type="text" class="form-control input-sm" placeholder="请输入开始时间">
+								     </div>
+								     <label class="control-label col-lg-1 col-md-1 col-sm-1">至</label>
+								     <div class="col-lg-2 col-md-2 col-sm-2">
+								        <input name="endTime" id='endTime' type="text" class="form-control input-sm" placeholder="请输入结束时间">
+								     </div>
+								 </div>
+								 <div class="form-group">   
+								    <label class="control-label col-lg-1 col-md-1 col-sm-1">账单状态</label>
+								    <div class="col-lg-2 col-md-2 col-sm-2">
+								    	<select id="billStatus" name="billStatus" class="form-control">
+								    	   <option value=''>请选择还款状态</option>
+								    	   <option value='0'>已逾期</option>
+								    	   <option value='1'>待还款</option>
+								    	   <option value='2'>部分还款</option>
+								    	   <option value='3'>已还款</option>
+								    	   <!--<option value='4'>失效账单</option>-->
+									    </select>
+								    </div>
+								    <label class="control-label col-lg-1 col-md-1 col-sm-1">划扣状态</label>
+								    <div class="col-lg-2 col-md-2 col-sm-2">
+								    	<select id="status" name="status" class="form-control">
+								    	   <option value=''>请选择划扣状态</option>
+								    	   <option value='1'>未发送</option>
+								    	   <option value='2'>发送成功</option>
+								    	   <option value='4'>划扣部分成功</option>
+								    	   <option value='5'>划扣失败</option>
+									    </select>
+								    </div>
+								    <div class="col-lg-3 col-md-3 col-sm-3">
+									    <button id="btn-search" type="button" class="btn btn-default btn-sm">查询</button>
+										<button id="btn-reset" type="button" class="btn btn-default btn-sm">重置</button>
+										<a id='btn-export' href='javascript:;' type="button" class="btn btn-default btn-sm">导出</a>  
+							  	    </div>
+							  	</div>
+							</form>		  												 	
+					  	</div>
+					</div>
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<h4 class="panel-title">划扣信息</h4>
+					  	</div>
+					  	<div class="panel-body">
+					    	<form id="listForm">		
+					    	    <input type='checkbox' id='checkAll' style='vertical-align:center;margin-left:-5px'><span>全选</span>			    		
+					    		<button id="btn-deduct" type="button" class="btn btn-primary btn-sm">划扣</button>
+					    	</form>
+					  	</div>
+						<table id='datagrid' class="table table-striped table-bordered table-hover table-condensed ">
+						    <thead>
+						    	<tr>	
+						    	    <th field="status" formatter='Formatter.deductStatusCheckbox(val)'></th>
+						    	    <th field="rn">序号</th>
+						    	    <th field="merchantName">商户</th>
+						    	    <th field="orderId">订单号</th>
+						    	    <th field="realName">姓名</th>		    		
+							    	<th field="regId">手机号</th>
+							    	<th field="repayNo">期数</th>
+							    	<th field="orderItems">总期数</th> 
+							    	<th field="lastRepayDate" formatter="Formatter.timeCfm2(val)">最后还款日</th>
+							    	<th field="monthInterest" formatter="Formatter.money(val)">月供</th>
+							    	<th field="overdueInterest" formatter="Formatter.money(val)">罚息</th>
+							    	<th field="curRepayAmt" formatter="Formatter.money(val)">本期应还</th>
+							    	<th field="overdueDays">逾期天数</th>
+							    	<th field="billStatus">账单状态</th>
+							    	<th field="status" formatter="Formatter.deductStatus(val)">划扣状态</th>
+							    	<th field="describe">失败原因</th>
+						    	</tr>
+						    </thead>
+						    <tbody></tbody>
+						</table>
+					  	<div class="panel-footer">
+							<div id="paginator"></div>
+						</div>
+					</div>
+				</div>
+			</div>		 	
+		</div>	
+		<div id="menuContent" class="menuContent" style="max-height:500px;overflow:scroll;display:none; position: absolute;background:#fff;border:1px solid #ccc;">
+	        <ul id="treeDemo" class="ztree" style="margin-top:0;"></ul>
+        </div>
+	</body>
+</html>

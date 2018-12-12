@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+	Apache License, Version 2.0 (the "License"); you may not use this file except 
+	in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- author gxy -->
+<mapper namespace="com.iqb.consumer.data.layer.dao.ContractInfoDao">
+	<!-- 配置映射字段 -->
+	<resultMap type="com.iqb.consumer.data.layer.bean.contract.ContractInfoBean"
+		id="ContractInfoBean">
+		<result property="id" column="ID" />
+		<result property="orderId" column="ORDERID" />
+		<result property="provider" column="PROVIDER" />
+		<result property="vendor" column="VENDOR" />
+		<result property="vendorNo" column="VENDORNO" />
+		<result property="seatNum" column="SEATNUM" />
+		<result property="carType" column="CARTYPE" />
+		<result property="fuelForm" column="FUELFORM" />
+		<result property="fuelOilNumber" column="FUELOILNUMBER" />
+		<result property="engineType" column="ENGINETYPE" />
+		<result property="carNo" column="CARNO" />
+		<result property="carColor" column="CARCOLOR" />
+		<result property="registrationNo" column="REGISTRATIONNO" />
+		<result property="createTime" column="CREATETIME" />
+		<result property="updateTime" column="UPDATETIME" />
+		<result property="status" column="STATUS" />
+	</resultMap>
+	
+	<!-- 配置映射字段 -->
+	<resultMap type="com.iqb.consumer.data.layer.bean.contract.OrderContractListBean"
+		id="OrderBeanResultMap">
+		<result property="orderId" column="ORDERID" />
+		<result property="userId" column="USERID" />
+		<result property="regId" column="REGID" />
+		<result property="merchantNo" column="MERCHANTNO" />
+		<result property="merchantShortName" column="MERCHANTSHORTNAME" />
+		<result property="bizType" column="BIZTYPE" />
+		<result property="orderName" column="ORDERNAME" />
+		<result property="orderRemark" column="ORDERREMARK" />
+		<result property="wfStatus" column="WFSTATUS" />
+		<result property="riskStatus" column="RISKSTATUS" />
+		<result property="contractStatus" column="CONTRACTSTATUS" />
+		<result property="orgCode" column="ORG_CODE" />
+		<result property="updateTime" column="UPDATETIME" />
+	</resultMap>
+
+	<sql id="table">inst_contractinfo</sql>
+
+	<!-- 替代，语句中的内容,简写 -->
+	<sql id="cols">
+		id,orderId,provider,vendor,vendorNo,seatNum,carType,fuelForm,fuelOilNumber,engineType,
+		carNo,carColor,registrationNo,createTime,updateTime,status
+	</sql>
+
+	<select id="selContractInfo" parameterType="java.lang.String"
+		resultMap="ContractInfoBean">
+		SELECT * from inst_contractinfo WHERE orderId = #{orderId} ORDER BY createTime DESC LIMIT 1 ;
+	</select>
+
+	<insert id="insertContractInfo"
+		parameterType="com.iqb.consumer.data.layer.bean.contract.ContractInfoBean"
+		keyProperty="id" useGeneratedKeys="true">
+		INSERT INTO
+		<include refid="table"></include>
+		(
+		<include refid="cols"></include>
+		)
+		VALUES
+		(
+		#{id},
+		#{orderId},
+		#{provider},
+		#{vendor},
+		#{vendorNo},
+		#{seatNum},
+		#{carType},
+		#{fuelForm},
+		#{fuelOilNumber},
+		#{engineType},
+		#{carNo},
+		#{carColor},
+		#{registrationNo},
+		#{createTime},
+		#{updateTime},
+		'commit'
+		);
+	</insert>
+	
+	<update id="updateContractInfo" parameterType="com.iqb.consumer.data.layer.bean.contract.ContractInfoBean">
+		update 
+		<include refid="table"></include>
+		<set>
+			updateTime = #{updateTime},
+			seatNum = #{seatNum},
+			<if test="provider != null and provider != ''">
+				provider = #{provider},
+			</if>
+			<if test="vendor != null and vendor != ''">
+				vendor = #{vendor},
+			</if>
+			<if test="vendorNo != null and vendorNo != ''">
+				vendorNo = #{vendorNo},
+			</if>
+			<if test="carType != null and carType != ''">
+				carType = #{carType},
+			</if>
+			<if test="fuelForm != null and fuelForm != ''">
+				fuelForm = #{fuelForm},
+			</if>
+			<if test="fuelOilNumber != null and fuelOilNumber != ''">
+				fuelOilNumber = #{fuelOilNumber},
+			</if>
+			<if test="engineType != null and engineType != ''">
+				engineType = #{engineType},
+			</if>
+			<if test="carNo != null and carNo != ''">
+				carNo = #{carNo},
+			</if>
+			<if test="carColor != null and carColor != ''">
+				carColor = #{carColor},
+			</if>
+			<if test="registrationNo != null and registrationNo != ''">
+				registrationNo = #{registrationNo},
+			</if>
+			<if test="status != null and status != ''">
+				status = #{status},
+			</if>
+		</set>
+		where orderId = #{orderId} and id=#{id}
+	</update>
+	
+	<update id="updataStatus" parameterType="com.iqb.consumer.data.layer.bean.contract.ContractInfoBean">
+		update 
+		<include refid="table"></include>
+		<set>
+			updateTime = #{updateTime},
+			<if test="status != null and status != ''">
+				status = #{status},
+			</if>
+		</set>
+		where orderId = #{orderId} and id=#{id}
+	</update>
+	
+	<select id="orderContractInit"  parameterType="java.util.Map"
+		resultMap="OrderBeanResultMap">
+		SELECT
+			IO.ORDERID,
+			IO.REGID,
+			IO.USERID,
+			IO.MERCHANTNO,
+			IO.BIZTYPE,
+			IO.ORDERNAME,
+			IO.ORDERREMARK,
+			IO.WFSTATUS,
+			IO.RISKSTATUS,
+			IO.CONTRACTSTATUS,
+			IO.orderAmt,
+			IM.ID as ORG_CODE,
+			iu.realName 
+		FROM
+			INST_ORDERINFO IO
+		INNER JOIN INST_MERCHANTINFO IM ON IM.MERCHANTNO = IO.MERCHANTNO
+		INNER JOIN inst_user iu ON iu.regId = IO.regId
+		WHERE
+			IO.wfStatus &lt;&gt; 0 AND IO.status &lt;&gt; 2
+			AND IO.showContract = 1
+			AND IO.contractStatus in (1,3)
+			AND IM.ID like CONCAT(#{id},'%')
+			<if test="contractStatus != null and contractStatus != ''">
+				AND IO.CONTRACTSTATUS = #{contractStatus}
+			</if>
+			<if test="orderId != null and orderId != ''">
+				AND IO.ORDERID = #{orderId}
+			</if>
+			<if test="startDateStart !=null and startDateStart != ''">
+				AND IO.UPDATETIME &gt;= #{startDateStart}
+			</if>
+			<if test="startDateEnd !=null and startDateEnd != ''">
+				AND IO.UPDATETIME &lt;= #{startDateEnd}
+			</if>
+	</select>
+	
+	<select id="orderContractFinish"  parameterType="java.util.Map"
+		resultMap="OrderBeanResultMap">
+		SELECT
+			IO.ORDERID,
+			IO.REGID,
+			IO.USERID,
+			IO.MERCHANTNO,
+			IM.MERCHANTSHORTNAME,
+			IO.BIZTYPE,
+			IO.ORDERNAME,
+			IO.ORDERREMARK,
+			IO.WFSTATUS,
+			IO.RISKSTATUS,
+			IO.CONTRACTSTATUS,
+			IO.orderAmt,
+			IM.ID as ORG_CODE,
+			FROM_UNIXTIME(D.FINISH_SIGN_TIME, '%Y-%m-%d') as UPDATETIME,
+			iu.realName 
+		FROM
+			INST_ORDERINFO IO
+		INNER JOIN INST_MERCHANTINFO IM ON IM.MERCHANTNO = IO.MERCHANTNO
+		INNER JOIN inst_user iu ON iu.regId = IO.regId
+		  LEFT JOIN ( SELECT * from iqb_ec_info  GROUP BY BIZ_ID )  D on IO.orderId = D.BIZ_ID
+		WHERE
+			IO.wfStatus &lt;&gt; 0 AND IO.status &lt;&gt; 2
+			AND IO.showContract = 1
+			AND IO.contractStatus in (1,2)
+			AND IM.ID like CONCAT(#{id},'%')
+			<if test="merchantNos != null and merchantNos.size() > 0">
+				AND IM.MERCHANTNO in
+				<foreach item="item" index="index" collection="merchantNos"
+					open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+			<if test="contractStatus != null and contractStatus != ''">
+				AND IO.CONTRACTSTATUS = #{contractStatus}
+			</if>
+			<if test="orderId != null and orderId != ''">
+				AND IO.ORDERID = #{orderId}
+			</if>
+			<if test="startDateStart !=null and startDateStart != ''">
+				AND FROM_UNIXTIME(D.FINISH_SIGN_TIME, '%Y-%m-%d') &gt;= #{startDateStart}
+			</if>
+			<if test="startDateEnd !=null and startDateEnd != ''">
+				AND FROM_UNIXTIME(D.FINISH_SIGN_TIME, '%Y-%m-%d') &lt;= #{startDateEnd}
+			</if>
+			<if test="regId !=null and regId != ''">
+				AND IO.REGID = #{regId}
+			</if>
+			<if test="realName !=null and realName != ''">
+				AND iu.realName = #{realName}
+			</if>
+	</select>
+
+</mapper>

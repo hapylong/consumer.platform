@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>门店信息维护</title>
+        <meta charset="UTF-8" />
+        <meta name="Author" content="" />
+        <meta name="Keywords" content="" />
+        <meta name="Description" content="" /> 
+        <!-- 样式库 -->
+	    <link rel="stylesheet" href="../../../js/bootstrap/themes/default/bootstrap.css" />
+	    <link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+	    <link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+	    <link rel="stylesheet" href="../../../js/ztree/css/zTreeStyle/zTreeStyle.css" />
+	    <link rel="stylesheet" href="../../../css/jquery.select2.css" />
+	    <link rel="stylesheet" href="../../../css/jquery.select2-bootstrap.css" />
+   	    <link rel="stylesheet" href="../../../js/lightbox2/css/lightbox.css" />
+	    
+	    <!-- 插件库 -->
+	    <script src="../../../js/common/package.js"></script>
+		<script src="../../../js/common/url.js"></script>
+		<script src="../../../js/common/json2.js"></script>	
+		<script src="../../../js/common/jquery-1.11.3.min.js"></script>	
+		<script src="../../../js/common/jquery.form.js"></script>		
+		<script src="../../../js/bootstrap/bootstrap.js"></script>
+		<script src="../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+		<script src="../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+		<script src="../../../js/ztree/js/jquery.ztree.all.min.js"></script>
+		<script src="../../../js/common/jquery.select2.js"></script>
+		
+		<!-- 图片上传  -->
+		<link href="../../../js/uploadplugin/fine-uploader-gallery.css" rel="stylesheet" type="text/css" />
+		<link href="../../../js/uploadplugin/fine-uploader-new.css" rel="stylesheet" type="text/css" />
+		<link href="../../../js/uploadplugin/styles.css" rel="stylesheet" type="text/css" />
+		<script src="../../../js/uploadplugin/all.fine-uploader.js"></script>
+		<script src="../../../js/uploadplugin/pica.js"></script>
+		
+		<!-- 业务库 -->
+		<script src="../../../js/common/base.js"></script>
+		<script src="../../../js/common/datagrid2.js"></script>
+		<script src="../../../js/common/tree.js"></script>
+		<script src="../../../js/common/formatter.js"></script>	  
+        <script src="../../../js/each/crm/customer/customerstoreinfo.js"></script>
+        <style type="text/css">
+            body {background:#eee url("../../../img/back.png") repeat;}
+            .container-fluid{
+                padding:5px;
+            }
+            .left-part {
+				height: 800px;
+			}
+			.modal-form {
+				margin: 15px 30px 15px 30px;
+			}
+			.PlanBox div p{    
+			    float: right;
+			    color: #488dcb;
+			    padding: 0 0 0 6px;
+			}
+			.addPlanBox{
+			    cursor: pointer;
+			    float: right;
+			    padding-right: 30px;
+			}
+			.removePlanBox{
+			    cursor: pointer;
+			    float: left;
+			    padding-left: 15px;
+			}
+			.modal-footer{text-align: center;}
+        </style>
+    </head>
+    <body>  
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-info">
+                    <div class="panel-heading">
+                    	<h3 class="panel-title">门店客户信息查询栏</h3>
+                    </div>
+                        <div class="panel-body">    
+                            <form id="searchForm" class="form-horizontal">                               
+                                <div class="form-group">
+                                    <label class="control-label col-lg-1 col-md-1 col-sm-1">门店名称:</label>
+                                    <div class="col-lg-2 col-md-2 col-sm-2">
+                                        <input name='customerName' id='customerName' type="text" class="form-control" placeholder="客户名称">
+                                    </div>
+                                    <label class="control-label col-lg-1 col-md-1 col-sm-1">门店简称:</label>
+                                    <div class="col-lg-2 col-md-2 col-sm-2">
+                                        <input name='customerShortName' id='customerShortName' type="text" class="form-control" placeholder="门店简称">
+                                    </div>
+                                    <label class="control-label col-lg-1 col-md-1 col-sm-1">所属担保公司:</label>
+                                    <div class="col-lg-2 col-md-2 col-sm-2">
+                                        <input name='guaranteeCorporationName' id='guaranteeCorporationName' type="text" class="form-control" placeholder="所属担保公司">
+                                    </div>
+                                 </div>   
+                                 <div class="form-group">   
+                                    <label class="control-label col-lg-1 col-md-1 col-sm-1">所属区域:</label>
+                                    <div class="col-lg-2 col-md-2 col-sm-2">
+                                        <select id="query-belongsArea" name="belongsArea" class="form-control" style="width: 100%"></select>
+                                    </div>
+                                    <label class="control-label col-lg-1 col-md-1 col-sm-1">债权人:</label>
+                                    <div class="col-lg-2 col-md-2 col-sm-2">
+                                        <input name='creditorName' id='creditorName' type="text" class="form-control" placeholder="债权人">
+                                    </div>
+                                    <div class="col-lg-3 col-md-3 col-sm-3">
+	                                    <button id="btn-search" type="button" class="btn btn-default btn-sm">查询</button>
+	                                    <button id="btn-reset" type="button" class="btn btn-default btn-sm">重置</button>  
+                                    </div>
+                                </div>
+                            </form>                                                         
+                        </div>
+					</div>		
+					<div class="panel panel-info">	
+                        <div class="panel-heading">
+                            <h3 class="panel-title">门店客户信息列表</h3>
+                        </div>
+                        <div class="panel-body">
+                            <form id="listForm">                                
+                                <button id="btn-update" type="button" class="btn btn-warning btn-sm">修改</button>
+                                <button id="btn-check" type="button" class="btn btn-info btn-sm">查看</button>
+                            </form>
+                        </div>
+                        <table id="datagrid" class="table table-bordered table-hover" style="text-align:center">
+                            <thead>
+                                <tr>
+                                    <th field="ck"></th>
+                                    <th field="customerCode" idField="true" hidden="true"></th>
+									<th field="rn" style="text-align:center">序号</th>
+									<th field="customerName" style="text-align:center">门店名称</th>
+									<th field="customerShortName" style="text-align:center">门店简称</th>
+									<th field="province" style="text-align:center">省</th>
+									<th field="city" style="text-align:center">市</th>
+									<th field="creditorName" style="text-align:center">债权人</th>
+									<th field="guaranteeCorporationName" style="text-align:center">所属担保公司</th>
+									<th field="belongsArea" style="text-align:center">所属区域</th>
+									<th field="higherOrgName" style="text-align:center">上级机构</th>
+									<th field="creditorStatus" style="text-align:center" formatter="IQB.customerstoreinfo.extFunc.formaterStatus(val);">状态</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                        <div class="panel-footer">
+                            <div id="paginator">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>          
+        </div>
+        <div id="update-win" class="modal fade" role="dialog" aria-labelledby="update-win-label" aria-describedby="门店客户信息">
+			<div class="modal-dialog modal-lg" role="document">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<h5 class="modal-title" id="update-win-label">门店信息维护</h5>
+		      		</div>
+		      		<div class="modal-form">
+		       			<form id="updateForm" class="form-horizontal">
+		       				<input id="customerCode" name="customerCode" type="hidden" class="form-control input-sm easyui-validatebox" placeholder="请输入客户编码" required="required" validType="maxLength[50]" />
+				  			<div class="form-group">
+				    			<label class="col-md-2 control-label">门店名称</label>
+				    			<div class="col-md-4">
+				      				<input id="customerName" readonly name="customerName" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入门店名称" required="required" validType="maxLength[50]" />
+				    			</div>
+				    			<label class="col-md-2 control-label">门店简称</label>
+				    			<div class="col-md-4">
+				      				<input name="customerShortName" readonly type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入门店简称" required="required" validType="maxLength[50]" />
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-md-2 control-label">省</label>
+				    			<div class="col-md-4">
+				      				<input name="province" readonly type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入省" required="required" validType="maxLength[50]" />
+				    			</div>
+				    			<label class="col-md-2 control-label">市</label>
+				    			<div class="col-md-4">
+				      				<input name="city" readonly type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入市" required="required" validType="maxLength[50]" />
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-md-2 control-label">上级机构</label>
+				    			<div class="col-md-4">
+				      				<input name="higherOrgName" readonly type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入上级机构" />
+				    			</div>
+				    			<label class="col-md-2 control-label">所属区域</label>
+				    			<div class="col-md-4">
+				      				<input name="belongsArea" readonly type="text" class="form-control input-sm easyui-validatebox" />
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-md-2 control-label">所属担保公司</label>
+				    			<div class="col-md-4">
+				      				<select id="select-guaranteeCorporationName" name="guaranteeCorporationName" style="width: 100%"></select>
+				    			</div>
+				    			<label class="col-md-2 control-label">担保公司法人</label>
+				    			<div class="col-md-4">
+				    				<input id="guaranteeCorporationCorName" readonly name="guaranteeCorporationCorName" type="text" class="form-control input-sm easyui-validatebox" placeholder="担保公司法人"/>
+				    			</div>
+			    				<input id="guaranteeCorporationCode" name="guaranteeCorporationCode" type="hidden" class="form-control input-sm easyui-validatebox" placeholder="担保公司法人" validType="maxLength[50]" />
+				  			</div>	
+				  			<div class="PlanBox">
+			      				<div class="removePlanBox">			
+			      					<p>移除</p>
+			      					<img src="../../../img/removePlan.png">
+			      				</div>
+			      				<div class="addPlanBox">
+			      					<p>添加</p>
+			      					<img src="../../../img/addPlan.png">	
+			      				</div>
+			      			</div>
+				  			<table class='table table-bordered' id='tableDialog'>
+					  			<tbody>
+							    	<tr>
+							    	    <td class='checkTd'></td>					    		
+								    	<td><span class="text-stress">债权人姓名</span></td>
+								    	<td><span class="text-stress">债权人身份证号</span></td>				    		
+								    	<td><span class="text-stress">开户银行</span></td>
+								    	<td><span class="text-stress">银行卡号</span></td>				    		
+								    	<td><span class="text-stress">手机号</span></td>
+								    	<td><span class="text-stress">默认债权人</span></td>				    		
+						    		</tr>
+						    		<tr>
+						    		    <td class='checkTd'></td>			    		
+								    	<td><input id='creditorName' name='creditorName' type="text" class="form-control input-sm easyui-validatebox validatebox" required="required" placeholder="请输入债权人姓名" maxlength='50' /></td>
+								    	<td><input  id='creditorIdNo' type="text" class="form-control input-sm easyui-validatebox validatebox" required="required" placeholder="请输入债权人身份证号" maxlength='18' /></td>				    		
+								    	<td><select id="select-creditorBankName"  required="required" class='easyui-validatebox validatebox'></select></td>
+								    	<td><input  id='creditorBankNo' type="text" class="form-control input-sm easyui-validatebox validatebox" required="required" placeholder="请输入债权人银行卡号" maxlength='20' /></td>				    		
+								    	<td><input id='creditorPhone' type="text" class="form-control input-sm easyui-validatebox validatebox" placeholder="请输入债权人手机号" required="required" maxlength='11' /></td>
+								    	<td>
+								    	   <select id='flag' name='flag' option='flag' required="required" class='easyui-validatebox validatebox'>
+								    	      <option value='1' selected>是</option>
+								    	      <option value='0'>否</option>
+								    	   </select>
+								    	</td>
+						    		</tr>
+					    	    </tbody>
+				  			</table>
+		  				</form>
+		      		</div>
+		      		<div class="modal-footer">
+				        <button id="btn-save2" type="button" class="btn btn-success btn-sm">保存</button>
+				        <button id="btn-close" type="button" class="btn btn-default btn-sm">关闭</button>		        
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+		<form id="uploadForm">
+			<input id="img" class="hidden" type="file" name="qqfile"/>
+			<input id="imgType" type="text" class="hidden" name="imgType"/>
+		</form>
+    </body>
+    <script src="../../../js/lightbox2/js/lightbox.js"></script>
+</html>

@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>信息报告</title>
+<meta charset="UTF-8" />
+<meta name="Author" content="" />
+<meta name="Keywords" content="" />
+<meta name="Description" content="" />
+<link rel="stylesheet" href="../../common/css/bootstrap.min.css">
+<link rel="stylesheet" href="../../common/css/font-awesome.min.css">
+<link rel="stylesheet" href="../../common/css/ui.jqgrid-bootstrap.css">
+<link rel="stylesheet" href="../../common/css/metroStyle.css">
+<link rel="stylesheet" href="../../common/css/main.css">
+<script src="../../../../js/common/url.js"></script>
+<script src="../../common/js/jquery.min.js"></script>
+<script src="../../common/js/layer.js"></script>
+<script src="../../common/js/bootstrap.min.js"></script>
+<script src="../../common/js/vue.min.js"></script>
+<script src="../../common/js/vue-validator.min.js"></script>
+<script src="../../common/js/grid.locale-cn.js"></script>
+<script src="../../common/js/jquery.jqGrid.min.js"></script>
+<script src="../../common/js/jquery.ztree.all.min.js"></script>
+<script src="../../common/js/common.js"></script>
+<script src="../../common/js/formatter.js"></script>
+<script src="../../common/js/base.js"></script>
+<script src="../../common/js/jquery-ui.custom.min.js"></script>
+<script src="../../common/js/jquery-ui-1.10.4.min.js"></script>
+<script src="../../common/js/jquery.multi-select.js"></script>
+<link rel="stylesheet" href="../../common/css/multi-select.css">
+<script src="../../common/js/jquery-barcode.js"></script>
+<script src="../js/info_report.js"></script>  
+<script>
+var pay_custom_feedback_success_code = '000000';
+</script>  
+<style>
+.title{
+	color:#000000;
+	text-align: center;
+}
+.title h1{
+	font-weight: bold;
+}
+.infoNum{
+	float: left;
+    margin-top: 3%;
+}
+.bcTarget{
+	float: left;
+    margin-top: 2%;
+}
+.searchTime{
+	float: left;
+    margin-top: 3%;
+    margin-left: 15%;
+}
+.answerTime{
+	margin-left: 15%;
+    display: inline-flex;
+    padding-top: 3%;
+}
+.qrCode{
+	float: right;
+    width: 3%;
+    margin-top: 2%;
+}
+.qrCode img{
+	width:100%;
+	height:100%;
+}
+hr{
+    border-top: 1px solid #000000;
+    margin-top: 1%;
+}
+.infoMajor{
+	overflow: hidden;
+	padding-top: 33px;
+    padding-bottom: 33px;
+    display:none;
+}
+.infoMajorL{
+	float:left;
+	display:none;
+}
+.damageImg{
+	float: left;
+    width: 21px;
+    position: relative;
+    top: 3px
+}
+.damageImg img{
+	width:100%;
+	height:100%;
+}
+.damageTitle span{
+	font-size: 18px;
+    font-weight: bold;
+    margin-left: 18px;
+    position: relative;
+    top: 3px;
+}
+.detailText{
+	margin-top: 21px;
+}
+.detailText p{
+	margin-left: 39px;
+    font-size: 15px;
+    display: inline-block;
+}
+.detailImg{
+	width: 15px;
+    display: inline-block;
+    margin-left: 12px;
+    position: relative;
+    top: -3px;
+}
+.detailImg img{
+	width:100%;
+	height:100%;
+}
+.infoMajorR{
+	float:right;
+	margin-right: 201px;
+	display:none;
+}
+.infoMajorRImg{
+	width: 180px;
+}
+.infoMajorRImg img{
+	width:100%;
+	height:100%;
+}
+.score{
+	font-size: 21px;
+    font-weight: bold;
+    margin-top: 12px;
+    margin-left: 12px;
+}
+.status{
+	font-size: 13px;
+    color: #929292;
+    margin-top: -12px;
+    margin-left: 12px;
+}
+.list-group-item{
+	background-color: #98a1b3;
+	color: white;
+}
+.list-group-item1{
+	position: relative;
+    display: block;
+    padding: 10px 15px;
+    margin-bottom: -1px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+}
+.form-control{
+	display: block;
+    width: 100%;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #999999;
+    border: 0px;
+    background-color: #fff;
+    webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,0);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,0);
+}
+#td-property{
+	line-height: 33px;
+	background-color: #f2f3f5;
+}
+td span{
+    margin-left: 13px;
+    line-height: 34px;
+    color: #999999;
+}
+.infoDetail{
+	float: right;
+    color: #448aca;
+    margin-right: 27px;
+    margin-top: 15px;
+    border-bottom: 1px solid;
+    cursor: pointer;
+    padding-bottom: 12px;
+    line-height: 0px;
+}
+.w13{
+	width:13%;
+}
+</style>
+</head>
+<body style='padding:50px;'>
+<!-- 报告标题 -->
+<div class="title">
+	<h1>个人风险分析报告</h1>
+</div>
+<!-- 报告号段 -->
+<div class="infoCode">
+	<div class="infoNum">
+		<span>报表编号 :</span>
+	</div>
+	<div class="bcTarget"></div>
+	<div class="searchTime">
+		<span>查询时间 :</span>
+		<span id="createTime"></span>
+	</div>
+	<div class="answerTime">
+		<span>报告时间 :</span>
+		<span id="updateTime"></span>
+	</div>
+<!-- 	<div class="qrCode">
+		<img src="${rc.contextPath}/statics/img/qrCode.png"/>
+	</div> -->
+	<hr>
+</div>
+<!-- 信息摘要 -->
+<div class="infoMajor">
+	<div class="infoMajorL">
+		<div class="infoMajorLBox">
+			<div class="damageImg">
+				<img src="../../common/img/damage.png"/>
+			</div>
+			<div class="damageTitle">
+				<span>个人风险摘要</span>
+			</div>
+		</div>
+		<div class="detailText">
+			<p>1.姓名与身份证不匹配</p>
+			<div class="detailImg">
+				<img src="../../common/img/infoMajor.png"/>
+			</div>
+		</div>
+	</div>
+	<div class="infoMajorR">
+		<div class="infoMajorRImg">
+			<img src="../../common/img/infoScore.png"/>
+		</div>
+		<p class="score">暂未评分</p>
+		<p class="status">您的风险分析结果尚不明确</p>
+	</div>
+</div>
+<form id="userForm" action="" method="post" runat="server"> 
+<!-- 个人基本信息 -->
+  <table class="table table-bordered personalBox" id="personal" style="display:none">
+  	<li class="list-group-item personalBox" style="display:none">个人基本信息</li>
+    <tbody>
+      	<tr>
+        	<td id="td-property" class="col-md-1">姓名</td>
+        	<td class="col-md-2"><span id="name"></span></td>
+        	<td id="td-property" class="col-md-1">证件号码</td>
+        	<td class="col-md-2"><span id="idNo"></span></td>
+        	<td id="td-property" class="col-md-1">手机号码</td>
+        	<td class="col-md-2"><span id="phone"></span></td>
+        	<td rowspan="5" colspan="2" style="width:200px;text-align: center;vertical-align: middle" class="personalPhoto"></td>
+     	 </tr>
+      	<tr>
+        	<td id="td-property">性别</td>
+        	<td><span id="sex"></span></td>
+        	<td id="td-property">年龄</td>
+        	<td><span id="age"></span></td>
+        	<td id="td-property">婚姻状况</td>
+        	<td><span id="married"></span></td>
+      	</tr> 
+      	<tr>
+        	<td id="td-property">银行卡号</td>
+        	<td><span id="bankNum"></span></td>
+        	<td id="td-property">银行名称</td>
+        	<td><span id="bankName"></span></td>
+        	<td id="td-property">月收入</td>
+        	<td><span id="income"></span></td>
+      	</tr> 
+      	<tr>
+        	<td id="td-property">学历</td>
+        	<td><span id="education"></span></td>
+        	<td id="td-property">毕业院校</td>
+        	<td><span id="school"></span></td>
+        	<td id="td-property">月其他收入</td>
+        	<td><span id="otherIncome"></span></td>
+      	</tr> 
+      	<tr>
+        	<td id="td-property">常住地址</td>
+        	<td colspan="5"><span id="nativePlace"></span></td>
+      	</tr> 
+    </tbody>
+  </table>
+<!-- 学历认证信息 -->
+  <table class="table table-bordered educationBox" style="display:none">
+  	<li class="list-group-item educationBox" style="display:none">学历认证信息</li>
+    <tbody>
+      	<tr>
+        	<td id="td-property" class="col-md-1">姓名</td>
+        	<td class="col-md-2"><span></span></td>
+        	<td id="td-property" class="col-md-1">出生日期</td>
+        	<td class="col-md-2"><span></span></td>
+        	<td id="td-property" class="col-md-1">证件号码</td>
+        	<td class="col-md-2"><span></span></td>
+        	<td rowspan="5" colspan="2" style="width:200px;text-align: center;vertical-align: middle;">学信网个人照片</td>
+      	</tr> 
+      	<tr>
+        	<td id="td-property">民族</td>
+        	<td><span></span></td>
+        	<td id="td-property">学历</td>
+        	<td><span></span></td>
+        	<td id="td-property">院校名称</td>
+        	<td><span></span></td>
+      	</tr> 
+      	<tr>
+        	<td id="td-property">专业名称</td>
+        	<td><span></span></td>
+        	<td id="td-property">学历类别</td>
+        	<td><span></span></td>
+        	<td id="td-property">学习形式</td>
+        	<td><span></span></td>
+      	</tr> 
+      	<tr>
+        	<td id="td-property">入学日期</td>
+        	<td><span></span></td>
+        	<td id="td-property">毕业日期</td>
+        	<td><span></span></td>
+        	<td id="td-property">离校日期</td>
+        	<td><span></span></td>
+      	</tr> 
+      	<tr>
+        	<td id="td-property">证书编号</td>
+        	<td><span></span></td>
+        	<td id="td-property">毕结业结论</td>
+        	<td><span></span></td>
+        	<td id="td-property">学籍状态</td>
+        	<td><span></span></td>
+      	</tr> 
+    </tbody>
+  </table>
+<!-- 不良信息 -->
+  <table class="table table-bordered badInfoBox" style="margin-bottom:0px;display:none">
+  	<li class="list-group-item badInfoBox3" style="display:none">司法及不良信息</li>
+    <tbody class="promiseTitle">
+      	<tr>
+      		<td id="td-property" rowspan="2" style="width:262px;text-align: center;vertical-align: middle;">不良信息</td>
+        	<td id="td-property" class="col-md-1">犯罪嫌疑人</td>
+        	<td class="col-md-2.5"><span id="crime"></span></td>
+        	<td id="td-property" class="col-md-1">前科人员</td>
+        	<td class="col-md-2.5"><span id="pedigree"></span></td>
+        	<td id="td-property" class="col-md-1">失信人员</td>
+        	<td class="col-md-2.5"><span id="trust"></span></td>
+     	 </tr>
+      	<tr>
+        	<td id="td-property">吸毒人员</td>
+        	<td><span id="drug"></span></td>
+        	<td id="td-property">涉案人员</td>
+        	<td><span id="case"></span></td>
+        	<td id="td-property">无风险</td>
+        	<td><span id="risk"></span></td>
+      	</tr>
+  	</tbody>
+  </table>
+<!-- 不良信息空 --> 
+  <table class="table table-bordered badInfoBoxNull" style="margin-bottom:0px;display:none">
+    <tbody class="promiseTitle">
+      	<tr>
+      		<td id="td-property" style="width: 262px;line-height: 66px;text-align: center;vertical-align: middle;">不良信息</td>
+      		<td style="line-height: 66px;text-align: center;vertical-align: middle;">未查到相关数据</td>
+     	 </tr>
+  	</tbody>
+  </table>
+<!-- 失信被执行信息 --> 
+  <table class="table table-bordered badInfoBox1" style="display: none;margin-bottom:0px">
+  	<tbody class="badInfoTitle">
+      	<tr>
+      		<td id="td-property" rowspan="120" style="width:262px;text-align: center;vertical-align: middle;">失信被执行信息</td>
+      	</tr>	
+    </tbody>
+  </table>
+<!-- 失信被执行信息空 --> 
+  <table class="table table-bordered badInfoBox1Null" style="display: none;margin-bottom:0px">
+  	<tbody>
+      	<tr>
+      		<td id="td-property" style="width: 262px;line-height: 66px;text-align: center;vertical-align: middle;">失信被执行信息</td>
+      		<td style="line-height: 66px;text-align: center;vertical-align: middle;">未查到相关数据</td>
+      	</tr>	
+    </tbody>
+  </table>
+<!-- 司法信息 --> 
+  <table class="table table-bordered badInfoBox2" id="involvedCase" style="display:none"> 
+    <tbody class="involvedCaseTitle">
+    	<tr>
+      		<td id="td-property" rowspan="140" style="width:262px;text-align: center;vertical-align: middle;">司法信息</td>
+      	</tr>	
+    </tbody>
+    </table>
+<!-- 涉案信息空 --> 
+    <table class="table table-bordered badInfoBox2Null" id="involvedCase" style="display:none"> 
+    <tbody>
+    	<tr>
+      		<td id="td-property" style="width: 262px;line-height: 66px;text-align: center;vertical-align: middle;">司法信息</td>
+      		<td style="line-height: 66px;text-align: center;vertical-align: middle;">未查到相关数据</td>
+      	</tr>	
+    </tbody>
+    </table>
+<!-- 运营商信息 -->
+  <table class="table table-bordered carrieroperatorBox" style="display:none;margin-bottom:0px">
+  	<li class="list-group-item carrieroperatorBox" style="display:none">运营商信息</li>
+    <tbody>
+      	<tr>
+        	<td id="td-property" class="col-md-1">手机号码</td>
+        	<td class="col-md-2"><span></span></td>
+        	<td id="td-property" class="col-md-1">机主姓名</td>
+        	<td class="col-md-2"><span></span></td>
+        	<td id="td-property" class="col-md-1">身份证号码</td>
+        	<td class="col-md-2"><span></span></td>
+     	 </tr>
+      	<tr>
+        	<td id="td-property">在网时长</td>
+        	<td><span></span></td>
+        	<td id="td-property">费用档次</td>
+        	<td><span></span></td>
+        	<td id="td-property">账户状态</td>
+        	<td><span></span></td>
+      	</tr> 
+      </tbody>
+  </table>
+<!-- 金融机构黑名单 -->
+  <table class="table table-bordered blacklistBox" style="display:none">
+  	<li class="list-group-item blacklistBoxTitle" style="display:none">金融机构黑名单</li>
+    <tbody>
+		<tr>
+        	<td id="td-property" class="col-md-1" style="text-align: center;vertical-align: middle;">黑名单命中结果</td>
+        	<td colspan="6"><span id="queryTyp"></span></td>
+      	</tr> 
+      	<tr>
+      		<td id="td-property" rowspan="3" style="text-align: center;vertical-align: middle;">逾期数据</td>
+        	<td id="td-property" style="width: 9%;">当前逾期时长</td>
+        	<td colspan="2"><span id="resultYqDqsc"></span></td>
+        	<td id="td-property" style="width: 9%;">当前逾期金额</td>
+        	<td colspan="2"><span id="resultYqDqje"></span></td>
+      	</tr> 
+      	<tr>
+        	<td id="td-property" style="width: 9%;">历史最大逾期时长</td>
+        	<td colspan="2"><span id="resultYqZdsc"></span></td>
+        	<td id="td-property" style="width: 9%;">历史最大逾期金额</td>
+        	<td colspan="2"><span id="resultYqZdje"></span></td>
+      	</tr> 
+      	<tr>
+        	<td id="td-property" style="width: 9%;">逾期最早出现时间</td>
+        	<td style="width: 15%;"><span id="resultYqZzsj"></span></td>
+        	<td id="td-property" style="width: 9%;">逾期最近出现时间</td>
+        	<td style="width: 15%;"><span id="resultYqZjsj"></span></td>
+        	<td id="td-property" style="width: 9%;">逾期累计出现次数</td>
+        	<td style="width: 15%;"><span id="resultYqLjcs"></span></td>
+      	</tr> 
+      	<tr>
+      		<td id="td-property" style="text-align: center;vertical-align: middle;">欺诈数据</td>
+        	<td id="td-property" style="width: 9%;">欺诈最早出现时间</td>
+        	<td><span id="resultQzZzsj"></span></td>
+        	<td id="td-property" style="width: 9%;">欺诈最近出现时间</td>
+        	<td><span id="resultQzZjsj"></span></td>
+        	<td id="td-property" style="width: 9%;">欺诈累计出现次数</td>
+        	<td><span id="resultQzLjcs"></span></td>
+      	</tr> 
+      	<tr>
+      		<td id="td-property" style="text-align: center;vertical-align: middle;">失信数据</td>
+        	<td id="td-property" style="width: 9%;">失信最早出现时间</td>
+        	<td><span id="resultSxZzsj"></span></td>
+        	<td id="td-property" style="width: 9%;">失信最近出现时间</td>
+        	<td><span id="resultSxZjsj"></span></td>
+        	<td id="td-property" style="width: 9%;">失信累计出现次数</td>
+        	<td><span id="resultSxLjcs"></span></td>
+      	</tr> 
+      </tbody>
+  </table>
+<!-- 金融机构黑名单空 -->
+  <table class="table table-bordered blacklistBoxNull" style="display:none;margin-bottom:0px">
+    <tbody>
+		<tr>
+      		<td style="width: 100%;line-height: 66px;text-align: center;vertical-align: middle;">未查到相关数据</td>
+      	</tr>	
+    </tbody>
+  </table>
+<!-- 金融交易信息 -->
+  <table class="table table-bordered tradeBox" style="display:none;margin-bottom:0px">
+  	<li class="list-group-item tradeBoxTitle" style="display:none">金融交易信息</li>
+    <tbody>
+      	<tr>
+        	<td id="td-property" class="w13">银行卡号</td>
+        	<td><span id="idNumber"></span></td>
+        	<td id="td-property" class="w13">四码验证</td>
+        	<td><span id=""></span></td>
+        	<td id="td-property" class="w13">卡性质</td>
+        	<td><span id="cardProperty"></span></td>
+     	 </tr>
+      	<tr>
+        	<td id="td-property">卡状态得分</td>
+        	<td><span id="cardStatusScore"></span></td>
+        	<td id="td-property">高中低消费人群标记</td>
+        	<td><span id="hmlConsumGroupsMark"></span></td>
+        	<td id="td-property">交易金额稳定性</td>
+        	<td><span id="transAmountStability"></span></td>
+      	</tr> 
+      	<tr>
+        	<td id="td-property">常用城市名称</td>
+        	<td><span id="commonCityName"></span></td>
+        	<td id="td-property">常用城市金额</td>
+        	<td><span id="generalCityTotalAmt"></span></td>
+        	<td id="td-property">消费能力得分</td>
+        	<td><span id="consumerAbilityScore"></span></td>
+      	</tr> 
+      	<tr>
+        	<td id="td-property">当月活动省市</td>
+        	<td><span id="monthActiveProvince"></span></td>
+        	<td id="td-property">消费强度标志实际月</td>
+        	<td colspan="3"><span id="consumptionStrengthMark"></span></td>
+      	</tr> 
+      	<tr>
+        	<td id="td-property">近1月交易金额</td>
+        	<td><span id="transAount1"></span></td>
+        	<td id="td-property">近3月交易金额</td>
+        	<td><span id="transAount3"></span></td>
+        	<td id="td-property">近3月月均交易金额</td>
+        	<td><span id="transAountAverage3"></span></td>
+      	</tr> 
+      	<tr>
+        	<td id="td-property">近6月交易金额</td>
+        	<td><span id="transAount6"></span></td>
+        	<td id="td-property">近6月法律交易金额</td>
+        	<td><span id="transAountLaw6"></span></td>
+        	<td id="td-property">近12月交易金额</td>
+        	<td><span id="transAount12"></span></td>
+      	</tr> 
+      	<tr>
+        	<td id="td-property">近12月月均交易金额</td>
+        	<td><span id="transAountAverage12"></span></td>
+        	<td id="td-property">近1月交易笔数</td>
+        	<td><span id="transNumber1"></span></td>
+        	<td id="td-property">近3月交易笔数</td>
+        	<td><span id="transNumber3"></span></td>
+      	</tr> 
+      	<tr>
+        	<td id="td-property">近3月月均交易笔数</td>
+        	<td><span id="transNumberAverage3"></span></td>
+        	<td id="td-property">近6月交易笔数</td>
+        	<td><span id="transNumber6"></span></td>
+        	<td id="td-property">近6月法律交易笔数</td>
+        	<td><span id="transNumberLaw6"></span></td>
+      	</tr> 
+      	<tr>
+        	<td id="td-property">近12月交易笔数</td>
+        	<td><span id="transNumber12"></span></td>
+        	<td id="td-property">近12月月均交易笔数</td>
+        	<td colspan="3"><span id="transNumberAverage12"></span></td>
+      	</tr> 
+      </tbody>
+  </table>
+<!-- 金融交易信息空 -->
+  <table class="table table-bordered tradeBoxNull" style="display:none;margin-bottom:0px">
+    <tbody>
+		<tr>
+      		<td style="width: 100%;line-height: 66px;text-align: center;vertical-align: middle;">未查到相关数据</td>
+      	</tr>	
+    </tbody>
+  </table>
+  <div class="tips">
+  	<h3 style="font-weight: bold;">报告说明：</h3>
+  	<p>1、本报告信息均由用户或与我司合作的数据服务机构提供，我司不保证其真实性和准确性，但承诺在数据汇总、加工、整合的全过程中保持客观、中立的地位。</p>
+  	<p>2、本报告中的金额类数据均以人民币计算，除有特别说明外，默认精确到元。</p>
+  	<p>3、如您发现相关信息存在不准确或错误的情况，可联系数据处理机构及经您授权的第三方进行更正或删除。</p>
+  	<p>4、本报告内容涉及个人隐私，查询者应取得客户授权，依法使用，妥善保管，因使用不当造成个人隐私泄露的，我司将不承担相关责任。</p>
+  	<p>5、本报告内容仅供使用者参考，我司不承担据此报告产生的任何法律责任。</p>
+  	<p>6、本报告内容未经我司书面许可，不得擅自复制、摘录、编辑、转载、披露和发表。</p>
+  	<p>7、本报告相关服务由北京中睿致行科技有限公司提供，更多咨询请访问致行科技官方网站www.zxbit.cn查询。</p>
+  </div>
+  <!-- <div style="text-align: center;">
+  	<input type="button" value="返回" class="btn btn-warning" onclick="javascript:history.go(-1);">
+  </div> -->
+</form>	
+</body>
+</html>

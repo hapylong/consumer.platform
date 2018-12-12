@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+    Apache License, Version 2.0 (the "License"); you may not use this file except 
+    in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+    Unless required by applicable law or agreed to in writing, software distributed 
+    under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+    OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+    the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.carthreehundred.InstOrderloanRiskDao">
+    
+    <insert id="saveInstOrderloanRiskInfo" parameterType="com.iqb.consumer.data.layer.bean.carthreehundred.InstOrderloanRiskBean">
+          insert into inst_order_loanrisk(orderId,sendStatus,version,createTime) values (#{orderId},#{sendStatus},1,NOW())
+    </insert>
+    
+    <update id="updateInstOrderloanRiskInfoByOrderId" parameterType="com.iqb.consumer.data.layer.bean.carthreehundred.InstOrderloanRiskBean">
+        update inst_order_loanrisk set status = #{status},errorMsg = #{errorMsg},assetsId = #{assetsId},sendStatus = #{sendStatus} , updateTime = NOW() where orderId = #{orderId}
+    </update>
+    <!-- 根据订单号获取发送车300接口贷后风控信息 -->
+    <select id="getInstOrderloanRiskInfoByOrderId" parameterType="java.lang.String" resultType="com.iqb.consumer.data.layer.bean.carthreehundred.InstOrderloanRiskBean">
+        select * from inst_order_loanrisk where orderId = #{orderId}
+    </select>
+    <!-- 保存贷后风控返回结果信息 -->
+    <insert id="insertInstLoanRiskResult" parameterType="com.iqb.consumer.data.layer.bean.cheegu.InstCarReportBean" keyProperty="id"
+        useGeneratedKeys="true">
+        INSERT INTO inst_order_loanrisk_result 
+            (
+                carNo, riskCode, rules,version, createTime, updateTime
+            ) 
+        VALUES 
+            (   
+                #{vin}, #{risk_code}, #{rule}, 1,NOW(),NOW()
+            )
+    </insert>
+</mapper>

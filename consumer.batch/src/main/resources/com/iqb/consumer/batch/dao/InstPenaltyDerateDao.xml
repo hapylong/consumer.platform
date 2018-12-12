@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iqb.consumer.batch.dao.InstPenaltyDerateDao" >
+
+    <select id="getCurrentInstPenaltyDerateInfo" parameterType="java.lang.String" resultType="com.iqb.consumer.batch.data.pojo.SpecialTimeOrderPojo">
+       SELECT
+		    A.ORDER_ID AS procBizId,
+		    A.PROC_INST_ID AS procInstId,
+		    B.ID AS procOrgCode
+		FROM
+		    IQB_INST_PENALTY_DERATE A
+		LEFT JOIN inst_merchantinfo B ON A.MERCHANT_NO = B.MERCHANTNO
+		WHERE A.APPLY_STATUS = 1
+		and DATE_FORMAT(A.APPLY_DATE,'%Y-%m-%d') = #{currentDate}
+    </select>
+    <!-- 更新罚息减免订单为已拒绝 -->
+    <update id="updateInstPenaltyDerateByOid" parameterType="java.lang.String">
+        UPDATE
+            IQB_INST_PENALTY_DERATE
+        SET
+            APPLY_STATUS = 3
+        WHERE 
+            PROC_INST_ID = #{procInstId}
+    </update>
+</mapper>

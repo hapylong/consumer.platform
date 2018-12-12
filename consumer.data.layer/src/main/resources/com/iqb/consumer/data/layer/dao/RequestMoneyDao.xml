@@ -1,0 +1,980 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+	Apache License, Version 2.0 (the "License"); you may not use this file except 
+	in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.RequestMoneyDao">
+
+	<!-- 配置映射字段 -->
+	<resultMap type="com.iqb.consumer.data.layer.bean.reqmoney.RequestMoneyBean"
+		id="requestMoneyBean">
+		<result property="id" column="ID" />
+		<result property="projectName" column="PROJECTNAME" />
+		<result property="merchName" column="merch_name" />
+		<result property="orderId" column="ORDERID" />
+		<result property="orderNo" column="order_no" />
+		<result property="sourcesFunding" column="SOURCESFUNDING" />
+		<result property="planFullName" column="PLANFULLNAME" />
+		<result property="realName" column="realName" /><!-- 真实姓名 -->
+		<result property="orderItems" column="order_items" />
+		<result property="leftItems" column="LEFTITEMS" />
+		<result property="orderAmt" column="orderAmt" />
+		<result property="applyItems" column="APPLYITEMS" />
+		<result property="remark" column="REMARK" />
+		<result property="deadline" column="DEADLINE" />
+		<!-- FINANCE-2382 资产分配明细优化 -->
+		<result property="creditName" column="CREDITNAME" />
+		<result property="creditCardNo" column="CREDITCARDNO" />
+		<result property="creditBankCard" column="CREDITBANKCARD" />
+		<result property="creditBank" column="CREDITBANK" />
+		<result property="creditPhone" column="CREDITPHONE" />
+		<result property="version" column="VERSION" />
+		<result property="createTime" column="CREATETIME" />
+		<result property="updateTime" column="UPDATETIME" />
+		<result property="applyTime" column="applyTime" />
+		<result property="planLendingTime" column="PLANLENDINGTIME" />
+		<result property="pushId"     column="PUSHID" />
+		<result property="regId"      column="regId" />
+		<result property="allotName"  column="allotName" />
+		<result property="redemptionDate" column="REDEMPTIONDATE" />
+		<result property="redemptionReason" column="REDEMPTIONREASON" />
+		<result property="applyInstIDay" column="applyInstIDay" />
+		<result property="lendersSubject" column="lendersSubject" />		
+		<result property="firstApplyTime" column="firstApplyTime" />
+		<result property="applyAmt" column="APPLYAMT" />
+		
+		<result property="status"         column="status" />
+		<result property="wfStatus"       column="wfStatus" />
+		<result property="riskStatus"     column="riskStatus"/>		
+	</resultMap>
+
+
+	<!-- 替代，语句中的内容,简写 -->
+	<sql id="cols">
+		O.PROJECTNAME,M.merch_name,O.order_id as
+		ORDERID,O.order_no,(SELECT real_name FROM fqzf_user U WHERE U.id =
+		O.user_id) AS realName,(SELECT
+		P.PLANFULLNAME FROM fqzf_plan P WHERE
+		P.ID =
+		O.planId) as
+		PLANFULLNAME,O.order_items,O.createTime as
+		CREATETIME,IFNULL((SELECT
+		SUM(APPLYITEMS)
+		FROM
+		CF_REQUESTMONEY R WHERE
+		R.ORDERID = O.order_id),0) as
+		APPLYITEMS,(order_items -
+		IFNULL((SELECT
+		SUM(APPLYITEMS) FROM
+		CF_REQUESTMONEY R WHERE R.ORDERID =
+		O.order_id),0))
+		as LEFTITEMS,IFNULL((SELECT
+		SOURCESFUNDING FROM
+		CF_REQUESTMONEY R WHERE R.ORDERID = O.order_id
+		ORDER BY R.APPLYTIME
+		DESC LIMIT 1),'') as SOURCESFUNDING
+	</sql>
+
+	<select id="getAllRequest" parameterType="java.util.Map"
+		resultMap="requestMoneyBean">
+		SELECT 
+		  * 
+		FROM
+		  (SELECT 
+			(SELECT 
+		      PROJECTNAME 
+		    FROM
+		      inst_orderotherinfo OO 
+		    WHERE O.orderId = OO.orderId) AS PROJECTNAME,
+		    M.MERCHANTFULLNAME as merchName,
+		    O.orderId AS ORDERID,
+		    O.lendersSubject AS lendersSubject,
+		    (SELECT 
+		      realName 
+		    FROM
+		      inst_user U 
+		    WHERE U.id = O.userId) AS realName,
+		    (SELECT 
+		      P.PLANFULLNAME 
+		    FROM
+		      inst_plan P 
+		    WHERE P.ID = O.planId) AS PLANFULLNAME,
+		    O.orderItems,
+		    <!-- FINANCE-2816 资产分配列表车主贷订单的“上标金额”实际取的借款金额，应取上标金额 -->
+		    IF(O.bizType='2400',O.borrowAmt,O.orderAmt) as orderAmt,
+		    O.createTime AS CREATETIME,
+		    IFNULL(
+		      (SELECT 
+		        SUM(APPLYITEMS) 
+		      FROM
+		        CF_REQUESTMONEY R 
+		      WHERE R.ORDERID = O.orderId),
+		      0
+		    ) AS APPLYITEMS,
+		   <!--  (
+		      orderItems - IFNULL(
+		        (SELECT 
+		          SUM(APPLYITEMS) 
+		        FROM
+		          CF_REQUESTMONEY R 
+		        WHERE R.ORDERID = O.orderId),
+		        0
+		      )
+		    ) AS LEFTITEMS, -->  
+		    <!--  上诉是老的剩余期数的代码 -->
+		    IFNULL(
+		      (SELECT 
+		        SOURCESFUNDING 
+		      FROM
+		        CF_REQUESTMONEY R 
+		      WHERE R.ORDERID = O.orderId 
+		      ORDER BY R.CREATETIME DESC 
+		      LIMIT 1),
+		      ''
+		    ) AS SOURCESFUNDING ,
+            IFNULL(
+                (
+                <!-- FINANCE-2457 资产分配时间优化 由 APPLYTIME 修改为R.CREATETIME -->
+                    SELECT
+                        R.CREATETIME
+                    FROM
+                        CF_REQUESTMONEY R
+                    WHERE
+                        R.ORDERID = O.orderId
+                    ORDER BY
+                        R.APPLYTIME DESC
+                    LIMIT 1
+                ),
+                ''
+            ) AS APPLYTIME ,
+            
+            IFNULL(
+                (
+                <!-- 用于计算资产到期日，取该订单第一次推标时间 -->
+                    SELECT
+                        R.CREATETIME
+                    FROM
+                        CF_REQUESTMONEY R
+                    WHERE
+                        R.ORDERID = O.orderId
+                    ORDER BY
+                        R.APPLYTIME ASC
+                    LIMIT 1
+                ),
+                ''
+            ) AS firstApplyTime ,
+            
+            IFNULL(
+                (
+                    SELECT
+                        DEADLINE
+                    FROM
+                        CF_REQUESTMONEY R
+                    WHERE
+                        R.ORDERID = O.orderId
+                    ORDER BY
+                        R.APPLYTIME DESC
+                    LIMIT 1
+                ),
+                ''
+            ) AS DEADLINE ,
+             IFNULL(
+                (
+                <!-- FINANCE-2562 添加预计放款时间 -->
+                    SELECT
+                        R.APPLYTIME
+                    FROM
+                        CF_REQUESTMONEY R
+                    WHERE
+                        R.ORDERID = O.orderId
+                    ORDER BY
+                        R.APPLYTIME DESC
+                    LIMIT 1
+                ),
+                ''
+            ) AS PLANLENDINGTIME,
+            <!-- 现在剩余期数显示x月x日这样 -->
+            CONCAT(O.leftInstIMonth,'月',O.leftInstIDay,'日') AS LEFTITEMS,
+            C.APPLYAMT
+		  FROM
+		    inst_orderinfo O
+		    LEFT JOIN  inst_merchantinfo M on O.merchantNo = M.MERCHANTNO
+		      LEFT JOIN (SELECT A.* from (SELECT * from cf_requestmoney ORDER BY  ID desc) A GROUP BY A.ORDERID ) C on O.orderId=C.orderId
+		      WHERE 
+		       (O.wfStatus = 9 or O.wfStatus = 100)
+		      AND O.status <![CDATA[<>]]> 2
+		      AND (O.riskStatus <![CDATA[<>]]> 10 or O.riskStatus IS NULL)
+		<if test="merList !=null and merList.size() != 0">
+			AND M.MERCHANTNO in
+			<foreach item="item" index="index" collection="merList" open="("
+				separator="," close=")">
+				#{item.merchantNo}
+			</foreach>
+		</if>
+		<if test="merchName != null and merchName != ''">
+			AND M.merchantNo = #{merchName}
+		</if>
+		<if test="orderId != null and orderId != ''">
+			AND O.orderId like CONCAT('%',#{orderId},'%' )
+		</if>
+		<if test="startTime !=null and startTime != ''">
+			AND O.createTime &gt;= #{startTime}
+		</if>
+		<if test="endTime !=null and endTime != ''">
+			AND O.createTime &lt;= #{endTime}
+		</if>
+		<if test="orderItems !=null and orderItems !='' ">
+			AND O.orderItems = #{orderItems}
+		</if>
+		ORDER BY O.updatetime DESC
+		) B WHERE 1=1 
+		<if test="realName !=null and realName !='' ">
+            AND B.realName like CONCAT("%",#{realName},"%")
+        </if>
+        <choose> 
+        	<when test="allotStatus == '0'.toString() ">
+        		AND  B.LEFTITEMS = B.orderitems
+        	</when> 
+        	<when test="allotStatus == '1'.toString() ">
+        		<![CDATA[
+        			AND  B.orderItems-IFNULL(B.applyitems,0)  > 0 and B.orderItems-IFNULL(B.applyitems,0) < B.orderItems
+        		]]>
+        	</when>
+        	<when test="allotStatus == '2'.toString() ">
+        		AND  B.LEFTITEMS=0
+        	</when>
+        	<otherwise>
+        	
+        	</otherwise>
+        </choose>
+        <if test="sourcesFunding !=null and sourcesFunding != ''">
+			AND B.SOURCESFUNDING = #{sourcesFunding}
+		</if>
+		<if test="projectName !=null and projectName != ''">
+			AND B.PROJECTNAME like CONCAT('%',#{projectName},'%' )
+		</if>
+        <if test="applyTime !=null and applyTime != ''">
+            AND date(B.APPLYTIME) between #{applyTime} and #{applyTime}
+        </if>
+        <if test="planLendingTime !=null and planLendingTime != ''">
+            AND date(B.PLANLENDINGTIME) between #{planLendingTime} and #{planLendingTime}
+        </if>
+        <if test="lendersSubject !=null and lendersSubject != ''">
+			AND B.lendersSubject = #{lendersSubject}
+		</if>
+	</select>
+
+	<insert id="insertReqMoney"
+		parameterType="com.iqb.consumer.data.layer.bean.reqmoney.RequestMoneyBean"
+		keyProperty="id" useGeneratedKeys="true">
+		INSERT INTO CF_REQUESTMONEY
+		(ORDERID, APPLYITEMS,SOURCESFUNDING, STATUS,DEADLINE,
+		APPLYTIME,REMARK,ISWITHHOLDING,ISPUBLIC,ISPUSHFF,
+		CREATETIME,ALLOT_REGID,CREDITNAME,CREDITCARDNO,CREDITBANKCARD,
+		CREDITBANK,CREDITPHONE,applyInstIDay,APPLYAMT,curRepayNo,pushMode
+		) VALUES
+		(
+			#{orderId}, #{applyItems}, #{sourcesFunding},#{status},#{deadline},
+			#{applyTime},#{remark},#{isWithholding},#{isPublic},#{isPushff},
+			NOW(),#{allotRegid},#{creditName},#{creditCardNo},#{creditBankCard},
+			#{creditBank},#{creditPhone},#{applyInstIDay},#{applyAmt},#{curRepayNo},#{pushMode}
+		);
+	</insert>
+	<!-- 查询资产分配详情 -->
+	<select id="getAllotDetailByOrderId" parameterType="java.util.Map" resultMap="requestMoneyBean">
+		SELECT
+			DATE_FORMAT(A.APPLYTIME,'%Y-%m-%d') CREATETIME,
+			<!-- FINANCE-2816 资产分配列表车主贷订单的“上标金额”实际取的借款金额，应取上标金额 -->
+		    IF(D.bizType='2400',D.borrowAmt,D.orderAmt) as orderAmt,
+			A.APPLYITEMS,
+			A.CREDITNAME,
+			DATE_FORMAT(A.DEADLINE,'%Y-%m-%d') DEADLINE,
+			C.DICT_NAME as SOURCESFUNDING,
+			B.REAL_NAME as realName,
+			A.REDEMPTIONDATE,
+			A.REDEMPTIONREASON,
+			A.applyInstIDay,
+			A.applyAmt,
+			A.pushMode
+		FROM
+			cf_requestmoney A
+		LEFT JOIN iqb_sys_user B ON A.ALLOT_REGID = B.ID and B.DELETE_FLAG=1
+		LEFT JOIN iqb_sys_dict_item C on C.DICT_VALUE = A.SOURCESFUNDING and C.DICT_TYPE_CODE='fund_source'
+		LEFT JOIN inst_orderinfo D on A.ORDERID = D.orderId
+		WHERE
+			A.ORDERID = #{orderId}
+			ORDER BY A.CREATETIME 
+	</select>
+	
+	<select id="getAllReqAllotMoney" parameterType="java.util.Map"
+		resultMap="requestMoneyBean">
+		SELECT 
+		  * 
+		FROM
+		  (SELECT 
+			(SELECT 
+		      PROJECTNAME 
+		    FROM
+		      inst_orderotherinfo OO 
+		    WHERE O.orderId = OO.orderId) AS PROJECTNAME,
+		    M.MERCHANTFULLNAME as merchName,
+		    O.orderId AS ORDERID,
+		    (SELECT 
+		      realName 
+		    FROM
+		      inst_user U 
+		    WHERE U.id = O.userId) AS realName,
+		    (SELECT 
+		      P.PLANFULLNAME 
+		    FROM
+		      inst_plan P 
+		    WHERE P.ID = O.planId) AS PLANFULLNAME,
+		    O.orderItems,
+		    <!-- FINANCE-2816 资产分配列表车主贷订单的“上标金额”实际取的借款金额，应取上标金额 -->
+		    IF(O.bizType='2400',O.borrowAmt,O.orderAmt) as orderAmt,
+		    O.createTime AS CREATETIME,
+		    IFNULL(
+		      (SELECT 
+		        SUM(APPLYITEMS) 
+		      FROM
+		        CF_REQUESTMONEY R 
+		      WHERE R.ORDERID = O.orderId),
+		      0
+		    ) AS APPLYITEMS,
+		   <!--  (
+		      orderItems - IFNULL(
+		        (SELECT 
+		          SUM(APPLYITEMS) 
+		        FROM
+		          CF_REQUESTMONEY R 
+		        WHERE R.ORDERID = O.orderId),
+		        0
+		      )
+		    ) AS LEFTITEMS, -->
+		    <!-- 现在剩余期数显示x月x日这样 -->
+            CONCAT(O.leftInstIMonth,'月',O.leftInstIDay,'日') AS LEFTITEMS,
+		    IFNULL(
+		      (SELECT 
+		        SOURCESFUNDING 
+		      FROM
+		        CF_REQUESTMONEY R 
+		      WHERE R.ORDERID = O.orderId 
+		      ORDER BY R.CREATETIME DESC 
+		      LIMIT 1),
+		      ''
+		    ) AS SOURCESFUNDING ,
+            IFNULL(
+                (
+                    SELECT
+                    <!-- FINANCE-2457 资产分配时间优化 由 APPLYTIME 修改为R.CREATETIME -->
+                        R.CREATETIME
+                    FROM
+                        CF_REQUESTMONEY R
+                    WHERE
+                        R.ORDERID = O.orderId
+                    ORDER BY
+                        R.APPLYTIME DESC
+                    LIMIT 1
+                ),
+                ''
+            ) AS  APPLYTIME,
+            
+            IFNULL(
+                (
+                <!-- 用于计算资产到期日，取该订单第一次推标时间 -->
+                    SELECT
+                        R.CREATETIME
+                    FROM
+                        CF_REQUESTMONEY R
+                    WHERE
+                        R.ORDERID = O.orderId
+                    ORDER BY
+                        R.APPLYTIME ASC
+                    LIMIT 1
+                ),
+                ''
+            ) AS firstApplyTime ,
+            
+            IFNULL(
+                (
+                    SELECT
+                        DEADLINE
+                    FROM
+                        CF_REQUESTMONEY R
+                    WHERE
+                        R.ORDERID = O.orderId
+                    ORDER BY
+                        R.APPLYTIME DESC
+                    LIMIT 1
+                ),
+                ''
+            ) AS DEADLINE ,
+             IFNULL(
+                (
+                <!-- FINANCE-2562 添加预计放款时间 -->
+                    SELECT
+                        R.APPLYTIME
+                    FROM
+                        CF_REQUESTMONEY R
+                    WHERE
+                        R.ORDERID = O.orderId
+                    ORDER BY
+                        R.APPLYTIME DESC
+                    LIMIT 1
+                ),
+                ''
+            ) AS PLANLENDINGTIME,
+            C.APPLYAMT,
+            O.riskStatus,
+            O.wfStatus
+		  FROM
+		    inst_orderinfo O
+		    LEFT JOIN  inst_merchantinfo M on O.merchantNo = M.MERCHANTNO
+            LEFT JOIN (SELECT A.* from (SELECT * from cf_requestmoney ORDER BY  ID desc) A GROUP BY A.ORDERID ) C on O.orderId=C.orderId
+		  WHERE (O.wfStatus = 9 or O.wfStatus = 100)
+		      AND O.status <![CDATA[<>]]> 2
+		<if test="merList !=null and merList.size() != 0">
+			AND M.MERCHANTNO in
+			<foreach item="item" index="index" collection="merList" open="("
+				separator="," close=")">
+				#{item.merchantNo}
+			</foreach>
+		</if>
+		<if test="merchName != null and merchName != ''">
+			AND M.merchantNo = #{merchName}
+		</if>
+		<if test="orderId != null and orderId != ''">
+			AND O.orderId like CONCAT('%',#{orderId},'%' )
+		</if>
+		<if test="startTime !=null and startTime != ''">
+			AND O.createTime &gt;= #{startTime}
+		</if>
+		<if test="endTime !=null and endTime != ''">
+			AND O.createTime &lt;= #{endTime}
+		</if>
+		<if test="orderItems !=null and orderItems !='' ">
+			AND O.orderItems = #{orderItems}
+		</if>
+		ORDER BY O.updatetime DESC
+		) B WHERE 1=1 
+        <choose> 
+        	<when test="allotStatus == '0'.toString() ">
+        		AND  B.LEFTITEMS <![CDATA[<>]]> B.orderitems
+        	</when> 
+        	<when test="allotStatus == '1'.toString() ">
+        		<![CDATA[
+        			AND  B.orderItems-IFNULL(B.applyitems,0)  > 0 and B.orderItems-IFNULL(B.applyitems,0) < B.orderItems
+        		]]>
+        	</when>
+        	<when test="allotStatus == '2'.toString() ">
+        		AND  B.LEFTITEMS=0
+        	</when>
+        	<otherwise>
+        	
+        	</otherwise>
+        </choose>
+            <if test="sourcesFunding !=null and sourcesFunding != ''">
+			AND B.SOURCESFUNDING = #{sourcesFunding}
+		</if>
+		<if test="projectName !=null and projectName != ''">
+			AND B.PROJECTNAME like CONCAT('%',#{projectName},'%' )
+		</if>
+		<if test="applyTime !=null and applyTime != ''">
+            AND date(B.APPLYTIME) between #{applyTime} and #{applyTime}
+        </if>
+        <if test="planLendingTime !=null and planLendingTime != ''">
+            AND date(B.PLANLENDINGTIME) between #{planLendingTime} and #{planLendingTime}
+        </if>
+	</select>
+	<!-- 根据订单号查询资产分配来源 -->
+	<select id="getRequestMoneyByOrderId" parameterType="java.util.Map" resultMap="requestMoneyBean">
+		SELECT
+			A.PUSHID,B.DICT_NAME as SOURCESFUNDING
+		FROM
+			cf_requestmoney A
+			LEFT JOIN iqb_sys_dict_item B on A.SOURCESFUNDING = B.DICT_VALUE and B.DICT_TYPE_CODE='fund_source'
+		WHERE 
+			<![CDATA[ 
+				NOT EXISTS(SELECT 1 FROM cf_requestmoney WHERE A.ORDERID=ORDERID AND A.id<id)
+			]]>
+			AND A.ORDERID = #{orderId}
+	</select>
+	<!-- 资产分配查询出总金额 总个数 -->
+	<select id="getAllRequestTotal" parameterType="java.util.Map"
+		resultType="java.util.Map">
+		SELECT 
+		  SUM(B.orderAmt) as orderAmtTotal,
+		COUNT(B.orderId) as orderAmtCount,
+		B.lendersSubject
+		FROM
+		  (SELECT 
+			(SELECT 
+		      PROJECTNAME 
+		    FROM
+		      inst_orderotherinfo OO 
+		    WHERE O.orderId = OO.orderId) AS PROJECTNAME,
+		    M.MERCHANTFULLNAME as merchName,
+		    O.orderId AS ORDERID,
+		    O.lendersSubject AS lendersSubject,
+		    (SELECT 
+		      realName 
+		    FROM
+		      inst_user U 
+		    WHERE U.id = O.userId) AS realName,
+		    (SELECT 
+		      P.PLANFULLNAME 
+		    FROM
+		      inst_plan P 
+		    WHERE P.ID = O.planId) AS PLANFULLNAME,
+		    O.orderItems,
+		    <!-- FINANCE-2816 资产分配列表车主贷订单的“上标金额”实际取的借款金额，应取上标金额 -->
+		    IF(O.bizType='2400',O.borrowAmt,O.orderAmt) as orderAmt,
+		    O.createTime AS CREATETIME,
+		    IFNULL(
+		      (SELECT 
+		        SUM(APPLYITEMS) 
+		      FROM
+		        CF_REQUESTMONEY R 
+		      WHERE R.ORDERID = O.orderId),
+		      0
+		    ) AS APPLYITEMS,
+		   <!--  (
+		      orderItems - IFNULL(
+		        (SELECT 
+		          SUM(APPLYITEMS) 
+		        FROM
+		          CF_REQUESTMONEY R 
+		        WHERE R.ORDERID = O.orderId),
+		        0
+		      )
+		    ) AS LEFTITEMS, -->  
+		    <!--  上诉是老的剩余期数的代码 -->
+		    IFNULL(
+		      (SELECT 
+		        SOURCESFUNDING 
+		      FROM
+		        CF_REQUESTMONEY R 
+		      WHERE R.ORDERID = O.orderId 
+		      ORDER BY R.CREATETIME DESC 
+		      LIMIT 1),
+		      ''
+		    ) AS SOURCESFUNDING ,
+            IFNULL(
+                (
+                <!-- FINANCE-2457 资产分配时间优化 由 APPLYTIME 修改为R.CREATETIME -->
+                    SELECT
+                        R.CREATETIME
+                    FROM
+                        CF_REQUESTMONEY R
+                    WHERE
+                        R.ORDERID = O.orderId
+                    ORDER BY
+                        R.APPLYTIME DESC
+                    LIMIT 1
+                ),
+                ''
+            ) AS APPLYTIME ,
+            
+            IFNULL(
+                (
+                <!-- 用于计算资产到期日，取该订单第一次推标时间 -->
+                    SELECT
+                        R.CREATETIME
+                    FROM
+                        CF_REQUESTMONEY R
+                    WHERE
+                        R.ORDERID = O.orderId
+                    ORDER BY
+                        R.APPLYTIME ASC
+                    LIMIT 1
+                ),
+                ''
+            ) AS firstApplyTime ,
+            
+            IFNULL(
+                (
+                    SELECT
+                        DEADLINE
+                    FROM
+                        CF_REQUESTMONEY R
+                    WHERE
+                        R.ORDERID = O.orderId
+                    ORDER BY
+                        R.APPLYTIME DESC
+                    LIMIT 1
+                ),
+                ''
+            ) AS DEADLINE ,
+             IFNULL(
+                (
+                <!-- FINANCE-2562 添加预计放款时间 -->
+                    SELECT
+                        R.APPLYTIME
+                    FROM
+                        CF_REQUESTMONEY R
+                    WHERE
+                        R.ORDERID = O.orderId
+                    ORDER BY
+                        R.APPLYTIME DESC
+                    LIMIT 1
+                ),
+                ''
+            ) AS PLANLENDINGTIME,
+            <!-- 现在剩余期数显示x月x日这样 -->
+            CONCAT(O.leftInstIMonth,'月',O.leftInstIDay,'日') AS LEFTITEMS
+		  FROM
+		    inst_orderinfo O,
+		    inst_merchantinfo M 
+		  WHERE O.merchantNo = M.MERCHANTNO 
+		      AND (O.wfStatus = 9 or O.wfStatus = 100)
+		      AND O.status <![CDATA[<>]]> 2
+		      AND (O.riskStatus <![CDATA[<>]]> 10 or O.riskStatus IS NULL)
+		<if test="merList !=null and merList.size() != 0">
+			AND M.MERCHANTNO in
+			<foreach item="item" index="index" collection="merList" open="("
+				separator="," close=")">
+				#{item.merchantNo}
+			</foreach>
+		</if>
+		<if test="merchName != null and merchName != ''">
+			AND M.merchantNo = #{merchName}
+		</if>
+		<if test="orderId != null and orderId != ''">
+			AND O.orderId like CONCAT('%',#{orderId},'%' )
+		</if>
+		<if test="startTime !=null and startTime != ''">
+			AND O.createTime &gt;= #{startTime}
+		</if>
+		<if test="endTime !=null and endTime != ''">
+			AND O.createTime &lt;= #{endTime}
+		</if>
+		<if test="orderItems !=null and orderItems !='' ">
+			AND O.orderItems = #{orderItems}
+		</if>
+		ORDER BY O.updatetime DESC
+		) B WHERE 1=1 
+		<if test="realName !=null and realName !='' ">
+            AND B.realName like CONCAT("%",#{realName},"%")
+        </if>
+        <choose> 
+        	<when test="allotStatus == '0'.toString() ">
+        		AND  B.LEFTITEMS = B.orderitems
+        	</when> 
+        	<when test="allotStatus == '1'.toString() ">
+        		<![CDATA[
+        			AND  B.orderItems-IFNULL(B.applyitems,0)  > 0 and B.orderItems-IFNULL(B.applyitems,0) < B.orderItems
+        		]]>
+        	</when>
+        	<when test="allotStatus == '2'.toString() ">
+        		AND  B.LEFTITEMS=0
+        	</when>
+        	<otherwise>
+        	
+        	</otherwise>
+        </choose>
+        <if test="sourcesFunding !=null and sourcesFunding != ''">
+			AND B.SOURCESFUNDING = #{sourcesFunding}
+		</if>
+		<if test="projectName !=null and projectName != ''">
+			AND B.PROJECTNAME like CONCAT('%',#{projectName},'%' )
+		</if>
+        <if test="applyTime !=null and applyTime != ''">
+            AND date(B.APPLYTIME) between #{applyTime} and #{applyTime}
+        </if>
+        <if test="planLendingTime !=null and planLendingTime != ''">
+            AND date(B.PLANLENDINGTIME) between #{planLendingTime} and #{planLendingTime}
+        </if>
+        <if test="lendersSubject !=null and lendersSubject != ''">
+            AND B.lendersSubject = #{lendersSubject}
+        </if>
+	</select>
+	
+	<!-- 资产分配明细个数总金额 -->
+	<select id="getAllReqAllotMoneyTotal" parameterType="java.util.Map"
+		resultType="java.util.Map">
+		SELECT 
+		   SUM(B.orderAmt) as orderAmtTotal,
+		COUNT(B.orderId) as orderAmtCount 
+		FROM
+		  (SELECT 
+			(SELECT 
+		      PROJECTNAME 
+		    FROM
+		      inst_orderotherinfo OO 
+		    WHERE O.orderId = OO.orderId) AS PROJECTNAME,
+		    M.MERCHANTFULLNAME as merchName,
+		    O.orderId AS ORDERID,
+		    (SELECT 
+		      realName 
+		    FROM
+		      inst_user U 
+		    WHERE U.id = O.userId) AS realName,
+		    (SELECT 
+		      P.PLANFULLNAME 
+		    FROM
+		      inst_plan P 
+		    WHERE P.ID = O.planId) AS PLANFULLNAME,
+		    O.orderItems,
+		    <!-- FINANCE-2816 资产分配列表车主贷订单的“上标金额”实际取的借款金额，应取上标金额 -->
+		    IF(O.bizType='2400',O.borrowAmt,O.orderAmt) as orderAmt,
+		    O.createTime AS CREATETIME,
+		    IFNULL(
+		      (SELECT 
+		        SUM(APPLYITEMS) 
+		      FROM
+		        CF_REQUESTMONEY R 
+		      WHERE R.ORDERID = O.orderId),
+		      0
+		    ) AS APPLYITEMS,
+		   <!--  (
+		      orderItems - IFNULL(
+		        (SELECT 
+		          SUM(APPLYITEMS) 
+		        FROM
+		          CF_REQUESTMONEY R 
+		        WHERE R.ORDERID = O.orderId),
+		        0
+		      )
+		    ) AS LEFTITEMS, -->
+		    <!-- 现在剩余期数显示x月x日这样 -->
+            CONCAT(O.leftInstIMonth,'月',O.leftInstIDay,'日') AS LEFTITEMS,
+		    IFNULL(
+		      (SELECT 
+		        SOURCESFUNDING 
+		      FROM
+		        CF_REQUESTMONEY R 
+		      WHERE R.ORDERID = O.orderId 
+		      ORDER BY R.CREATETIME DESC 
+		      LIMIT 1),
+		      ''
+		    ) AS SOURCESFUNDING ,
+            IFNULL(
+                (
+                    SELECT
+                    <!-- FINANCE-2457 资产分配时间优化 由 APPLYTIME 修改为R.CREATETIME -->
+                        R.CREATETIME
+                    FROM
+                        CF_REQUESTMONEY R
+                    WHERE
+                        R.ORDERID = O.orderId
+                    ORDER BY
+                        R.APPLYTIME DESC
+                    LIMIT 1
+                ),
+                ''
+            ) AS  APPLYTIME,
+            
+            IFNULL(
+                (
+                <!-- 用于计算资产到期日，取该订单第一次推标时间 -->
+                    SELECT
+                        R.CREATETIME
+                    FROM
+                        CF_REQUESTMONEY R
+                    WHERE
+                        R.ORDERID = O.orderId
+                    ORDER BY
+                        R.APPLYTIME ASC
+                    LIMIT 1
+                ),
+                ''
+            ) AS firstApplyTime ,
+            
+            IFNULL(
+                (
+                    SELECT
+                        DEADLINE
+                    FROM
+                        CF_REQUESTMONEY R
+                    WHERE
+                        R.ORDERID = O.orderId
+                    ORDER BY
+                        R.APPLYTIME DESC
+                    LIMIT 1
+                ),
+                ''
+            ) AS DEADLINE ,
+             IFNULL(
+                (
+                <!-- FINANCE-2562 添加预计放款时间 -->
+                    SELECT
+                        R.APPLYTIME
+                    FROM
+                        CF_REQUESTMONEY R
+                    WHERE
+                        R.ORDERID = O.orderId
+                    ORDER BY
+                        R.APPLYTIME DESC
+                    LIMIT 1
+                ),
+                ''
+            ) AS PLANLENDINGTIME
+            
+		  FROM
+		    inst_orderinfo O,
+		    inst_merchantinfo M 
+		  WHERE O.merchantNo = M.MERCHANTNO 
+		      AND (O.wfStatus = 9 or O.wfStatus = 100)
+		      AND O.status <![CDATA[<>]]> 2
+		<if test="merList !=null and merList.size() != 0">
+			AND M.MERCHANTNO in
+			<foreach item="item" index="index" collection="merList" open="("
+				separator="," close=")">
+				#{item.merchantNo}
+			</foreach>
+		</if>
+		<if test="merchName != null and merchName != ''">
+			AND M.merchantNo = #{merchName}
+		</if>
+		<if test="orderId != null and orderId != ''">
+			AND O.orderId like CONCAT('%',#{orderId},'%' )
+		</if>
+		<if test="startTime !=null and startTime != ''">
+			AND O.createTime &gt;= #{startTime}
+		</if>
+		<if test="endTime !=null and endTime != ''">
+			AND O.createTime &lt;= #{endTime}
+		</if>
+		<if test="orderItems !=null and orderItems !='' ">
+			AND O.orderItems = #{orderItems}
+		</if>
+		ORDER BY O.updatetime DESC
+		) B WHERE 1=1 
+        <choose> 
+        	<when test="allotStatus == '0'.toString() ">
+        		AND  B.LEFTITEMS <![CDATA[<>]]> B.orderitems
+        	</when> 
+        	<when test="allotStatus == '1'.toString() ">
+        		<![CDATA[
+        			AND  B.orderItems-IFNULL(B.applyitems,0)  > 0 and B.orderItems-IFNULL(B.applyitems,0) < B.orderItems
+        		]]>
+        	</when>
+        	<when test="allotStatus == '2'.toString() ">
+        		AND  B.LEFTITEMS=0
+        	</when>
+        	<otherwise>
+        	
+        	</otherwise>
+        </choose>
+            <if test="sourcesFunding !=null and sourcesFunding != ''">
+			AND B.SOURCESFUNDING = #{sourcesFunding}
+		</if>
+		<if test="projectName !=null and projectName != ''">
+			AND B.PROJECTNAME like CONCAT('%',#{projectName},'%' )
+		</if>
+		<if test="applyTime !=null and applyTime != ''">
+            AND date(B.APPLYTIME) between #{applyTime} and #{applyTime}
+        </if>
+        <if test="planLendingTime !=null and planLendingTime != ''">
+            AND date(B.PLANLENDINGTIME) between #{planLendingTime} and #{planLendingTime}
+        </if>
+	</select>
+	<!-- 资产赎回查询 -->	
+	<select id="geAllotRedemptionInfo" parameterType="java.util.Map" resultMap="requestMoneyBean">
+        SELECT
+            A.id,
+		    A.PUSHID,
+		    (
+		        SELECT
+		            MERCHANTFULLNAME
+		        FROM
+		            inst_merchantinfo
+		        WHERE
+		            merchantNo = B.MERCHANTNO
+		        ORDER BY
+		            id DESC
+		        LIMIT 1
+		    ) AS merchName,
+		    OO.PROJECTNAME,
+		    A.ORDERID,
+		    U.realName,
+		    B.regId,
+		
+		IF (
+		    B.bizType = '2400',
+		    B.borrowAmt,
+		    B.orderAmt
+		) AS orderAmt,
+		 B.orderItems,
+		 A.APPLYITEMS,
+		 A.APPLYTIME,
+		 A.DEADLINE,
+		 A.SOURCESFUNDING,
+		 c.REAL_NAME AS allotName,
+		 A.REDEMPTIONDATE,
+		 A.CREDITNAME,
+		 A.applyInstIDay,
+		 A.applyAmt
+		FROM
+		    cf_requestmoney A
+		LEFT JOIN inst_orderinfo B ON A.ORDERID = B.orderId
+		LEFT JOIN inst_user U on B.userId = U.id
+		LEFT JOIN inst_orderotherinfo OO ON A.ORDERID = OO.orderId
+		LEFT JOIN iqb_sys_user C ON A.ALLOT_REGID = C.ID
+		AND c.DELETE_FLAG = 1
+        WHERE 1=1
+        <if test="merList !=null and merList.size() != 0">
+            AND B.MERCHANTNO in
+            <foreach item="item" index="index" collection="merList" open="("
+                separator="," close=")">
+                #{item.merchantNo}
+            </foreach>
+        </if>       
+        <if test="projectName != null and projectName != ''">
+            AND OO.projectName like CONCAT('%',#{projectName},'%' )
+        </if>        
+        <if test="orderId != null and orderId != ''">
+            AND A.orderId  = #{orderId}
+        </if>        
+        <if test="realName !=null and realName != ''">
+            AND U.realName = #{realName}
+        </if>
+        <if test="regId !=null and regId != ''">
+            AND B.regId = #{regId}
+        </if>
+        <if test="sourcesFunding !=null and sourcesFunding != ''">
+            AND A.SOURCESFUNDING = #{sourcesFunding}
+        </if>        
+        <if test="startTime !=null and startTime != ''">
+            AND A.APPLYTIME &gt;= #{startTime}
+        </if>
+        <if test="endTime !=null and endTime != ''">
+            AND A.APPLYTIME &lt;= #{endTime}
+        </if>
+        <if test="creditName !=null and creditName !='' ">
+            AND A.creditName = #{creditName}
+        </if>
+        <if test="deadLineStartTime !=null and deadLineStartTime != ''">
+            AND A.DEADLINE &gt;= #{deadLineStartTime}
+        </if>
+        <if test="deadLineEndTime !=null and deadLineEndTime != ''">
+            AND A.DEADLINE &lt;= #{deadLineEndTime}
+        </if>
+    </select>
+    <!-- 更新资产分配信息 -->
+    <update id="updateRequestmoneyById" parameterType="com.iqb.consumer.data.layer.bean.reqmoney.RequestMoneyBean">
+        update cf_requestmoney
+        a
+        <set>
+            a.version = #{version,jdbcType=INTEGER} + 1,
+            <if test="redemptionDate != null and redemptionDate != ''">
+                a.redemptionDate = #{redemptionDate},
+            </if>
+            <if test="redemptionReason != null and redemptionReason != ''">
+                a.redemptionReason = #{redemptionReason},
+            </if>            
+            a.updateTime = NOW()
+        </set>
+        where a.id = #{id}
+    </update>
+    
+    <select id="getRequestMoneyById" parameterType="java.lang.Integer" resultMap="requestMoneyBean">
+        SELECT A.ORDERID,A.APPLYITEMS,A.SOURCESFUNDING,A.`STATUS`,A.APPLYTIME,A.DEADLINE from cf_requestmoney A WHERE  A.id = #{id}
+    </select>
+</mapper>

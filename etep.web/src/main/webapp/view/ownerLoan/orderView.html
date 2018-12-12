@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>申请</title>
+        <meta charset="UTF-8" />
+        <meta name="Author" content="" />
+        <meta name="Keywords" content="" />
+        <meta name="Description" content="" />
+        
+        <!-- 样式库 -->
+        <link rel="stylesheet" href="../../js/ztree/css/zTreeStyle/zTreeStyle.css" />
+        <link rel="stylesheet" href="../../js/bootstrap/themes/default/bootstrap.css" />
+        <link rel="stylesheet" href="../../css/font-awesome/css/font-awesome.min.css" />
+        <link rel="stylesheet" href="../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+        <link rel="stylesheet" href="../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+        <link rel="stylesheet" href="../../css/jquery.select2.css" />
+        <link rel="stylesheet" href="../../css/jquery.select2-bootstrap.css" />
+        <link rel="stylesheet" href="../../css/jquery.datetimepicker.css" />
+        <link rel="stylesheet" href="../../js/bootstrap/themes/default/jquery.mCustomScrollbar.css" />
+        <link rel="stylesheet" href="../../js/viewer/viewer.css" />
+        <link rel="stylesheet" href="../../js/prettyphoto/css/prettyPhoto.css" />
+        
+        <!-- 插件库 -->
+        <script src="../../js/common/package.js"></script>
+        <script src="../../js/common/url.js"></script>
+        <script src="../../js/common/json2.js"></script> 
+        <script src="../../js/common/jquery-1.11.3.min.js"></script>     
+        <script src="../../js/bootstrap/bootstrap.js"></script>
+        <script src="../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+        <script src="../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+        <script src="../../js/ztree/js/jquery.ztree.all.min.js"></script>
+        <script src="../../js/common/jquery.select2.js"></script>
+        <script src="../../js/viewer/viewer.js"></script>
+        <script src="../../js/common/jquery.form.js"></script>
+        <script src="../../js/common/jquery.datetimepicker.js"></script>
+        <script src="../../js/bootstrap/plugins/jquery.mCustomScrollbar.js"></script>
+        <script src="../../js/prettyphoto/js/jquery.prettyPhoto.js"></script> 
+           
+        
+        <!-- 业务库 -->
+        <script src="../../js/common/base.js"></script>
+        <script src="../../js/common/datagrid2.js"></script>
+        <script src="../../js/common/tree.js"></script>
+        <script src="../../js/common/formatter.js"></script>   
+        <script src="../../js/common/wflow.js"></script>  
+        <script src="../../js/each/ownerLoan/orderView.js"></script>
+        <script src="../../js/each/cfm/merch/merch.js"></script>
+        
+        
+        <!-- 页面样式 -->
+        <style type="text/css">
+            body {
+                font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif !important;
+                background:#eee url("../../img/back.png") repeat;
+            }
+            .container-fluid {
+                padding-top: 5px;
+            }
+            .left-part {
+                height:800px;
+            }
+            .modal-form {
+                margin:5px;
+                height:600px;
+            }
+            .text-left {
+                text-align: left;
+            }
+            .text-center {
+                text-align: center;
+            }
+            .text-right {
+                text-align: right;
+            }
+            .text-muted {
+                font-weight: bold;
+            }
+            .text-stress {
+                font-weight: bold;
+            }
+            .item-title {
+                background-color: #f5f5f5;
+            }
+            .float-left {
+                float: left;
+                margin-left: 5px;
+            }
+        </style>
+        
+    </head>
+    <body>
+        <div class="container-fluid">
+            <div class="row">               
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+						<form id="updateForm">
+							<div class="panel panel-info">
+	                      		<ul class="list-group">
+	                      		    <li class="list-group-item list-group-blank">申请人信息</li>
+	                      		    <li class="list-group-item" style="border: none;">
+										<div class="row">				
+											<div class="col-md-1 text-right"><span class="text-stress">机构名称</span></div>
+											<div class="col-md-2"><span id="merchantName" class="text-muted"></span></div>	
+											<div class="col-md-1 text-right"><span class="text-stress">业务类型</span></div>
+											<div class="col-md-2"><span id="bizType" class="text-muted"></span></div>	
+											<div class="col-md-1 text-right"><span class="text-stress">姓名</span></div>
+											<div class="col-md-2"><span id="realName" class="text-muted"></span></div>	
+											<div class="col-md-1 text-right"><span class="text-stress">手机号</span></div>
+											<div class="col-md-2"><span id="regId" class="text-muted"></span></div>	
+										</div>
+							         </li>
+							         <li class="list-group-item" style="border: none;">
+										<div class="row">				
+											<div class="col-md-1 text-right"><span class="text-stress">证件号码</span></div>
+											<div class="col-md-2"><span id="idNo" class="text-muted"></span></div>	
+											<div class="col-md-1 text-right"><span class="text-stress">性别</span></div>
+											<div class="col-md-2"><span id="sex" class="text-muted"></span></div>
+											<div class="col-md-1 text-right"><span class="text-stress">年龄</span></div>
+											<div class="col-md-2"><span id="age" class="text-muted"></span></div>	
+										</div>
+							         </li>
+							         <li class="list-group-item" style="border: none;">
+										<div class="row">				
+											<div class="col-md-1 text-right"><span class="text-stress">申请金额</span></div>
+											<div class="col-md-2"><span id="applyAmt" class="text-muted"></span></div>
+											<div class="col-md-1 text-right"><span class="text-stress">期限（月）</span></div>
+											<div class="col-md-2"><span id="applyItems" class="text-muted"></span></div>	
+										</div>
+							         </li>
+							         <li class="list-group-item" style="border: none;">
+										<div class="row">				
+											<div class="col-md-1 text-right"><span class="text-stress">居住地</span></div>
+											<div class="col-md-5"><span id="address" class="text-muted"></span></div>
+											<div class="col-md-1 text-right"><span class="text-stress">从事工作</span></div>
+											<div class="col-md-5"><span id="job" class="text-muted"></span></div>	
+										</div>
+							         </li>
+							         <li class="list-group-item" style="border: none;">
+										<div class="row">				
+											<div class="col-md-1 text-right"><span class="text-stress">开户行</span></div>
+											<div class="col-md-5"><span id="bankName" class="text-muted"></span></div>
+											<div class="col-md-1 text-right"><span class="text-stress">账号</span></div>
+											<div class="col-md-2"><span id="bankNo" class="text-muted"></span></div>	
+										</div>
+							         </li>
+							         <li class="list-group-item" style="border: none;">
+										<div class="row">				
+											<div class="col-md-1 text-right"><span class="text-stress">姓名1</span></div>
+											<div class="col-md-2"><span id="userName1" class="text-muted"></span></div>	
+											<div class="col-md-1 text-right"><span class="text-stress">手机号1</span></div>
+											<div class="col-md-2"><span id="mobile1" class="text-muted"></span></div>
+										    <div class="col-md-1 text-right"><span class="text-stress">与借款人关系1</span></div>
+											<div class="col-md-2"><span id="relation1" class="text-muted"></span></div>
+										</div>
+							         </li>
+							         <li class="list-group-item" style="border: none;">
+										<div class="row">				
+											<div class="col-md-1 text-right"><span class="text-stress">姓名2</span></div>
+											<div class="col-md-2"><span id="userName2" class="text-muted"></span></div>	
+											<div class="col-md-1 text-right"><span class="text-stress">手机号2</span></div>
+											<div class="col-md-2"><span id="mobile2" class="text-muted"></span></div>
+										    <div class="col-md-1 text-right"><span class="text-stress">与借款人关系2</span></div>
+											<div class="col-md-2"><span id="relation2" class="text-muted"></span></div>
+										</div>
+							         </li>
+							         <li class="list-group-item" style="border: none;">
+										<div class="row">				
+											<div class="col-md-1 text-right"><span class="text-stress">姓名3</span></div>
+											<div class="col-md-2"><span id="userName3" class="text-muted"></span></div>	
+											<div class="col-md-1 text-right"><span class="text-stress">手机号3</span></div>
+											<div class="col-md-2"><span id="mobile3" class="text-muted"></span></div>
+										    <div class="col-md-1 text-right"><span class="text-stress">与借款人关系3</span></div>
+											<div class="col-md-2"><span id="relation3" class="text-muted"></span></div>
+										</div>
+							         </li>
+							         <li class="list-group-item" style="border: none;">
+										<div class="row">				
+											<div class="col-md-1 text-right"><span class="text-stress">姓名4</span></div>
+											<div class="col-md-2"><span id="userName4" class="text-muted"></span></div>	
+											<div class="col-md-1 text-right"><span class="text-stress">手机号4</span></div>
+											<div class="col-md-2"><span id="mobile4" class="text-muted"></span></div>
+										    <div class="col-md-1 text-right"><span class="text-stress">与借款人关系4</span></div>
+											<div class="col-md-2"><span id="relation4" class="text-muted"></span></div>
+										</div>
+							         </li>
+							         <li class="list-group-item list-group-blank">车辆信息</li>
+							         <li class="list-group-item" style="border: none;">
+										<div class="row">				
+											<div class="col-md-1 text-right"><span class="text-stress">车牌号</span></div>
+											<div class="col-md-2"><span id="plate" class="text-muted"></span></div>	
+											<div class="col-md-1 text-right"><span class="text-stress">车龄（年）</span></div>
+											<div class="col-md-2"><span id="carAge" class="text-muted"></span></div>
+										    <div class="col-md-1 text-right"><span class="text-stress">车辆品牌</span></div>
+											<div class="col-md-2"><span id="carbrand" class="text-muted"></span></div>
+											<div class="col-md-1 text-right"><span class="text-stress">车辆型号</span></div>
+											<div class="col-md-2"><span id="carDetail" class="text-muted"></span></div>
+										</div>
+							         </li>
+	                      		</ul>
+							</div>
+						</form>		
+						<ul class="list-group">
+				    		<li class="list-group-item" style="border-bottom: 1px solid #fff;border-top:0;">
+								<div class="row">	
+									<table id="viewerOne" class="table table-bordered" style='width:90%;margin:0 auto;'>
+								    <tbody>
+								    	<tr>		
+								    		<td style="width: 15%; vertical-align: middle;" rowspan="7"><span class="text-stress">个人信息</span></td>				    		
+									    	<td style="width: 15%; vertical-align: middle;"><span class="text-stress">身份证（正反面）</span></td>						    	
+									    	<td id="td-1" style="width: 70%; vertical-align: middle;"></td>
+							    		</tr>
+							    		<tr>					    		
+									    	<td style="width: 15%; vertical-align: middle;"><span class="text-stress">居住证明（房本或租房合同）</span></td>						    	
+									    	<td id="td-2" style="width: 70%; vertical-align: middle;"></td>
+							    		</tr>
+							    		<tr>					
+									    	<td style="width: 15%; vertical-align: middle;"><span class="text-stress">信贷业务申请表</span></td>						    	
+									    	<td id="td-3" style="width: 70%; vertical-align: middle;"></td>
+							    		</tr>
+							    		<tr>			
+									    	<td style="width: 15%; vertical-align: middle;"><span class="text-stress">近6个月通话记录</span></td>						    	
+									    	<td id="td-4" style="width: 70%; vertical-align: middle;"></td>
+							    		</tr>
+							    		<tr>			
+									    	<td style="width: 15%; vertical-align: middle;"><span class="text-stress">车辆分期借款合同及还款流水</span></td>						    	
+									    	<td id="td-5" style="width: 70%; vertical-align: middle;"></td>
+							    		</tr>
+							    		<tr>		
+									    	<td style="width: 15%; vertical-align: middle;"><span class="text-stress">银行借记卡（正反面）</span></td>						    	
+									    	<td id="td-6" style="width: 70%; vertical-align: middle;"></td>
+							    		</tr>
+							    		<tr>			
+									    	<td style="width: 15%; vertical-align: middle;"><span class="text-stress">业务申请表</span></td>						    	
+									    	<td id="td-7" style="width: 70%; vertical-align: middle;"></td>
+							    		</tr>
+							    		<tr>
+							    	        <td style="width: 15%; vertical-align: middle;" rowspan="5"><span class="text-stress">车辆信息</span></td>	
+									    	<td style="width: 15%; vertical-align: middle;"><span class="text-stress">登记证</span></td>						    	
+									    	<td id="td-8" style="width: 70%; vertical-align: middle;"></td>
+							    		</tr>
+							    		<tr>		
+									    	<td style="width: 15%; vertical-align: middle;"><span class="text-stress">行驶证</span></td>						    	
+									    	<td id="td-9" style="width: 70%; vertical-align: middle;"></td>
+							    		</tr>
+							    		<tr>			
+									    	<td style="width: 15%; vertical-align: middle;"><span class="text-stress">车辆保单（交强、商业）</span></td>						    	
+									    	<td id="td-10" style="width: 70%; vertical-align: middle;"></td>
+							    		</tr>
+							    		<tr>			
+									    	<td style="width: 15%; vertical-align: middle;"><span class="text-stress">购车发票</span></td>						    	
+									    	<td id="td-11" style="width: 70%; vertical-align: middle;"></td>
+							    		</tr>
+							    		<tr>			
+									    	<td style="width: 15%; vertical-align: middle;"><span class="text-stress">车辆备用钥匙等</span></td>						    	
+									    	<td id="td-12" style="width: 70%; vertical-align: middle;"></td>
+							    		</tr>
+							    		<tr>		
+								    		<td style="width: 15%; vertical-align: middle;" rowspan="2"><span class="text-stress">面审资料</span></td>				    		
+									    	<td style="width: 15%; vertical-align: middle;"><span class="text-stress">面审意见表</span></td>						    	
+									    	<td id="td-13" style="width: 70%; vertical-align: middle;"></td>
+							    		</tr>
+							    		<tr>					    		
+									    	<td style="width: 15%; vertical-align: middle;"><span class="text-stress">面审环节资料</span></td>						    	
+									    	<td id="td-14" style="width: 70%; vertical-align: middle;"></td>
+							    		</tr>
+							    		<tr>		
+								    		<td style="width: 15%; vertical-align: middle;" rowspan="1"><span class="text-stress">其它</span></td>				    		
+									    	<td style="width: 15%; vertical-align: middle;"><span class="text-stress">其它</span></td>						    	
+									    	<td id="td-15" style="width: 70%; vertical-align: middle;"></td>
+							    		</tr>
+								    </tbody>
+								</table>
+								</div>
+							</li>
+						</ul>                                             	                                                  
+                   	</div>
+                </div>
+            </div>
+        </div>          
+    </body>
+</html>

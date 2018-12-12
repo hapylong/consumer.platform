@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	    <title>业务字典</title>
+	    <meta charset="UTF-8" />
+	    <meta name="Author" content="" />
+	    <meta name="Keywords" content="" />
+	    <meta name="Description" content="" />
+	    
+	    <!-- 基础CSS库 -->
+	    <link rel="stylesheet" href="../../../../js/bootstrap/themes/default/bootstrap.css"/>
+	    <link rel="stylesheet" href="../../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css"/>
+	    <link rel="stylesheet" href="../../../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+	   	<link rel="stylesheet" href="../../../../js/jquery-easyui-1.5/themes/bootstrap/menu.css"/>
+	   	<link rel="stylesheet" href="../../../../js/jquery-easyui-1.5/themes/icon.css"/>	    
+	    <link rel="stylesheet" href="../../../../js/ztree/css/zTreeStyle/zTreeStyle.css"/>
+	    <link rel="stylesheet" href="../../../../css/jquery.select2.css" />
+	    <link rel="stylesheet" href="../../../../css/jquery.select2-bootstrap.css" />
+	    
+	    <!-- 基础CSS库 -->
+	    <link rel="stylesheet" href="../../../../css/common/base.css" />
+	    <link rel="stylesheet" href="../../../../css/common/scrollbar.css" />
+	    
+	    <!-- 基础JS库 -->
+	    <script src="../../../../js/common/package.js"></script>
+		<script src="../../../../js/common/url.js"></script>
+		<script src="../../../../js/common/json2.js"></script>	
+		<script src="../../../../js/common/jquery-1.11.3.min.js"></script>		
+		<script src="../../../../js/bootstrap/bootstrap.js"></script>
+		<script src="../../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+		<script src="../../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+		<script src="../../../../js/ztree/js/jquery.ztree.all.min.js"></script>
+		<script src="../../../../js/common/jquery.select2.js"></script>
+		
+		<!-- 业务JS库 -->
+		<script src="../../../../js/common/base.js"></script>
+		<script src="../../../../js/common/datagrid.js"></script>
+		<script src="../../../../js/common/tree.js"></script>
+		<script src="../../../../js/common/formatter.js"></script>	    
+	    <script src="../../../../js/each/etep/sys/dict/commondict.js"></script>
+		
+		<!-- 页面样式 -->
+		<style type="text/css">
+			.container-fluid {
+				padding-top: 4px;
+			}
+			.left-panel {
+				height: calc(100% - 3px);
+			}
+			.left-panel-body {
+				height: calc(100% - 39px);
+			}
+			.scroll-div {
+				overflow: scroll;
+			}
+			.modal-form {
+				margin: 15px 0;
+			}
+		</style>
+	    
+	</head>
+	<body>
+	
+		<div class="container-fluid height-fill-100">
+			<div class="row height-fill-100">
+				<div class="col-md-2 height-fill-100">
+					<div class="panel panel-success left-panel">
+						<div class="panel-heading">
+							<h3 class="panel-title">业务字典树</h3>
+					  	</div>
+					  	<div class="panel-body left-panel-body scroll-div">
+					    	<ul id="tree" class="ztree"></ul>
+					  	</div>
+					</div>
+				</div>
+				<div class="col-md-10 height-fill-100">
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<h3 class="panel-title">查询信息</h3>
+					  	</div>
+					  	<div class="panel-body">	
+					  		<form id="searchForm" class="form-inline">
+					  			<input id="search-dictTypeCode" name="dictTypeCode" type="text" class="hidden" />
+							  	<div class="form-group">
+							    	<label class="form-label">名称 </label>
+							  	</div>
+							  	<div class="form-group">
+							    	<input name="dictName" type="text" class="form-control input-sm" placeholder="请输入名称">
+							  	</div>				  	
+							  	<button id="btn-search" type="button" class="btn btn-default btn-sm">查询</button>
+								<button id="btn-reset" type="button" class="btn btn-default btn-sm">重置</button>   							
+							</form>		  												 	
+					  	</div>
+					</div>
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<h3 class="panel-title">字典项信息</h3>
+					  	</div>
+					  	<div class="panel-body">
+					    	<form id="listForm">					    		
+					    		<button id="btn-insert" type="button" class="btn btn-primary btn-sm">添加业务字典项</button>
+					    		<button id="btn-update" type="button" class="btn btn-warning btn-sm">修改业务字典项</button>
+					    		<button id="btn-remove" type="button" class="btn btn-danger btn-sm hidden">删除业务字典项</button>
+					    	</form>
+					  	</div>
+						<table class="table table-striped table-bordered table-hover datagrid">
+						    <thead>
+						    	<tr>
+							    	<th field="ck"></th>	
+							    	<th field="rn">序号</th>						    	
+							    	<th field="id" idField="true" hidden="true">ID</th>
+							    	<th field="dictCode">字典项代码</th>
+							    	<th field="dictName">字典项名称</th>							    	
+							    	<th field="dictValue">字典项值</th>
+							    	<th field="cascadeCode">级联代码</th>							    	
+							    	<th field="isEnable" formatter="Formatter.isEnableHtml(val)">是否启用</th>
+							    	<th field="remark">备注</th>
+						    	</tr>
+						    </thead>
+						    <tbody></tbody>
+						</table>
+					  	<div class="panel-footer">
+							<div id="paginator"></div>
+						</div>
+					</div>
+				</div>
+			</div>		 	
+		</div>
+		
+
+		<div id="update-win" class="modal fade" role="dialog" aria-labelledby="update-win-label" aria-describedby="">
+			<div class="modal-dialog" role="document">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<h5 class="modal-title" id="update-win-label"></h5>
+		      		</div>
+	      			<div class="modal-form">
+		       			<form id="updateForm" class="form-horizontal">
+							<input name="id" type="text" class="hidden" />	
+					  		<input id="update-dictTypeCode" name="dictTypeCode" type="text" class="hidden" />				  			
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">字典项代码</label>
+				    			<div class="col-sm-8">
+				      				<input name="dictCode" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入字典项代码" data-options="required:true, validType:['code','maxLength[20]']" />
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">字典项名称</label>
+				    			<div class="col-sm-8">
+				      				<input name="dictName" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入字典项名称" required="required" validType="length[1,20]" />
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">字典项值</label>
+				    			<div class="col-sm-8">
+				      				<input name="dictValue" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入字典项值" required="required" validType="length[1,20]" />
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">级联代码</label>
+				    			<div class="col-sm-8">
+				      				<input name="cascadeCode" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入级联代码" data-options="validType:['code','maxLength[20]']" />
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">是否可用</label>
+				    			<div class="col-sm-8">
+				    				<select id="isEnable" name="isEnable">
+									  <option value="1" selected>是</option>
+									  <option value="2">否</option>
+									</select>
+				    			</div>
+				  			</div>
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">备注</label>
+				    			<div class="col-sm-8">
+				      				<textarea name="remark" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入备注" validType="maxLength[50]"></textarea>
+				    			</div>
+				  			</div>				 			
+						</form>
+		      		</div>
+		      		<div class="modal-footer">
+				        <button id="btn-save" type="button" class="btn btn-success btn-sm">保存</button>
+				        <button id="btn-close" type="button" class="btn btn-default btn-sm">关闭</button>		        
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+			
+		<div id="update-dictType-win" class="modal fade" role="dialog" aria-labelledby="update-dictType-label" aria-describedby="">
+			<div class="modal-dialog" role="document">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<h5 class="modal-title" id="update-dictType-label"></h5>
+		      		</div>
+	      			<div class="modal-form">
+		       			<form id="updateDictTypeForm" class="form-horizontal">
+							<input name="id" type="text" class="hidden" />
+							<input id="update-parentId" name="parentId" type="text" class="hidden" />
+							<input id="dictType" name="dictType" type="text" class="hidden" />
+							<input id="isContent" name="isContent" type="text" class="hidden" />
+							<div class="form-group">
+				    			<label class="col-sm-3 control-label">字典类别代码</label>
+				    			<div class="col-sm-8">
+				      				<input id="dictTypeCode" name="dictTypeCode" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入字典类别代码" data-options="required:true, validType:['code','maxLength[20]']" />
+				    			</div>
+				  			</div>											  			
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">字典类别名称</label>
+				    			<div class="col-sm-8">
+				      				<input name="dictTypeName" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入字典类别名称" required="required" validType="length[1,20]" />
+				    			</div>
+				  			</div>					  				
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">顺序号</label>
+				    			<div class="col-sm-8">
+				      				<input name="dictTypeSequence" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入顺序号" data-options="required:true,validType:['num','maxNum[127]']" />
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">级联代码</label>
+				    			<div class="col-sm-8">
+				      				<input id="cascadeCode" name="cascadeCode" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入级联代码" data-options="validType:['code','maxLength[20]']" />
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">是否可编辑</label>
+				    			<div class="col-sm-8">
+				    				<select id="editable" name="editable">
+									  <option value="1" selected>是</option>
+									  <option value="2">否</option>
+									</select>
+				    			</div>
+				  			</div>
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">是否启用</label>
+				    			<div class="col-sm-8">
+				    				<select id="isEnable2" name="isEnable">
+									  <option value="1" selected>是</option>
+									  <option value="2">否</option>
+									</select>
+				    			</div>
+				  			</div>
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">备注</label>
+				    			<div class="col-sm-8">
+				      				<textarea name="remark" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入备注" validType="maxLength[50]"></textarea>
+				    			</div>
+				  			</div>				 			
+						</form>
+		      		</div>
+		      		<div class="modal-footer">
+				        <button id="btn-dictType-save" type="button" class="btn btn-success btn-sm">保存</button>
+				        <button id="btn-dictType-close" type="button" class="btn btn-default btn-sm">关闭</button>		        
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+		
+		<div id="menu" class="easyui-menu" style="width:140px;">
+		    <div id="men-insert" iconCls="icon-add">添加字典类别目录</div>
+		    <div id="men-insert2" iconCls="icon-add">添加字典类别</div>
+		    <div id="men-update" iconCls="icon-edit">修改</div>
+		    <div id="men-start" iconCls="icon-add">启用</div>
+		    <div id="men-stop" iconCls="icon-remove">停用</div>
+		</div>
+			
+	</body>
+</html>

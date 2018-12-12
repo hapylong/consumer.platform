@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	    <title>资产导入</title>
+	    <meta charset="UTF-8" />
+	    <meta name="Author" content="" />
+	    <meta name="Keywords" content="" />
+	    <meta name="Description" content="" />
+	    
+	    <!-- 样式库 -->
+	    <link rel="stylesheet" href="../../../js/ztree/css/zTreeStyle/zTreeStyle.css" />
+	    <link rel="stylesheet" href="../../../js/bootstrap/themes/default/bootstrap.css" />
+	    <link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+	    <link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+	    <link rel="stylesheet" href="../../../css/jquery.select2.css" />
+	    <link rel="stylesheet" href="../../../css/jquery.select2-bootstrap.css" />
+	    <link rel="stylesheet" href="../../../css/jquery.datetimepicker.css" />
+	    
+	    <!-- 插件库 -->
+	    <script src="../../../js/common/package.js"></script>
+		<script src="../../../js/common/url.js"></script>
+		<script src="../../../js/common/json2.js"></script>	
+		<script src="../../../js/common/jquery-1.11.3.min.js"></script>		
+		<script src="../../../js/bootstrap/bootstrap.js"></script>
+		<script src="../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+		<script src="../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+		<script src="../../../js/ztree/js/jquery.ztree.all.min.js"></script>
+		<script src="../../../js/common/jquery.select2.js"></script>
+		<script src="../../../js/common/ajaxfileupload.js"></script>
+		
+		<!-- 业务库 -->
+		<script src="../../../js/common/base.js"></script>
+		<script src="../../../js/common/datagrid2.js"></script>
+		<script src="../../../js/common/tree.js"></script>
+		<script src="../../../js/common/formatter.js"></script>	    
+	    <script src="../../../js/each/cfm/exchange/assetInto.js"></script>
+	    <script src="../../../js/common/jquery.datetimepicker.js"></script>
+	    <script src="../../../js/each/cfm/merch/merch.js"></script>
+	    <script src="../../../js/each/cfm/merch/merchModel.js"></script>
+		
+		<!-- 页面样式 -->
+		<style type="text/css">
+			body {
+				font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif !important;
+				background:#eee url("../../../img/back.png") repeat;
+			}
+			.container-fluid {
+				padding:5px;
+			}
+			.left-part {
+				height:800px;
+			}
+			.modal-form {
+				margin:8px;
+				overflow-y:scroll;
+				overflow-x:hidden;
+			}
+		</style>
+	    
+	</head>   
+	<body>
+	
+		<div class="container-fluid">
+			<div class="row">				
+				<div class="col-md-12">
+					<div class="panel panel-info" style="width:2301px">
+						<div class="panel-heading">
+							<h4 class="panel-title">查询信息</h4>
+					  	</div>
+					  	<div class="panel-body">	
+					  		<form id="searchForm" class="form-horizontal">
+							  	<div class="form-group">
+							    	<label class="control-label col-lg-1 col-md-1 col-sm-1">业务类型</label>
+								    <div class="col-lg-2 col-md-2 col-sm-2">	
+								    	<select id="bizType" name="bizType" class="form-control">
+								    	    <option value=''>请选择</option>
+								    	    <option value='2001'>以租代售新车</option>
+								    	    <option value='2002'>以租代售二手车</option>
+								    	    <option value='2100'>抵押车</option>
+								    	    <option value='2200'>质押车</option>
+								    	    <option value='1100'>易安家</option>
+								    	    <option value='1000'>医美</option>
+								    	    <option value='1200'>旅游</option>
+									    </select>
+								    </div>
+								    <label class="control-label col-lg-1 col-md-1 col-sm-1">所属机构</label>
+								    <div class="col-lg-2 col-md-2 col-sm-2">
+								        <input id="merchNames" type="text" readonly value="全部商户" name="merchNames" class="form-control merch" onclick="showMenu(); return false;"/>
+								  	</div>
+								  	<label class="control-label col-lg-1 col-md-1 col-sm-1">订单号</label>
+							  	    <div class="col-lg-2 col-md-2 col-sm-2">
+							  	        <input id="orderId" name="orderId" type="text" class="form-control input-sm" placeholder="请输入订单号">
+							  	    </div>
+							  	 </div>
+							  	 <div class="form-group">
+							  	    <label class="control-label col-lg-1 col-md-1 col-sm-1">手机号</label>
+							  	    <div class="col-lg-2 col-md-2 col-sm-2">
+							  	        <input id="regId" name="regId" type="text" class="form-control input-sm" placeholder="请输入手机号">
+							  	    </div>
+							  	    <label class="control-label col-lg-1 col-md-1 col-sm-1">姓名</label>
+							  	    <div class="col-lg-2 col-md-2 col-sm-2">
+							  	        <input id="userName" name="userName" type="text" class="form-control input-sm" placeholder="请输入姓名">
+							  	    </div>
+								  	<div class="col-lg-6 col-md-6 col-sm-6">
+								  	    <button id="btn-import" type="button" class="btn btn-default btn-sm">导入</button>
+									  	<button id="btn-search" type="button" class="btn btn-default btn-sm">查询</button>
+										<button id="btn-reset" type="button" class="btn btn-default btn-sm">重置</button>
+										<a href='javascript:;' id="btn-downLoad" class="btn btn-default btn-sm">下载导入模板</a>  
+							  	    </div> 
+							  	</div>				
+							</form>	
+							<form id="uploadForm"  enctype="multipart/form-data">
+	                            <input id="file" type="file" name="file" class='hidden'/>
+                            </form>		 	
+					  	</div>
+					</div>
+					<div class="panel panel-info" style="width:2301px">
+						<div class="panel-heading">
+							<h4 class="panel-title">导入资产信息</h4>
+					  	</div>
+					    <div class="panel-body">
+					    	<form id="listForm">					    		
+					    		<button id="btn-updates" type="button" class="btn btn-success btn-sm">修改</button>
+					    		<button id="btn-removes" type="button" class="btn btn-warning btn-sm">删除</button>
+					    		<button id="btn-submit" type="button" class="btn btn-sm btn-primary">提交审核</button>
+					    	</form>
+					  	</div>
+						<table id='datagrid' class="table table-striped table-bordered table-hover table-condensed ">
+						    <thead>
+						    	<tr>	
+						    	    <th field="ck"></th>					    		
+							    	<th field="rn"></th>
+							    	<th field="id" hidden='true'>订单号</th>	
+							    	<th field="orderId">订单号</th>		
+							    	<th field="regId">手机号</th>						    	
+                                    <th field="realName">姓名</th>	
+							    	<th field="orderName">订单名称</th>
+							    	<!-- <th field="orderName">资产名称</th> -->
+							    	<th field="orderAmt" formatter="Formatter.money(val)">金额</th>
+							    	<th field="orderItems">期数</th>
+							    	<th field="fee">利率（月）</th>
+							    	<th field="monthInterest" formatter="Formatter.money(val)">月供</th>
+							    	<th field="bizType">业务类型</th>
+							    	<th field="merchantNo">所属机构</th>
+							    	<th field="expireDate" formatter="Formatter.timeCfm2(val)">到期日</th>
+							    	<th field="createTime" formatter="Formatter.timeCfm2(val)">订单时间</th>
+							        <th field="status" formatter="Formatter.toLead(val)">状态</th>
+							        <th field="planId">分期方案</th>
+							        <th field="planShortName">方案名称</th>
+							        <th field="batchNo">导出批次号</th>
+							        <th field="creditName">债权人姓名</th>
+							        <th field="creditCardNo">债权人身份证号</th>
+							        <th field="creditBankCard">债权人银行卡号</th>
+							        <th field="creditBank">债权人开户银行</th>
+							        <th field="creditPhone">债权人手机号</th>
+							        <th field="procOrgCode" hidden='true'></th>
+						    	</tr>
+						    </thead>
+						    <tbody></tbody>
+						</table>
+					  	<div class="panel-footer">
+							<div id="paginator"></div>
+						</div>
+					</div>
+				</div>
+			</div>		 	
+		</div>
+		
+
+		<div id="update-win" class="modal fade bs-example-modal-lg" role="dialog" aria-labelledby="update-win-label" aria-labelledby="myLargeModalLabel">
+			<div class="modal-dialog" role="document">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<h5 class="modal-title" id="update-win-label"></h5>
+		      		</div>
+	      			<div class="modal-form">
+	      				<form id="updateForm" class="form-horizontal">
+							<input name="orderId" type="text" class="hidden" />	
+							<div class="panel-body">
+								<div class="form-group">
+					    			<label class="col-sm-2 control-label">订单编号</label>
+					    			<div class="col-sm-4">
+					    				<input name="orderId" id='orderId' type="text" class="form-control input-sm" readonly>
+					    			</div>
+					    			<label class="col-sm-3 control-label" style='text-align:center'>导入批次号</label>
+					    			<div class="col-sm-3">
+					      				<input name="batchNo" id="batchNo" type="text" class="form-control input-sm" readonly/>
+					    			</div>
+					  			</div>	
+							</div>
+							<div class="panel-body">
+							    <table class="table table-striped table-bordered table-hover table-condensed ">
+							        <tr>
+							           <td>
+							           <span style='color:red'>*</span>业务类型
+							           <input id="id" type="text"  name="id" class='hidden'/>
+							           <input id="userId" type="text"  name="userId" class='hidden'/>
+							           </td>
+							           <td>
+							              <select id="bizType" name="bizType" class="form-control" readonly disabled>
+								    	    <option value='2001'>以租代售新车</option>
+								    	    <option value='2002'>以租代购二手车</option>
+								    	    <option value='2100'>抵押车</option>
+								    	    <option value='2200'>质押车</option>
+								    	    <option value='1100'>易安家</option>
+								    	    <option value='1000'>医美</option>
+								    	    <option value='1200'>旅游</option>
+								          </select>
+							           </td>
+							           <td><span style='color:red'>*</span>所属机构</td>
+							           <td>
+							              <input id="merchantNo" type="text"  name="merchantNo" class="form-control" readonly/>
+							           </td>
+							        </tr>
+							        <tr>
+							           <td><span style='color:red'>*</span>姓名</td>
+							           <td>
+							              <input type="text" class="form-control input-sm" id="userName">
+							           </td>
+							           <td><span style='color:red'>*</span>手机号</td>
+							           <td>
+							              <input type="text" class="form-control input-sm" id="regId">
+							           </td>
+							        </tr>
+							        <tr>
+							           <td><span style='color:red'>*</span>订单名称</td>
+							           <td>
+							              <input type="text" class="form-control input-sm" id="orderName">
+							           </td>
+							           <td><span style='color:red'>*</span>金额</td>
+							           <td>
+							              <input type="text" class="form-control input-sm" id="orderAmt" readonly>
+							           </td>
+							        </tr>
+							        <tr>
+							           <td><span style='color:red'>*</span>期数</td>
+							           <td>
+							              <input type="text" class="form-control input-sm" id="orderItems" readonly>
+							           </td>
+							           <td><span style='color:red'>*</span>月供</td>
+							           <td>
+							              <input type="text" class="form-control input-sm" id="monthInterest" readonly>
+							           </td>
+							        </tr>
+							        <tr>
+							           <td><span style='color:red'>*</span>分期方案</td>
+							           <td colspan='3'>
+							              <select id="planId" name="planId" class="form-control">
+								    	    
+								          </select>
+							           </td>
+							        </tr>
+							    </table>
+						    </div>		
+						</form>
+	      			</div>		      		
+		      		<div class="modal-footer">
+				        <button id="btn-saveOrder" type="button" class="btn btn-success btn-sm">保存</button>
+				        <button id="btn-close" type="button" class="btn btn-default btn-sm">关闭</button>		        
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+		<div id="import-win" class="modal fade" role="dialog" aria-labelledby="update-win-label" aria-describedby="……">
+			<div class="modal-dialog" role="document">
+		    	<div class="modal-content">
+		    	    <div class="modal-header">
+		        		<h5 class="modal-title" id="update-win-label">导入情况</h5>
+		      		</div>
+		      		<div class="panel-body import-body">
+		      		    <h5 class='import-title'>导入成功,共导入条数据</h5>
+		      		</div>
+		      		<div class="modal-footer">
+				        <button id="btn-confirm" type="button" class="btn btn-success btn-sm">确定</button>		        
+		      		</div>
+		    	</div>
+		    </div>
+		</div>
+		<div id="approve-win" class="modal fade" role="dialog" aria-labelledby="approve-win-label" aria-describedby="">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="approve-win-label">审批</h5>
+					</div>
+					<div class="modal-form">
+						<form id="approveForm" class="form-horizontal">
+							<div class="form-group">
+								<label class="col-sm-3 control-label">审批结果</label>
+								<div class="col-sm-4">
+									<select class="form-control" disabled>
+										<option value="1" selected>通过</option>
+										<option value="2">退回</option>
+										<option value="0">拒绝</option>
+									</select> 
+									<input type="text" class="hidden" value="1" name="approveStatus">
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-3 control-label">审批意见</label>
+								<div class="col-sm-8">
+									<textarea name="approveOpinion" class="form-control" rows="3" placeholder="请输入审批意见"></textarea>
+								</div>
+							</div>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button id="btn-approve-save" type="button"	class="btn btn-success btn-sm">提交</button>
+						<button id="btn-approve-close" type="button" class="btn btn-default btn-sm">关闭</button>
+					</div>
+				</div>
+			</div>
+	    </div>
+		<div id="menuContent" class="menuContent" style="max-height:500px;overflow:scroll;display:none; position: absolute;background:#fff;border:1px solid #ccc;">
+	        <ul id="treeDemo" class="ztree" style="margin-top:0; width:160px;"></ul>
+        </div>	
+        <div id="menuContentModel" class="menuContent" style="max-height:500px;overflow:scroll;display:none; position: absolute;background:#fff;border:1px solid #ccc;z-index:99">
+	        <ul id="treeDemoModel" class="ztree" style="margin-top:0;"></ul>
+        </div>
+	</body>
+</html>

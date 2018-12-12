@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+    Apache License, Version 2.0 (the "License"); you may not use this file except 
+    in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+    Unless required by applicable law or agreed to in writing, software distributed 
+    under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+    OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+    the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.order.InstAssetStockDao">    
+    <!-- 配置映射字段 -->
+    <resultMap type="com.iqb.consumer.data.layer.bean.order.InstAssetStockBean" id="instAssetStockBeanInfo">
+        <result property="orderId"              column="ORDERID" />
+        <result property="regId"                column="REGID" />
+        <result property="realName"             column="REALNAME" />
+        <result property="merchantNo"           column="MERCHANTNO" />
+        <result property="merchantShortName"    column="MERCHANTSHORTNAME" />
+        <result property="openId"               column="OPENID" />
+        <result property="fundId"               column="FUNDID" />        
+        <result property="sourcesFunding"       column="SOURCESFUNDING" />
+        <result property="installTerms"         column="INSTALLTERMS" />
+        <result property="repayNo"              column="REPAYNO" />
+        <result property="nonRepayno"           column="NONREPAYNO" />
+        <result property="contractAmt"          column="CONTRACTAMT" />        
+        <result property="preAmt"               column="PREAMT" />
+        <result property="installSumAmt"        column="INSTALLSUMAMT" />
+        <result property="curRepayPrincipal"    column="CUR_REPAY_PRINCIPAL" />
+        <result property="remainPrincipal"      column="REMAINPRINCIPAL" />
+        <result property="parentMerName"        column="PARENTMERNAME" />
+    </resultMap>
+    <!-- 查询资产存量报表数据 -->
+    <select id="selInstAssetStockInfo" parameterType="java.util.Map" resultMap="instAssetStockBeanInfo">
+        SELECT
+		    A.ORDERID,
+		    A.REALNAME,
+		    A.REGID,
+		    A.PARENTMERNAME,
+		    A.MERCHANTSHORTNAME,
+		    A.MERCHANTNO,
+		    A.FUNDID,
+		    A.SOURCESFUNDING,
+		    A.CONTRACTAMT,
+		    A.PREAMT,
+		    A.INSTALLSUMAMT,
+		    A.CUR_REPAY_PRINCIPAL,
+		    A.REMAINPRINCIPAL,
+		    A.INSTALLTERMS,
+		    A.REPAYNO,
+		    A.NONREPAYNO
+		FROM
+		    inst_asset_stock A
+		    where 1=1
+		      <if test="merList != null and merList.size() > 0">
+                AND A.MERCHANTNO in
+                <foreach item="item" index="index" collection="merList" open="("
+                    separator="," close=")">
+                    #{item.merchantNo}
+                </foreach>
+            </if>
+             <if test="orderId !=null and orderId != ''">
+                AND A.orderId = #{orderId}
+            </if>
+            <if test="regId !=null and regId != ''">
+                AND A.orderId = #{orderId}
+            </if>
+            <if test="curRepayDate !=null and curRepayDate != ''">
+                and DATE_FORMAT(A.createTime,'%Y-%m-%d') = #{curRepayDate}
+            </if>
+            <if test="curRepayDate == null or curRepayDate =='' ">
+                and DATE_FORMAT(A.createTime,'%Y-%m-%d') = DATE_FORMAT(NOW(),'%Y-%m-%d')
+            </if>
+    </select>   
+</mapper>

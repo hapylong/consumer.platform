@@ -1,0 +1,704 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iqb.consumer.crm.customer.dao.CustomerDao" >
+
+	<!-- 保存来自etep的客户信息  -->
+	<insert id="saveCustomerServiceFromEtep" parameterType="com.iqb.consumer.crm.customer.bean.CustomerBean">
+		INSERT INTO IQB_CUSTOMER_BASE_INFO (
+		  CUSTOMER_CODE, CUSTOMER_NAME, CUSTOMER_SHORT_NAME, CUSTOMER_FULL_NAME, CUSTOMER_TYPE, PROVINCE,
+		  CITY, ADDRESS_DETAIL, CUSTOMER_STATUS, CREATE_TIME, DELETE_FLAG, REMARK, VERSION
+		) 
+		VALUES
+		  (
+		    #{customerCode}, #{customerName}, #{customerShortName}, #{customerFullName}, #{customerType}, #{province},
+		    #{city}, #{addressDetail}, #{customerStatus}, #{createTime}, #{deleteFlag}, #{remark}, #{version}
+		  )	
+	</insert>
+	
+	<!-- 根据客户编码获取客户信息  -->
+	<select id="getCustomerInfoByCustmerCode" resultType="com.iqb.consumer.crm.customer.bean.CustomerBean" parameterType="string">
+		SELECT 
+		  icbi.CUSTOMER_CODE AS customerCode,
+		  icbi.CUSTOMER_NAME AS customerName,
+		  icbi.CUSTOMER_SHORT_NAME AS customerShortName,
+		  icbi.CUSTOMER_FULL_NAME AS customerFullName,
+		  icbi.CUSTOMER_SHORT_NAME_CODE AS customerShortNameCode,
+		  icbi.CUSTOMER_TYPE AS customerType,
+		  icbi.CUSTOMER_BANKNAME AS customerBankName,
+		  icbi.CUSTOMER_BANKNO AS customerBankNo,
+		  icbi.BELONGS_AREA AS belongsArea,
+		  icbi.PROVINCE AS province,
+		  icbi.CITY AS city,
+		  icbi.BUSINESS_TYPE AS businessType, 
+		  icbi.ADDRESS_DETAIL AS addressDetail,
+		  icbi.CUSTOMER_STATUS AS customerStatus,
+		  icbi.COMPONY_IMG_URL AS componyImgUrl,
+		  icbi.CORPORATE_IMG_URL AS corporateImgUrl,
+		  icbi.PUSH_TIME AS pushTime,
+		  icbi.CONTACT_USER_NAME AS contactUserName,
+		  icbi.CONTACT_PHONE_NUM AS contactPhoneNum,
+		  icbi.REMARK AS remark,
+		  ieci.REG_SERIAL_NUM AS regSerialNum,
+		  ieci.REG_ADDRESS AS regAddress,
+		  ieci.REG_CAPITAL AS regCapital,
+		  ieci.ESTABLISHMENT_DATE AS establishmenDate,
+		  ieci.MERCHANT_MATURITY AS merchantMaturity,
+		  ieci.OPERATING_PERIOD AS operatingPeriod,
+		  icbi.CORPORATE_NAME AS corporateName,
+		  icbi.CORPORATE_CERTIFICATE_TYPE AS corporateCertificateType,
+		  icbi.CORPORATE_CERTIFICATE_CODE AS corporateCertificateCode,
+		  ieci.UNIFORM_CREDIT_CODE AS uniformCreditCode,
+		  ieci.ORGANIZATION_CODE AS organizationCode,
+		  ieci.TAX_CERTIFICATE_CODE AS taxCertificateCode,
+		  ieci.ACCOUNT_PERMIT_CODE AS accountPermitCode,
+		  ieci.ICP_CODE AS icpCode,
+		  ieci.COMPANY_CHOP AS companyChop,
+		  ieci.COMPANY_CHOP_PWD AS companyChopPwd,
+		  ieci.COMPANY_PAGE_ID AS companyPageId,
+		  ieci.COMPANY_URL AS companyUrl,
+		  ieci.WORK_ADDRESS AS workAddress,
+		  ieci.ORGANIZATION_CODE AS organizationCode,
+		  
+		  
+		  ieci.BUSINESS_LICENSE_NUM AS businessLicenseNum,
+          ieci.SERVICE_CALL AS serviceCall,
+          ieci.ENTERPRISE_MAILBOX AS enterpriseMailbox,
+          ieci.LEGAL_PERSON_PHONE_NUM AS legalPersonPhoneNum,
+          ieci.SOCIAL_CREDIT_CODE AS socialCreditCode,
+          ieci.IC_REG_CODE AS icRegCode,
+          ieci.BUSINESS_CONTACT_NAME AS businessContactName,
+          ieci.BUSINESS_CONTACT_IDCARD AS businessContactIdcard,
+          
+		  icxi.HOLD_WEIXIN AS holdWeixin,
+		  icxi.RISK_MANAGE_TYPE AS riskManageType,
+		  icxi.IS_FATHER AS isFather,
+		  icxi.LAYER AS layer,
+		  icxi.INSTALLMENT_PLAN AS installmentPlan,
+		  icxi.OVERDUE_INTEREST_RATE AS overdueInterestRate,
+		  icxi.OVERDUE_FIXED_FEE AS overdueFixedFee,
+		  icxi.OVERDUE_INTEREST_MODEL AS overdueInterestModel,
+		  icxi.IS_VIRTUAL_MERC AS isVirtualMerc,
+		  isoi.ORG_NAME AS higherOrgName,
+		  isoi.ORG_CODE AS higherOrgCode,
+		  icxi.RESERVE_FIELD AS reserveField,
+		  merchant.riskFlag,
+          merchant.customerCode as riskCode
+		FROM
+		  IQB_CUSTOMER_BASE_INFO icbi 
+		  LEFT JOIN IQB_ENTERPRISE_CUSTOMER_INFO ieci 
+		    ON icbi.CUSTOMER_CODE = ieci.CUSTOMER_CODE 
+		  LEFT JOIN IQB_CUSTOMER_XFJR_INFO icxi 
+		    ON icbi.CUSTOMER_CODE = icxi.CUSTOMER_CODE 
+		  LEFT JOIN IQB_SYS_ORGANIZATION_INFO isoi 
+		    ON LEFT(icbi.CUSTOMER_CODE, LENGTH(icbi.CUSTOMER_CODE) - 3) = isoi.ORG_CODE 
+		  LEFT JOIN inst_merchantinfo merchant on  merchant.ID = icbi.CUSTOMER_CODE
+		WHERE icbi.DELETE_FLAG = 1 
+		  AND icbi.CUSTOMER_CODE = #{customerCode}
+	</select>
+	
+	<!-- 根据客户编码获取客户信息  -->
+	<select id="getCustomerInfoByCustmerShortNameCode" resultType="com.iqb.consumer.crm.customer.bean.CustomerBean" parameterType="string">
+		SELECT 
+		  icbi.CUSTOMER_CODE AS customerCode,
+		  icbi.CUSTOMER_NAME AS customerName,
+		  icbi.CUSTOMER_SHORT_NAME AS customerShortName,
+		  icbi.CUSTOMER_FULL_NAME AS customerFullName,
+		  icbi.CUSTOMER_SHORT_NAME_CODE AS customerShortNameCode,
+		  icbi.CUSTOMER_TYPE AS customerType,
+		  icbi.BELONGS_AREA AS belongsArea,
+		  icbi.PROVINCE AS province,
+		  icbi.CITY AS city,
+		  icbi.ADDRESS_DETAIL AS addressDetail,
+		  icbi.CUSTOMER_STATUS AS customerStatus,
+		  icbi.COMPONY_IMG_URL AS componyImgUrl,
+		  icbi.CORPORATE_IMG_URL AS corporateImgUrl,
+		  icbi.PUSH_TIME AS pushTime,
+		  icbi.CONTACT_USER_NAME AS contactUserName,
+		  icbi.CONTACT_PHONE_NUM AS contactPhoneNum,
+		  icbi.REMARK AS remark,
+		  ieci.REG_SERIAL_NUM AS regSerialNum,
+		  ieci.REG_ADDRESS AS regAddress,
+		  ieci.REG_CAPITAL AS regCapital,
+		  ieci.ESTABLISHMENT_DATE AS establishmenDate,
+		  ieci.MERCHANT_MATURITY AS merchantMaturity,
+		  ieci.OPERATING_PERIOD AS operatingPeriod,
+		  icbi.CORPORATE_NAME AS corporateName,
+		  icbi.CORPORATE_CERTIFICATE_TYPE AS corporateCertificateType,
+		  icbi.CORPORATE_CERTIFICATE_CODE AS corporateCertificateCode,
+		  ieci.UNIFORM_CREDIT_CODE AS uniformCreditCode,
+		  ieci.ORGANIZATION_CODE AS organizationCode,
+		  ieci.TAX_CERTIFICATE_CODE AS taxCertificateCode,
+		  ieci.ACCOUNT_PERMIT_CODE AS accountPermitCode,
+		  ieci.ICP_CODE AS icpCode,
+		  ieci.COMPANY_CHOP AS companyChop,
+		  ieci.COMPANY_CHOP_PWD AS companyChopPwd,
+		  ieci.COMPANY_PAGE_ID AS companyPageId,
+		  ieci.COMPANY_URL AS companyUrl,
+		  ieci.WORK_ADDRESS AS workAddress,
+		  ieci.ORGANIZATION_CODE AS organizationCode,
+		  icxi.HOLD_WEIXIN AS holdWeixin,
+		  icxi.RISK_MANAGE_TYPE AS riskManageType,
+		  icxi.IS_FATHER AS isFather,
+		  icxi.LAYER AS layer,
+		  icxi.INSTALLMENT_PLAN AS installmentPlan,
+		  icxi.OVERDUE_INTEREST_RATE AS overdueInterestRate,
+		  icxi.OVERDUE_FIXED_FEE AS overdueFixedFee,
+		  icxi.OVERDUE_INTEREST_MODEL AS overdueInterestModel,
+		  icxi.IS_VIRTUAL_MERC AS isVirtualMerc,
+		  icxi.RESERVE_FIELD AS reserveField 
+		FROM
+		  IQB_CUSTOMER_BASE_INFO icbi 
+		  LEFT JOIN IQB_ENTERPRISE_CUSTOMER_INFO ieci 
+		    ON icbi.CUSTOMER_CODE = ieci.CUSTOMER_CODE 
+		  LEFT JOIN IQB_CUSTOMER_XFJR_INFO icxi 
+		    ON icbi.CUSTOMER_CODE = icxi.CUSTOMER_CODE 
+		WHERE icbi.DELETE_FLAG = 1 
+		  AND icbi.CUSTOMER_SHORT_NAME_CODE = #{customerShortNameCode}
+	</select>
+	
+	<!-- 插入客户推送记录 -->
+	<insert id="insertCustomerPushRecord" parameterType="com.iqb.consumer.crm.customer.bean.CustomerPushRecord">
+		INSERT INTO IQB_CUSTOMER_PUSH_RECORD (
+		  CUSTOMER_CODE, UUID, PUSH_TYPE, PUSH_TIME, RECEIVE, PUSH_STATUS
+		) 
+		VALUES
+		  (#{customerCode}, #{uuid}, #{pushType}, #{pushTime}, #{receive}, #{pushStatus})
+	</insert>
+	<!-- 根据客户CODE判断是否已推送消费金融  -->
+	<select id="selectCustomerPushRecordByCustomerCode" parameterType="com.iqb.consumer.crm.customer.bean.CustomerBean" resultType="java.lang.Integer">
+		SELECT
+			COUNT(*)
+		FROM
+			inst_merchantinfo
+		WHERE ID = #{customerCode}
+	</select>
+	
+	<!-- 查询客户信息  -->
+	<select id="queryCustomerList" parameterType="map" resultType="com.iqb.consumer.crm.customer.bean.CustomerBean">
+		SELECT 
+		  CUSTOMER_NAME AS customerName,
+		  CUSTOMER_CODE AS customerCode,
+		  CUSTOMER_TYPE AS customerType,
+		  ADDRESS_DETAIL AS addressDetail,
+		  CUSTOMER_STATUS AS customerStatus,
+		  CORPORATE_NAME AS corporateName,
+		  remark 
+		FROM
+		  IQB_CUSTOMER_BASE_INFO
+		WHERE DELETE_FLAG = 1 
+		<if test="customerName != null and customerName != ''" >
+        	AND CUSTOMER_NAME LIKE '%${customerName}%'
+      	</if>
+		<if test="customerType != null and customerType != ''" >
+        	AND CUSTOMER_TYPE LIKE '%${customerType}%'
+      	</if>
+		<if test="customerStatus != null and customerStatus != ''" >
+        	AND CUSTOMER_STATUS = #{customerStatus}
+      	</if>
+	</select>
+	
+	<!-- 根据客户编号删除客户信息  -->
+	<update id="deleteCustomerInfo" parameterType="string">
+		UPDATE 
+		  IQB_CUSTOMER_BASE_INFO 
+		SET
+		  DELETE_FLAG = 2 
+		WHERE CUSTOMER_CODE = #{customerCode}
+	</update>
+	
+	<!-- 新增客户信息  -->
+	<insert id="insertCustomerBaseInfo" parameterType="com.iqb.consumer.crm.customer.bean.CustomerBean">
+		INSERT INTO IQB_CUSTOMER_BASE_INFO (
+		  CUSTOMER_CODE,
+		  CUSTOMER_NAME,
+		  CUSTOMER_SHORT_NAME,
+		  CUSTOMER_FULL_NAME,
+		  CUSTOMER_SHORT_NAME_CODE,
+		  CUSTOMER_TYPE,
+		  CUSTOMER_BANKNAME,
+		  CUSTOMER_BANKNO,
+		  BELONGS_AREA,
+		  CORPORATE_NAME,
+		  CORPORATE_CERTIFICATE_TYPE,
+		  CORPORATE_CERTIFICATE_CODE,
+		  PROVINCE,
+		  CITY,
+		  ADDRESS_DETAIL,
+		  CUSTOMER_STATUS,
+		  IMG_URL,
+		  CREATE_TIME,
+		  DELETE_FLAG,
+		  REMARK,
+		  VERSION,
+		  CONTACT_USER_NAME,
+		  CONTACT_PHONE_NUM,
+		  BUSINESS_TYPE
+		) 
+		VALUES
+		  (
+		    #{customerCode}, 
+		    #{customerName}, 
+		    #{customerShortName}, 
+		    #{customerFullName}, 
+		    #{customerShortNameCode}, 
+		    #{customerType}, 
+		    #{customerBankName},
+		    #{customerBankNo},
+		    #{belongsArea}, 
+		    #{corporateName},
+		    #{corporateCertificateType},
+		    #{corporateCertificateCode},
+		    #{province},
+		    #{city}, 
+		    #{addressDetail}, 
+		    #{customerStatus}, 
+		    #{imgUrl}, 
+		    #{createTime}, 
+		    #{deleteFlag}, 
+		    #{remark}, 
+		    #{version},
+		    #{contactUserName},
+		    #{contactPhoneNum},
+		    #{businessType}
+		  )
+	</insert>
+	
+	<!-- 更新来自etep的客户信息  -->
+	<update id="updateCustomerInfoFromEtep" parameterType="com.iqb.consumer.crm.customer.bean.CustomerBean">
+		UPDATE IQB_CUSTOMER_BASE_INFO 
+	    <set >
+	      <if test="customerName != null and customerName != ''" >
+	        CUSTOMER_NAME = #{customerName},
+	      </if>
+	      <if test="customerShortName != null and customerShortName != ''" >
+	        CUSTOMER_SHORT_NAME = #{customerShortName},
+	      </if>
+	      <if test="customerFullName != null and customerFullName != ''" >
+	        CUSTOMER_FULL_NAME = #{customerFullName},
+	      </if>
+	      <if test="customerShortNameCode != null and customerShortNameCode != ''" >
+	        CUSTOMER_SHORT_NAME_CODE = #{customerShortNameCode},
+	      </if>
+	      <if test="customerType != null and customerType != ''" >
+	        CUSTOMER_TYPE = #{customerType},
+	      </if>
+	      <if test="belongsArea != null and belongsArea != ''" >
+	        BELONGS_AREA = #{belongsArea},
+	      </if>
+	      <if test="province != null and province != ''" >
+	        PROVINCE = #{province},
+	      </if>
+	      <if test="city != null and city != ''" >
+	        CITY = #{city},
+	      </if>
+	      <if test="addressDetail != null and addressDetail != ''" >
+	        ADDRESS_DETAIL = #{addressDetail},
+	      </if>
+	      <if test="customerStatus != null and customerStatus != ''" >
+	        CUSTOMER_STATUS = #{customerStatus},
+	      </if>
+	      <if test="remark != null and remark != ''" >
+	        REMARK = #{remark},
+	      </if>
+	      <if test="contactUserName != null and contactUserName != ''" >
+	        CONTACT_USER_NAME = #{contactUserName},
+	      </if>
+	    </set>
+	    WHERE CUSTOMER_CODE = #{customerCode} 
+	</update>
+	
+	<!-- 更新来自etep的客户信息  -->
+	<update id="updateCustomerBaseInfo" parameterType="com.iqb.consumer.crm.customer.bean.CustomerBean">
+		UPDATE IQB_CUSTOMER_BASE_INFO 
+	    <set >
+	      <if test="customerName != null and customerName != ''" >
+	        CUSTOMER_NAME = #{customerName},
+	      </if>
+	      <if test="customerShortName != null and customerShortName != ''" >
+	        CUSTOMER_SHORT_NAME = #{customerShortName},
+	      </if>
+	      <if test="customerFullName != null and customerFullName != ''" >
+	        CUSTOMER_FULL_NAME = #{customerFullName},
+	      </if>
+	      <if test="customerShortNameCode != null and customerShortNameCode != ''" >
+	        CUSTOMER_SHORT_NAME_CODE = #{customerShortNameCode},
+	      </if>
+	      <if test="customerType != null and customerType != ''" >
+	        CUSTOMER_TYPE = #{customerType},
+	      </if>
+	      <if test="customerBankName != null and customerBankName != ''" >
+	        CUSTOMER_BANKNAME = #{customerBankName},
+	      </if>
+	      <if test="customerBankNo != null and customerBankNo != ''" >
+	        CUSTOMER_BANKNO = #{customerBankNo},
+	      </if>
+	      <if test="belongsArea != null and belongsArea != ''" >
+	        BELONGS_AREA = #{belongsArea},
+	      </if>
+	      <if test="corporateName != null and corporateName != ''" >
+	        CORPORATE_NAME = #{corporateName},
+	      </if>
+	      <if test="corporateCertificateType != null and corporateCertificateType != ''" >
+	        CORPORATE_CERTIFICATE_TYPE = #{corporateCertificateType},
+	      </if>
+	      <if test="corporateCertificateCode != null and corporateCertificateCode != ''" >
+	        CORPORATE_CERTIFICATE_CODE = #{corporateCertificateCode},
+	      </if>
+	      <if test="province != null and province != ''" >
+	        PROVINCE = #{province},
+	      </if>
+	      <if test="city != null and city != ''" >
+	        CITY = #{city},
+	      </if>
+	      <if test="addressDetail != null and addressDetail != ''" >
+	        ADDRESS_DETAIL = #{addressDetail},
+	      </if>
+	      <if test="customerStatus != null and customerStatus != ''" >
+	        CUSTOMER_STATUS = #{customerStatus},
+	      </if>
+	      <if test="imgUrl != null and imgUrl != ''" >
+	        IMG_URL = #{imgUrl},
+	      </if>
+	      <if test="remark != null and remark != ''" >
+	        REMARK = #{remark},
+	      </if>
+	      <if test="contactUserName != null and contactUserName != ''" >
+	        CONTACT_USER_NAME = #{contactUserName},
+	      </if>
+	      <if test="contactPhoneNum != null and contactPhoneNum != ''" >
+	        CONTACT_PHONE_NUM = #{contactPhoneNum},
+	      </if>
+	       <if test="contactPhoneNum != null and contactPhoneNum != ''" >
+	        CONTACT_PHONE_NUM = #{contactPhoneNum},
+	      </if>
+	       <if test="businessType != null and businessType != ''" >
+	        BUSINESS_TYPE = #{businessType},
+	      </if>
+	    </set>
+	    WHERE CUSTOMER_CODE = #{customerCode} 
+	</update>
+	
+	<!-- 插入客户企业相关信息  -->
+	<insert id="insertCustomerEnterpriseInfo" parameterType="com.iqb.consumer.crm.customer.bean.CustomerBean">
+		INSERT INTO IQB_ENTERPRISE_CUSTOMER_INFO (
+		  CUSTOMER_CODE,
+		  REG_SERIAL_NUM,
+		  REG_ADDRESS,
+		  REG_CAPITAL,
+		  ESTABLISHMENT_DATE,
+		  MERCHANT_MATURITY,
+		  OPERATING_PERIOD,
+		  UNIFORM_CREDIT_CODE,
+		  ORGANIZATION_CODE,
+		  TAX_CERTIFICATE_CODE,
+		  ACCOUNT_PERMIT_CODE,
+		  ICP_CODE,
+		  COMPANY_CHOP,
+		  COMPANY_CHOP_PWD,
+		  COMPANY_PAGE_ID,
+		  COMPANY_URL,
+		  DELETE_FLAG,
+		  WORK_ADDRESS,
+		  BUSINESS_LICENSE_NUM,
+          SERVICE_CALL,
+          ENTERPRISE_MAILBOX,
+          LEGAL_PERSON_PHONE_NUM,
+          SOCIAL_CREDIT_CODE,
+          IC_REG_CODE,
+          BUSINESS_CONTACT_NAME,
+          BUSINESS_CONTACT_IDCARD
+		) 
+		VALUES
+		  (
+		    #{customerCode},
+		    #{regSerialNum},
+		    #{regAddress},
+		    #{regCapital},
+		    #{establishmenDate},
+		    #{merchantMaturity},
+		    #{operatingPeriod},
+		    #{uniformCreditCode},
+		    #{organizationCode},
+		    #{taxCertificateCode},
+		    #{accountPermitCode},
+		    #{icpCode},
+		    #{companyChop},
+		    #{companyChopPwd},
+		    #{companyPageId},
+		    #{companyUrl},
+		    '1',
+		    #{workAddress},
+            #{businessLicenseNum},
+            #{serviceCall},
+            #{enterpriseMailbox},
+            #{legalPersonPhoneNum},
+            #{socialCreditCode},
+            #{icRegCode},
+            #{businessContactName},
+            #{businessContactIdcard}
+		  )
+	</insert>
+	
+	
+	<!-- 插入消费金融客户相关信息  -->
+	<insert id="insertCustomerXFJRInfo" parameterType="com.iqb.consumer.crm.customer.bean.CustomerBean">
+		INSERT INTO IQB_CUSTOMER_XFJR_INFO (
+		  CUSTOMER_CODE,
+		  HOLD_WEIXIN,
+		  RISK_MANAGE_TYPE,
+		  IS_FATHER,
+		  LAYER,
+		  INSTALLMENT_PLAN,
+		  OVERDUE_INTEREST_RATE,
+		  OVERDUE_FIXED_FEE,
+		  OVERDUE_INTEREST_MODEL,
+		  IS_VIRTUAL_MERC,
+		  RESERVE_FIELD,
+		  DELETE_FLAG
+		) 
+		VALUES
+		  (
+		    #{customerCode},
+		    #{holdWeixin},
+		    #{riskManageType},
+		    #{isFather},
+		    #{layer},
+		    #{installmentPlan},
+		    #{overdueInterestRate},
+		    #{overdueFixedFee},
+		    #{overdueInterestModel},
+		    #{isVirtualMerc},
+		    #{reserveField},
+		    '1'
+		  )
+	</insert>
+	
+	<!-- 删除客户企业相关信息  -->
+	<delete id="deleteCustomerEnterpriseInfo" parameterType="string">
+		DELETE FROM IQB_ENTERPRISE_CUSTOMER_INFO WHERE CUSTOMER_CODE = #{customerCode}
+	</delete>
+	
+	<!-- 删除消费金融客户相关信息  -->
+	<delete id="deleteCustomerXFJRInfo" parameterType="string">
+		DELETE FROM IQB_CUSTOMER_XFJR_INFO WHERE CUSTOMER_CODE = #{customerCode}
+	</delete>
+	
+	<!-- 更新更新客户企业相关信息  -->
+	<update id="updateCustomerEnterpriseInfo" parameterType="com.iqb.consumer.crm.customer.bean.CustomerBean">
+		UPDATE IQB_ENTERPRISE_CUSTOMER_INFO 
+	    <set >
+	      <if test="regSerialNum != null and regSerialNum != ''" >
+	        REG_SERIAL_NUM = #{regSerialNum},
+	      </if>
+	      <if test="regAddress != null and regAddress != ''" >
+	        REG_ADDRESS = #{regAddress},
+	      </if>
+	      <if test="regCapital != null and regCapital != ''" >
+	        REG_CAPITAL = #{regCapital},
+	      </if>
+	      <if test="establishmenDate != null and establishmenDate != ''" >
+	        ESTABLISHMENT_DATE = #{establishmenDate},
+	      </if>
+	      <if test="merchantMaturity != null and merchantMaturity != ''" >
+	        MERCHANT_MATURITY = #{merchantMaturity},
+	      </if>
+	      <if test="operatingPeriod != null and operatingPeriod != ''" >
+	        OPERATING_PERIOD = #{operatingPeriod},
+	      </if>
+	      <if test="uniformCreditCode != null and uniformCreditCode != ''" >
+	        UNIFORM_CREDIT_CODE = #{uniformCreditCode},
+	      </if>
+	      <if test="organizationCode != null and organizationCode != ''" >
+	        ORGANIZATION_CODE = #{organizationCode},
+	      </if>
+	      <if test="taxCertificateCode != null and taxCertificateCode != ''" >
+	        TAX_CERTIFICATE_CODE = #{taxCertificateCode},
+	      </if>
+	      <if test="accountPermitCode != null and accountPermitCode != ''" >
+	        ACCOUNT_PERMIT_CODE = #{accountPermitCode},
+	      </if>
+	      <if test="icpCode != null and icpCode != ''" >
+	        ICP_CODE = #{icpCode},
+	      </if>
+	      <if test="companyChop != null and companyChop != ''" >
+	        COMPANY_CHOP = #{companyChop},
+	      </if>
+	      <if test="companyChopPwd != null and companyChopPwd != ''" >
+	        COMPANY_CHOP_PWD = #{companyChopPwd},
+	      </if>
+	      <if test="companyPageId != null and companyPageId != ''" >
+	        COMPANY_PAGE_ID = #{companyPageId},
+	      </if>
+	      <if test="companyUrl != null and companyUrl != ''" >
+	        COMPANY_URL = #{companyUrl},
+	      </if>
+	      <if test="workAddress != null and workAddress != ''" >
+	        WORK_ADDRESS = #{workAddress},
+	      </if>
+	      <if test="businessLicenseNum != null and businessLicenseNum != ''" >
+	        BUSINESS_LICENSE_NUM = #{businessLicenseNum},
+	      </if>
+		  <if test="serviceCall != null and serviceCall != ''" >
+		    SERVICE_CALL = #{serviceCall},
+		  </if>
+		  <if test="enterpriseMailbox != null and enterpriseMailbox != ''" >
+		    ENTERPRISE_MAILBOX = #{enterpriseMailbox},
+		  </if>
+		  <if test="legalPersonPhoneNum != null and legalPersonPhoneNum != ''" >
+		    LEGAL_PERSON_PHONE_NUM = #{legalPersonPhoneNum},
+		  </if>
+		  <if test="socialCreditCode != null and socialCreditCode != ''" >
+		    SOCIAL_CREDIT_CODE = #{socialCreditCode},
+		  </if>
+		  <if test="icRegCode != null and icRegCode != ''" >
+		    IC_REG_CODE = #{icRegCode},
+		  </if>
+		  <if test="businessContactName != null and businessContactName != ''" >
+		    BUSINESS_CONTACT_NAME = #{businessContactName},
+		  </if>
+		  <if test="businessContactIdcard != null and businessContactIdcard != ''" >
+		    BUSINESS_CONTACT_IDCARD = #{businessContactIdcard},
+		  </if>
+		   <if test="businessContactIdcard != null and businessContactIdcard != ''" >
+		    BUSINESS_CONTACT_IDCARD = #{businessContactIdcard},
+		  </if>
+	    </set>
+	    WHERE CUSTOMER_CODE = #{customerCode} 
+	</update>
+	
+	<!-- 更新更新客户企业相关信息  -->
+	<update id="updateCustomerXFJRInfo" parameterType="com.iqb.consumer.crm.customer.bean.CustomerBean">
+		UPDATE IQB_CUSTOMER_XFJR_INFO 
+	    <set >
+	      <if test="holdWeixin != null and holdWeixin != ''" >
+	        HOLD_WEIXIN = #{holdWeixin},
+	      </if>
+	      <if test="riskManageType != null and riskManageType != ''" >
+	        RISK_MANAGE_TYPE = #{riskManageType},
+	      </if>
+	      <if test="isFather != null and isFather != ''" >
+	        IS_FATHER = #{isFather},
+	      </if>
+	      <if test="layer != null and layer != ''" >
+	        LAYER = #{layer},
+	      </if>
+	      <if test="installmentPlan != null and installmentPlan != ''" >
+	        INSTALLMENT_PLAN = #{installmentPlan},
+	      </if>
+	      <if test="overdueInterestRate != null and overdueInterestRate != ''" >
+	        OVERDUE_INTEREST_RATE = #{overdueInterestRate},
+	      </if>
+	      <if test="overdueFixedFee != null and overdueFixedFee != ''" >
+	        OVERDUE_FIXED_FEE = #{overdueFixedFee},
+	      </if>
+	      <if test="overdueInterestModel != null and overdueInterestModel != ''" >
+	        OVERDUE_INTEREST_MODEL = #{overdueInterestModel},
+	      </if>
+	      <if test="isVirtualMerc != null and isVirtualMerc != ''" >
+	        IS_VIRTUAL_MERC = #{isVirtualMerc},
+	      </if>
+	      <if test="reserveField != null and reserveField != ''" >
+	        RESERVE_FIELD = #{reserveField},
+	      </if>
+	    </set>
+	    WHERE CUSTOMER_CODE = #{customerCode} 
+	</update>
+	
+	<!-- 根据客户编码更新推送时间  -->
+	<update id="updatePushTimeByCustmerCode" parameterType="com.iqb.consumer.crm.customer.bean.CustomerBean">
+		UPDATE 
+		  IQB_CUSTOMER_BASE_INFO 
+		SET
+		  PUSH_TIME = #{pushTime} 
+		WHERE CUSTOMER_CODE = #{customerCode}
+	</update>
+	
+	<!-- 初始化一条消费金融数据  -->
+	<insert id="insertXFJRCustomerForEtep" parameterType="com.iqb.consumer.crm.customer.bean.CustomerBean">
+		INSERT INTO IQB_CUSTOMER_XFJR_INFO (CUSTOMER_CODE) VALUES (#{customerCode});
+	</insert>
+	
+	<!-- 上传客户信息图片  -->
+	<update id="uploadCustomerImg" parameterType="map">
+		UPDATE IQB_CUSTOMER_BASE_INFO SET COMPONY_IMG_URL = #{imgPath} WHERE CUSTOMER_CODE = #{customerCode}
+	</update>
+	
+	<!-- 上传客户信息图片  -->
+	<update id="uploadCustomerComponyImg" parameterType="map">
+		UPDATE IQB_CUSTOMER_BASE_INFO SET COMPONY_IMG_URL = #{imgPath} WHERE CUSTOMER_CODE = #{customerCode}
+	</update>
+	
+	<!-- 上传客户信息图片  -->
+	<update id="uploadCustomerCorporateImg" parameterType="map">
+		UPDATE IQB_CUSTOMER_BASE_INFO SET CORPORATE_IMG_URL = #{imgPath} WHERE CUSTOMER_CODE = #{customerCode}
+	</update>
+	
+	<!-- 删除客户信息图片  -->
+	<update id="deleteCustomerImg" parameterType="string">
+		UPDATE IQB_CUSTOMER_BASE_INFO SET COMPONY_IMG_URL = null WHERE CUSTOMER_CODE = #{customerCode}
+	</update>
+	
+	<!-- 删除客户信息图片  -->
+	<update id="deleteCustomerComponyImg" parameterType="string">
+		UPDATE IQB_CUSTOMER_BASE_INFO SET COMPONY_IMG_URL = null WHERE CUSTOMER_CODE = #{customerCode}
+	</update>
+	
+	<!-- 删除客户信息图片  -->
+	<update id="deleteCustomerCorporateImg" parameterType="string">
+		UPDATE IQB_CUSTOMER_BASE_INFO SET CORPORATE_IMG_URL = null WHERE CUSTOMER_CODE = #{customerCode}
+	</update>
+	
+	<!-- 根据客户编码查询门店信息 -->
+	<select id="getCustomerStoreInfoByCode" parameterType="map" resultType="com.iqb.consumer.crm.customer.bean.CustomerBean">
+		SELECT 
+		  icsi.CUSTOMER_CODE AS customerCode,
+		  icbi.CORPORATE_NAME AS corporateName,
+		  icsi.GUARANTEE_CORPORATION_NAME AS customerName,
+		  icsi.CREDITOR_NAME AS creditorName,
+		  icsi.CREDITOR_ID_NO AS creditorIdNo,
+		  icsi.CREDITOR_BANK_NO AS creditorBankNo,
+		  icsi.CREDITOR_BANK_NAME AS creditorBankName,
+		  icsi.CREDITOR_PHONE AS creditorPhone
+		FROM
+		  IQB_CUSTOMER_STORE_INFO icsi 
+		  LEFT JOIN IQB_CUSTOMER_BASE_INFO icbi 
+		    ON icbi.CUSTOMER_CODE = icsi.GUARANTEE_CORPORATION_CODE
+		    AND icbi.CUSTOMER_STATUS = '1' 
+		    AND icbi.DELETE_FLAG = '1' 
+		WHERE icsi.CUSTOMER_CODE = #{customerCode} LIMIT 1;
+	</select>
+	
+	<!-- 获取市下拉框集合  -->
+	<select id="getCustomerCityListByProvince" parameterType="map" resultType="map">
+		SELECT 
+		  isdi.DICT_NAME AS id,
+		  isdi.DICT_NAME AS 'text' 
+		FROM
+		  IQB_SYS_DICT_ITEM isdi 
+		  LEFT JOIN IQB_SYS_DICT_ITEM isdi1 
+		    ON isdi.CASCADE_CODE = isdi1.DICT_CODE 
+		WHERE isdi.DICT_TYPE_CODE = 'city' 
+		  AND isdi1.DICT_NAME = #{provinceName} 
+	</select>
+	
+	<!-- 根据客户编码查询门店信息 -->
+	<select id="getCustomerStoreInfoListByCode" parameterType="string" resultType="com.iqb.consumer.crm.customer.bean.CustomerBean">
+		SELECT 
+		  icsi.CUSTOMER_CODE AS customerCode,
+		  icbi.CORPORATE_NAME AS corporateName,
+		  icsi.GUARANTEE_CORPORATION_NAME AS customerName,
+		  icsi.CREDITOR_NAME AS creditorName,
+		  icsi.CREDITOR_ID_NO AS creditorIdNo,
+		  icsi.CREDITOR_BANK_NO AS creditorBankNo,
+		  icsi.CREDITOR_BANK_NAME AS creditorBankName,
+		  icsi.CREDITOR_PHONE AS creditorPhone,
+		  icsi.CREDITOR_OTHER_INFO AS creditorOtherInfo
+		FROM
+		  IQB_CUSTOMER_STORE_INFO icsi 
+		  LEFT JOIN IQB_CUSTOMER_BASE_INFO icbi 
+		    ON icbi.CUSTOMER_CODE = icsi.GUARANTEE_CORPORATION_CODE
+		    AND icbi.CUSTOMER_STATUS = '1' 
+		    AND icbi.DELETE_FLAG = '1' 
+		WHERE icsi.CUSTOMER_CODE = #{customerCode} 
+	</select>
+</mapper>

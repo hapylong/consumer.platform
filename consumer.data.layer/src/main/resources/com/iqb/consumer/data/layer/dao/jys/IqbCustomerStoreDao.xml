@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the Apache License, Version 2.0 (the "License"); 
+	you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS 
+	IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language 
+	governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.jys.IqbCustomerStoreDao">
+
+	<sql id="table">iqb_customer_store_info</sql>
+
+	<!-- 配置映射字段 -->
+	<resultMap type="com.iqb.consumer.data.layer.bean.jys.Iqb_customer_store_info" id="iqb_customer_store_info">
+		<result property="id" column="corporate_name" />
+		<result property="text" column="customer_name" />
+	</resultMap>
+	
+	<!-- 根据Key查询对应的字典内容 -->
+	<select id="queryAllInfo" parameterType="String" resultMap="iqb_customer_store_info">
+		SELECT 
+            customer_name,corporate_name
+        FROM 
+            iqb_customer_base_info
+
+        WHERE 
+            customer_type like "%5%"
+	</select>
+</mapper>

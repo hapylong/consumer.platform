@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+	Apache License, Version 2.0 (the "License"); you may not use this file except 
+	in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.MerchantBeanDao">
+
+	<!-- 配置映射字段 -->
+	<resultMap type="com.iqb.consumer.data.layer.bean.merchant.MerchantBean"
+		id="merchantBean">
+		<result property="id" column="ID" />
+		<result property="level" column="LEVEL" />
+		<result property="parentId" column="PARENTID" />
+		<result property="merchantNo" column="MERCHANTNO" />
+		<result property="password" column="PASSWORD" />
+		<result property="merchantShortName" column="MERCHANTSHORTNAME" />
+		<result property="publicNo" column="PUBLICNO" />
+		<result property="province" column="PROVINCE" />
+		<result property="city" column="CITY" />
+		<result property="merchantAddr" column="MERCHANTADDR" />
+		<result property="riskType" column="RISKTYPE" />
+		<result property="fee" column="FEE" />
+		<result property="overdueFee" column="OVERDUEFEE" />
+		<result property="merchantRemark" column="MERCHANTREMARK" />
+		<result property="status" column="STATUS" />
+		<result property="enabled" column="ENABLED" />
+		<result property="openId" column="OPENID" />
+		<result property="autoLogin" column="AUTOLOGIN" />
+		<result property="lastLoginTime" column="LASTLOGINTIME" />
+		<result property="version" column="VERSION" />
+		<result property="createTime" column="CREATETIME" />
+		<result property="updateTime" column="UPDATETIME" />
+	</resultMap>
+	
+	<!-- 根据商户简称查询商户号 -->
+	<select id="getMerCodeByMerSortName" resultType="java.lang.String"
+		parameterType="String">
+		SELECT MERCHANTNO from inst_merchantinfo WHERE
+		MERCHANTSHORTNAME =
+		#{merchantShortName};
+	</select>
+	<!-- 根据CITY查询商户加盟商 -->
+	<select id="getMerListByCity" resultMap="merchantBean"
+		parameterType="String">
+		SELECT * from inst_merchantinfo WHERE ENABLED!= 1 AND PUBLICNO = 3
+		ORDER BY CASE WHEN CITY =#{city} then 0 else 1 end , PROVINCE, CITY;
+		<!-- SELECT * from inst_merchantinfo WHERE CITY =#{city} AND ENABLED!= 
+			1 ORDER BY MERCHANTNO; -->
+	</select>
+	<!-- 根据ID查询商户加盟商 -->
+	<select id="getAllMerByID" resultMap="merchantBean"
+		parameterType="String">
+		SELECT * from inst_merchantinfo WHERE ID like
+		CONCAT(#{id},'%');
+	</select>
+	
+	<select id="getAllMerchantNosByOrgCode" resultType="String"
+        parameterType="String">
+        SELECT merchantno FROM inst_merchantinfo WHERE ID like
+        CONCAT(#{id},'%');
+    </select>
+    
+	<!-- 根据商户号查询商户加盟商 -->
+	<select id="getAllMerByMerNo" resultMap="merchantBean"
+		parameterType="String">
+		SELECT * from inst_merchantinfo WHERE
+		MERCHANTNO=#{merchantNo};
+	</select>
+	<!-- 根据ID查询单个商户加盟商 -->
+	<select id="getMerByID" resultMap="merchantBean" parameterType="String">
+		SELECT * from inst_merchantinfo WHERE ID=#{id} LIMIT 1;
+	</select>
+	<!-- 根据商户号查询单个商户加盟商 -->
+	<select id="getMerByMerNo" resultMap="merchantBean"
+		parameterType="String">
+		SELECT * from inst_merchantinfo WHERE
+		MERCHANTNO=#{merchantNo} LIMIT 1;
+	</select>
+	<!-- 新增商户 -->
+	<insert id="insertMerchantInfo" parameterType="com.iqb.consumer.data.layer.bean.merchant.MerchantBean"
+		keyProperty="id" useGeneratedKeys="true">
+		INSERT INTO inst_merchantinfo (ID,
+		LEVEL, PARENTID, MERCHANTNO, PASSWORD, MERCHANTSHORTNAME,
+		MERCHANTFULLNAME, PUBLICNO, PROVINCE, CITY, MERCHANTADDR, RISKTYPE,
+		FEE,
+		OVERDUEFEE, MERCHANTREMARK, STATUS, ENABLED, OPENID, AUTOLOGIN,
+		WFSTATUS,
+		LASTLOGINTIME,
+		VERSION, CREATETIME, UPDATETIME,RISKFLAG,customerCode) VALUES (#{id},
+		#{level}, #{parentId}, #{merchantNo}, #{password},
+		#{merchantShortName}, #{merchantFullName}, #{publicNo}, #{province},
+		#{city},
+		#{merchantAddr}, #{riskType}, #{fee}, #{overdueFee},
+		#{merchantRemark},
+		#{status}, #{enabled}, NULL, #{autoLogin}, 0,
+		#{lastLoginTime}, #{version}, #{createTime}, #{updateTime},
+		#{riskFlag},#{riskCode}
+		);
+	</insert>
+	<!-- 删除商户 -->
+	<delete id="delMerchantInfo" parameterType="com.iqb.consumer.data.layer.bean.merchant.MerchantBean">
+		DELETE FROM inst_merchantinfo
+		<where>
+			<if test="id !=null and id !=''">
+				ID=#{id} and
+			</if>
+			<if test="merchantNo !=null and merchantNo !=''">
+				MERCHANTNO=#{merchantNo}
+			</if>
+		</where>
+	</delete>
+
+	<!-- 修改商户信息 -->
+	<update id="updateMerchantInfo" parameterType="com.iqb.consumer.data.layer.bean.merchant.MerchantBean">
+		update
+		inst_merchantinfo 
+		<set>
+			version = #{version,jdbcType=INTEGER} + 1,
+			<if test="password != null and password != ''">
+				PASSWORD = #{password},
+			</if>
+			<if test="merchantShortName != null and merchantShortName != ''">
+				MERCHANTSHORTNAME = #{merchantShortName},
+			</if>
+			<if test="merchantFullName != null and merchantFullName != ''">
+				MERCHANTFULLNAME = #{merchantFullName},
+			</if>
+			<if test="publicNo != null and publicNo != ''">
+				PUBLICNO = #{publicNo},
+			</if>
+			<if test="province != null and province != ''">
+				PROVINCE = #{province},
+			</if>
+			<if test="city != null and city != ''">
+				CITY = #{city},
+			</if>
+			<if test="merchantAddr != null and merchantAddr != ''">
+				MERCHANTADDR = #{merchantAddr},
+			</if>
+			<if test="fee != null and fee != ''">
+				FEE = #{fee},
+			</if>
+			<if test="overdueFee != null and overdueFee != ''">
+				OVERDUEFEE = #{overdueFee},
+			</if>
+			<if test="merchantRemark != null and merchantRemark != ''">
+				MERCHANTREMARK = #{merchantRemark},
+			</if>
+			<if test="enabled != null and enabled != ''">
+				ENABLED = #{enabled},
+			</if>
+		</set>
+		where MERCHANTNO = #{merchantNo}
+	</update>
+	
+	<!-- 根据商户简称查询商户号 -->
+	<select id="getMerCodeByMerSortNameList" resultMap="merchantBean" >
+		SELECT * from inst_merchantinfo 
+		<where>
+		<if test="merchNames != null and merchNames != ''">
+			MERCHANTSHORTNAME IN
+			<foreach item="item" index="index" collection="merchNames" open="(" separator="," close=")">  
+		 		#{item}  
+			</foreach>
+		</if>
+		</where>
+	</select>
+	
+	<select id="getAllMerchantNosByNames" resultType="String" >
+        SELECT merchantno FROM inst_merchantinfo 
+        <where>
+        <if test="merchNames != null and merchNames != ''">
+            MERCHANTSHORTNAME IN
+            <foreach item="item" index="index" collection="merchNames" open="(" separator="," close=")">  
+                #{item}  
+            </foreach>
+        </if>
+        </where>
+    </select>
+	
+	<!-- 获取所有商户No -->
+	<select id="getAllMerchantNoList" resultType="String">
+		SELECT MERCHANTNO FROM inst_merchantinfo
+	</select>
+	
+	<!-- 根据商户简称查询单个商户加盟商 -->
+	<select id="getMerByMerName" resultMap="merchantBean"
+		parameterType="String">
+		SELECT * from inst_merchantinfo WHERE
+		merchantShortName=#{merchantShortName} LIMIT 1;
+	</select>
+    
+    <select id="getICPEByOrgCode" parameterType="java.lang.String" resultType="com.iqb.consumer.data.layer.bean.admin.entity.IqbCustomerPermissionEntity">
+        SELECT
+		    *
+		FROM
+		    iqb_customer_permission
+		WHERE
+		    merchantno = (
+		        SELECT
+		            merchantno
+		        FROM
+		            inst_merchantinfo
+		        WHERE
+		            ID = #{orgCode}
+		    )
+    </select>
+    
+    <select id="getMBListByATList" parameterType="com.iqb.consumer.data.layer.bean.admin.pojo.MerchantTreePojo" resultType="com.iqb.consumer.data.layer.bean.merchant.MerchantBean">
+        SELECT
+            *
+        FROM
+            inst_merchantinfo
+        WHERE
+            id 
+        IN
+	        <foreach item="item" index="index" collection="list" open="("
+	            separator="," close=")">
+	            #{item.id}
+	        </foreach>
+    </select>
+</mapper>

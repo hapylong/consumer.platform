@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>车辆失联</title>
+        <meta charset="UTF-8" />
+        <meta name="Author" content="" />
+        <meta name="Keywords" content="" />
+        <meta name="Description" content="" />
+        
+        <!-- 样式库 -->
+        <link rel="stylesheet" href="../../js/bootstrap/themes/default/bootstrap.css" />
+        <link rel="stylesheet" href="../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+        <link rel="stylesheet" href="../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+        <link rel="stylesheet" href="../../css/jquery.select2.css" />
+        <link rel="stylesheet" href="../../css/jquery.select2-bootstrap.css" />
+        <link rel="stylesheet" href="../../css/jquery.datetimepicker.css" />
+        <link rel="stylesheet" href="../../js/bootstrap/themes/default/jquery.mCustomScrollbar.css" />
+        <link rel="stylesheet" href="../../js/prettyphoto/css/prettyPhoto.css" />
+        
+        <!-- 插件库 -->
+        <script src="../../js/common/package.js"></script>
+        <script src="../../js/common/url.js"></script>
+        <script src="../../js/common/json2.js"></script> 
+        <script src="../../js/common/jquery-1.11.3.min.js"></script>     
+        <script src="../../js/bootstrap/bootstrap.js"></script>
+        <script src="../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+        <script src="../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+        <script src="../../js/ztree/js/jquery.ztree.all.min.js"></script>
+        <script src="../../js/common/jquery.select2.js"></script>
+        <script src="../../js/common/jquery.datetimepicker.js"></script>
+        <script src="../../js/bootstrap/plugins/jquery.mCustomScrollbar.js"></script>
+        <script src="../../js/prettyphoto/js/jquery.prettyPhoto.js"></script>    
+        
+        <!-- 业务库 -->
+        <script src="../../js/common/base.js"></script>
+        <script src="../../js/common/datagrid2.js"></script>
+        <script src="../../js/common/tree.js"></script>
+        <script src="../../js/common/formatter.js"></script>     
+        <script src="../../js/each/carTrack/carReturnOutApproval.js"></script>
+        
+        
+        <!-- 页面样式 -->
+        <style type="text/css">
+            body {
+                font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif !important;
+                background:#eee url("../../img/back.png") repeat;
+            }
+            .container-fluid {
+                padding-top: 5px;
+            }
+            .left-part {
+                height:800px;
+            }
+            .modal-form {
+                margin:5px;
+                height:600px;
+            }
+            .text-left {
+                text-align: left;
+            }
+            .text-center {
+                text-align: center;
+            }
+            .text-right {
+                text-align: right;
+            }
+            .text-muted {
+                font-weight: bold;
+            }
+            .text-stress {
+                font-weight: bold;
+            }
+            .item-title {
+                background-color: #f5f5f5;
+            }
+            .float-left {
+                float: left;
+                margin-left: 5px;
+            }
+        </style>
+        
+    </head>
+    <body>
+        <div class="container-fluid">
+            <div class="row">               
+                <div class="col-md-12">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+							<button id="btn-approve" type="button"	class="btn btn-primary btn-sm">
+								<span class="glyphicon glyphicon-user"></span> 审核
+							</button>
+							<button id="btn-unassign" type="button" class="btn btn-primary btn-sm">
+								<span class="glyphicon glyphicon-share-alt"></span> 取消签收
+							</button>
+                        </div>
+                        <div class="panel-body">                                 
+                            <form id="updateForm" class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-sm-1 control-label">商户:</label>
+                                    <div class="col-sm-2">
+                                        <input id="merchantShortName" type="text" readonly="readonly" name="merchantShortName" class="form-control" />
+                                    </div>
+                                    <label class="col-sm-1 control-label">订单号:</label>
+                                    <div class="col-sm-2">
+                                        <input id="orderId" type="text" readonly="readonly" name="orderId" class="form-control" />
+                                    </div>
+                                    <label class="col-sm-1 control-label">姓名:</label>
+                                    <div class="col-sm-2">
+                                        <input id="realName" type="text" readonly="readonly" name="realName" class="form-control" />
+                                    </div>
+                                </div>  
+                                <div class="form-group">
+                                    <label class="col-sm-1 control-label">借款金额:</label>
+                                    <div class="col-sm-2">
+                                        <input id="orderAmt" type="text" readonly="readonly" name="orderAmt" class="form-control" />
+                                    </div>
+                                    <label class="col-sm-1 control-label">月供:</label>
+                                    <div class="col-sm-2">
+                                        <input id="monthInterest" type="text" readonly="readonly" name="monthInterest" class="form-control" />
+                                    </div>
+                                    <label class="col-sm-1 control-label">品牌车系:</label>
+                                    <div class="col-sm-2">
+                                        <input id="orderName" type="text" readonly="readonly" name="orderName" class="form-control" />
+                                    </div>
+                                </div> 
+                                <div class="form-group">
+                                    <label class="col-sm-1 control-label">车架号:</label>
+                                    <div class="col-sm-2">
+                                        <input id="carNo" type="text" id="expireDate" readonly="readonly" name="carNo" class="form-control" />
+                                    </div>
+                                    <label class="col-sm-1 control-label">车牌号:</label>
+                                    <div class="col-sm-2">
+                                        <input id="plate" type="text" id="expireDate" readonly="readonly" name="plate" class="form-control" />
+                                    </div>
+                                </div>   
+                                <div class="form-group">
+                                    <label class="col-sm-1 control-label"><span class="VINs" style="color: red;">*</span>失联原因:</label>
+                                    <div class="col-sm-8">
+                                        <textarea id="remark" type="text"  name="remark" class="form-control easyui-validatebox" required="required"></textarea>
+                                    </div>
+                                </div> 		                        
+                                                                                      
+                            </form>                                                       
+                        </div>
+                    </div>
+                </div>
+            </div>          
+        </div>
+        <form id="uploadForm">
+			<input id="file" class="hidden" type="file" name="qqfile" multiple />
+		</form>  
+		<div id="approve-win" class="modal fade" role="dialog" aria-labelledby="approve-win-label" aria-describedby="">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="approve-win-label">审批</h5>
+				</div>
+				<div class="modal-form">
+					<form id="approveForm" class="form-horizontal">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">审批结果</label>
+							<div class="col-sm-4">
+								<select class="form-control" disabled>
+									<option value="1" selected>通过</option>
+									<option value="2">退回</option>
+									<option value="0">拒绝</option>
+								</select> 
+								<input type="text" class="hidden" value="1" name="approveStatus">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">审批意见</label>
+							<div class="col-sm-8">
+								<textarea name="approveOpinion" class="form-control" rows="3" placeholder="请输入审批意见"></textarea>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button id="btn-approve-save" type="button"	class="btn btn-success btn-sm">提交</button>
+					<button id="btn-approve-close" type="button" class="btn btn-default btn-sm">关闭</button>
+				</div>
+			</div>
+		</div>
+	</div>      
+    </body>
+</html>

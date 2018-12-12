@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	    <title>系统参数</title>
+	    <meta charset="UTF-8" />
+	    <meta name="Author" content="" />
+	    <meta name="Keywords" content="" />
+	    <meta name="Description" content="" />
+	    
+	    <!-- 样式库 -->
+	    <link rel="stylesheet" href="../../../../js/ztree/css/zTreeStyle/zTreeStyle.css" />
+	    <link rel="stylesheet" href="../../../../js/bootstrap/themes/default/bootstrap.css" />
+	    <link rel="stylesheet" href="../../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+	    <link rel="stylesheet" href="../../../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+	    <link rel="stylesheet" href="../../../../css/jquery.select2.css" />
+	    <link rel="stylesheet" href="../../../../css/jquery.select2-bootstrap.css" />
+		<link rel="stylesheet" href="../../../../css/jquery.datetimepicker.css" />
+	    
+	    <!-- 插件库 -->
+	    <script src="../../../../js/common/package.js"></script>
+		<script src="../../../../js/common/url.js"></script>
+		<script src="../../../../js/common/json2.js"></script>	
+		<script src="../../../../js/common/jquery-1.11.3.min.js"></script>		
+		<script src="../../../../js/bootstrap/bootstrap.js"></script>
+		<script src="../../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+		<script src="../../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+		<script src="../../../../js/ztree/js/jquery.ztree.all.min.js"></script>
+		<script src="../../../../js/common/jquery.select2.js"></script>
+		
+		<!-- 业务库 -->
+		<script src="../../../../js/common/base.js"></script>
+		<script src="../../../../js/common/datagrid2.js"></script>
+		<script src="../../../../js/common/tree.js"></script>
+		<script src="../../../../js/common/formatter.js"></script>	    
+	    <script src="../../../../js/each/cfm/pledge/wf/pledgeApply.js"></script>
+	    <script src="../../../../js/each/cfm/merch/merch.js"></script>
+	    <script src="../../../../js/each/cfm/merch/merchModel.js"></script>
+		<script src="../../../../js/common/jquery.datetimepicker.js"></script>
+	    
+		
+		<!-- 页面样式 -->
+		<style type="text/css">
+			body {
+				font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif !important;
+				background:#eee url("../../../../img/back.png") repeat;
+			}
+			.container-fluid {
+				padding:5px;
+			}
+			.left-part {
+				height:800px;
+			}
+			.modal-form {
+				margin:8px;
+			}
+			.z-index{
+			    z-index:98;
+			}
+			.z-index2{
+			    z-index:97;
+			}
+		</style>
+	    
+	</head>
+	<body>
+	
+		<div class="container-fluid">
+			<div class="row">				
+				<div class="col-md-12">
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<h4 class="panel-title">查询信息</h4>
+					  	</div>
+					  	<div class="panel-body">	
+					  		<form id="searchForm" class="form-horizontal">
+					   		<div class="form-group">
+								<label class="control-label col-lg-1 col-md-1 col-sm-1">商户名称</label>
+								<div class="col-lg-2 col-md-2 col-sm-2">
+								    <input id="merchNames" type="text" readonly value="全部商户" name="merchNames" class="form-control merch" onclick="showMenu(); return false;"/>
+								</div>
+								<label class="control-label col-lg-1 col-md-1 col-sm-1">车架号</label>
+								<div class="col-lg-2 col-md-2 col-sm-2">
+								    <input type="text" name="carNo" class="form-control input-sm" placeholder="请输入车架号">
+								</div>
+								<label class="control-label col-lg-1 col-md-1 col-sm-1">车辆类型</label>
+								<div class="col-lg-2 col-md-2 col-sm-2">
+									<select name="carType" class="form-control" style="width: 100%">
+							    	    <option value=''>请选择</option>
+							    	    <option value='1'>二手车</option>
+							    	    <option value='2'>新车</option>
+								    </select>
+							    </div>
+							</div>
+							<div class="form-group">    
+							    <label class="control-label col-lg-1 col-md-1 col-sm-1">状态</label>
+								<div class="col-lg-2 col-md-2 col-sm-2">
+								    <select id="status" name="status" class="form-control" style="width: 100%">
+							    	    <option value=''>请选择</option>
+							    	    <option value='1'>评估中</option>
+							    	    <option value='2'>已估价</option>
+							    	    <!-- <option value='3'>已退回</option> -->
+							    	    <option value='4'>已使用</option>
+							    	    <option value='5'>已拒绝</option>
+								    </select>
+								</div>
+								<div class="col-lg-3 col-md-3 col-sm-3">
+								    <button id="btn-search" type="button" class="btn btn-default btn-sm">查询</button>
+								    <button id="btn-reset" type="button" class="btn btn-default btn-sm">重置</button>
+							    </div>
+							</div>
+						</form>		  												 	
+					  	</div>
+					</div>
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<h4 class="panel-title">车辆评估申请查询</h4>
+					  	</div>
+					  	<div class="panel-body">
+					    	<form id="listForm">
+							  <button id="btn-insert" type="button" class="btn btn-primary btn-sm">增加</button>
+						    </form>
+					  	</div>
+						<table id='datagrid' class="table table-striped table-bordered table-hover table-condensed">
+						    <thead>
+						    	<tr>						    		
+							    	<!-- <th field="ck"></th> -->
+								<th field="id" idField="true" hidden="true" >序号</th>
+								<th field="merchantNo" 		>商户名称</th>
+								<th field="carBrand" 		>品牌</th>
+								<th field="carDetail" 		>型号及配置</th>
+								<th field="carType" 		formatter = "Formatter.carType(val)">车辆类型</th>
+								<th field="plate" 			>车牌号</th>
+								<th field="carNo" 			>车架号</th>
+								<th field="engine" 			>发动机号</th>
+								<th field="registDate"      formatter = "Formatter.dateFund(val)" >初次登记日期</th>
+								<th field="registAdd" 		>上牌所在地</th>
+								<th field="assessPrice" 	formatter = "Formatter.money(val)" >评估价</th>
+								<th field="applyAmt" 		formatter = "Formatter.money(val)" >融资金额 </th>
+								<th field="status" 			formatter = "Formatter.pledgeStatus(val)">状态</th>	
+						    	</tr>
+						    </thead>
+						    <tbody></tbody>
+						</table>
+					  	<div class="panel-footer">
+							<div id="paginator"></div>
+						</div>
+					</div>
+				</div>
+			</div>		 	
+		</div>
+		
+
+		<div id="update-win" class="modal fade  bs-example-modal-lg" role="dialog" aria-labelledby="update-win-label" aria-describedby="……">
+			<div class="modal-dialog modal-lg" role="document">
+		    	<div class="modal-content" style='min-width:1000px'>
+		      		<div class="modal-header">
+		        		<h5 class="modal-title" id="update-win-label">车辆评估申请</h5>
+		      		</div>
+		      		<div class="modal-body"></div>
+	      			<div class="modal-form">
+	      				<form id="updateForm" class="form-horizontal">
+                            	<div class="form-group">
+									<label class="col-sm-2 control-label"><span class="VINs" style="color: red;">*</span>商户名称</label>
+									<div class="col-sm-8">
+										<input id="merchantNo" type="text" readonly placeholder="请选择商户名" name="merchantNo" class="form-control merchModel easyui-validatebox" required="required" onclick="showMenuModel(); return false;"/>	                 
+	                                </div>
+								</div>
+							
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"><span class="VINs" style="color: red;">*</span>品牌:</label>
+                                    <div class="col-sm-3">
+                                        <input type="text" name="carBrand" id='carBrand' class="form-control easyui-validatebox" required="required"/>
+                                    </div>
+                                    <label class="col-sm-2 control-label"><span class="VINs" style="color: red;">*</span>型号及配置:</label>
+                                    <div class="col-sm-3">
+                                        <input type="text" name="carDetail" id='carDetail' class="form-control easyui-validatebox" required="required" />
+                                    </div>
+                                </div>  
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"><span class="VINs" style="color: red;">*</span>车辆类型:</label>
+                                    <div class="col-sm-3">
+                                    	<select id="carType" name="carType" class="form-control easyui-validatebox" required="required">
+								    	    <option value=''>请选择</option>
+								    	    <option value='1'>二手车</option>
+								    	    <option value='2'>新车</option>
+									    </select>
+                                    </div>
+                                    <label class="col-sm-2 control-label"><span class="VINs plateVINs" style="color: red;">*</span>车牌号:</label>
+                                    <div class="col-sm-3">
+                                        <input type="text"  name="plate" id='plate' class="form-control easyui-validatebox" required="required" maxlength='16'/>
+                                    </div>
+                                </div> 
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"><span class="VINs" style="color: red;">*</span>车架号:</label>
+                                    <div class="col-sm-3">
+                                        <input type="text"  name="carNo" id='carNo' class="form-control easyui-validatebox" required="required" maxlength='32'/>
+                                    </div>
+                                    <label class="col-sm-2 control-label"><span class="VINs" style="color: red;">*</span>发动机号:</label>
+                                    <div class="col-sm-3">
+                                        <input type="text" id="engine"  name="engine" class="form-control easyui-validatebox" required="required" maxlength='32'/>
+                                    </div>
+                                </div>   
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"><span class="VINs" style="color: red;">*</span>初次登记日期:</label>
+                                    <div class="col-sm-3">
+                                    	<input id="registDate" name="registDate" size="16" type="text" class="form-control easyui-validatebox" required="required" style="width: 100%;">
+                                    </div>
+                                    <label class="col-sm-2 control-label"><span class="VINs registAddVINs" style="color: red;">*</span>上牌所在地:</label>
+                                    <div class="col-sm-3">
+                                        <input type="text" name="registAdd" id='registAdd' class="form-control easyui-validatebox" required="required"/>
+                                    </div>
+                                </div> 
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"><span class="VINs" style="color: red;">*</span>公里数:</label>
+                                    <div class="col-sm-3">
+                                        <input type="text" name="mileage" id='mileage'  class="form-control easyui-validatebox" required="required"/>
+                                    </div>
+                                </div>
+                            
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">备注:</label>
+                                    <div class="col-sm-8">
+                                        <textarea name="remark" id='remark' class="form-control"></textarea>
+                                    </div>
+                                </div>                                                          
+                            </form>
+	      			</div>		      		
+		      		<div class="modal-footer">
+				        <button id="btn-save" type="button" class="btn btn-success ">保存</button>
+				        <button id="btn-close" type="button" class="btn btn-default ">关闭</button>		        
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+		<div id="menuContent" class="menuContent" style="max-height:500px;overflow:scroll;display:none; position: absolute;background:#fff;border:1px solid #ccc;">
+	        <ul id="treeDemo" class="ztree" style="margin-top:0; width:180px;"></ul>
+        </div>
+        <div id="menuContentModel" class="menuContent" style="max-height:500px;overflow:scroll;display:none; position: absolute;background:#fff;border:1px solid #ccc;">
+	        <ul id="treeDemoModel" class="ztree" style="margin-top:0;"></ul>
+        </div>
+	</body>
+</html>

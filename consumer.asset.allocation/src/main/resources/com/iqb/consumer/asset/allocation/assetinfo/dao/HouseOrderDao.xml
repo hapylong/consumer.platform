@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iqb.consumer.asset.allocation.assetinfo.dao.HouseOrderDao" >
+
+	<!-- 获取资产推送信息  -->
+	<select id="selectHouseOrderByParams" resultType="com.iqb.consumer.asset.allocation.assetinfo.bean.HouseOrderBean">
+		SELECT
+            A.PLAN_ID AS planId,
+            A.USER_CODE AS userId,
+            A.ORDER_NO AS orderNo,
+            A.MOBILE,
+            A.PROJECT_NAME AS projectName,
+            A.APPLY_TERM AS applyTerm,
+            A.HOUSE_ID AS houseId,
+            A.BUSINESS_TYPE AS bizType,
+            A.WFSTATUS,
+            A.USER_NAME AS userName,
+            A.ID_CARD AS idNo,
+            A.RESERVE_MOBILE AS reserveMobile,
+            A.BANK_CARD AS bankCard,
+            A.BANK_NAME AS bankName,
+            A.CHANNEL_CODE as channelCode,
+            A.BUSINESS_SUBTYPE as subBizType,
+            B.SOURCESFUNDING as source,
+            B.id as projectId,
+            B.APPLYAMT,
+            (SELECT UNIX_TIMESTAMP(B.CREATETIME)) AS checkTime,
+            (SELECT UNIX_TIMESTAMP(B.deadline)) AS deadline,
+            C.id as merchantId,
+            E.CREDITOR_NAME AS creditorName,
+            E.CREDITOR_ID_NO  AS creditorIdNo,
+            E.CREDITOR_BANK_NO AS creditorBankNo,
+            E.CREDITOR_BANK_NAME AS creditorBankName,
+            E.CREDITOR_PHONE AS creditorPhone,
+            E.GUARANTEE_CORPORATION_NAME AS guaranteeCorporationName,
+            F.CORPORATE_NAME AS guaranteeCorporationCorName
+        FROM
+            eatep_house_order A
+        LEFT JOIN cf_requestmoney B ON A.ORDER_NO = B.ORDERID
+        LEFT JOIN inst_merchantinfo C ON A.CHANNEL_CODE = C.MERCHANTNO
+        LEFT JOIN iqb_sys_dict_item D ON A.BUSINESS_TYPE = D.DICT_CODE and D.DICT_TYPE_CODE='business_type'
+        LEFT JOIN iqb_customer_store_info E ON C.ID = E.CUSTOMER_CODE
+        LEFT JOIN IQB_CUSTOMER_BASE_INFO F ON F.CUSTOMER_CODE = E.CUSTOMER_CODE 
+		WHERE
+			A.ORDER_NO = #{orderNo}
+			<![CDATA[ 
+				and  NOT EXISTS(SELECT 1 FROM cf_requestmoney WHERE B.ORDERID=ORDERID AND B.id<id)
+			]]>
+			limit 1
+	</select>
+
+	<!-- 更新房贷订单资产分配信息  -->
+	<update id="updateHouseOrderByOrderNo" parameterType="java.util.Map">
+		UPDATE eatep_house_order SET ALLOT_AMT = IFNULL(ALLOT_AMT,0)  + #{allotAmt} WHERE ORDER_NO = #{orderNo};
+	</update>
+</mapper>

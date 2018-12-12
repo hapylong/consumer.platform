@@ -1,0 +1,27 @@
+#datagrid td{
+   white-space:nowrap;
+}
+#datagrid th{
+   white-space:nowrap;
+}
+.scrollbar
+{
+	width: 65px;
+	background: #fff;
+}
+.scrollbar::-webkit-scrollbar-track
+{
+	border-radius: 10px;
+}
+.scrollbar::-webkit-scrollbar
+{
+	height:10px;
+	width: 6px;
+	background-color: #F5F5F5;
+}
+.scrollbar::-webkit-scrollbar-thumb
+{
+	height:10px;
+	border-radius: 3px;
+	background-color: #AAAAAA;
+}

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+	Apache License, Version 2.0 (the "License"); you may not use this file except 
+	in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.merchant.MerchantKeypairDao">
+
+	<resultMap id="merchantKeypair" type="com.iqb.consumer.data.layer.bean.merchant.MerchantKeypair">
+		<result property="id" column="id" />
+		<result property="merchantNo" column="merchantNo" />
+		<result property="publicKey" column="publicKey" />
+		<result property="privateKey" column="privateKey" />
+		<result property="whiteList" column="whiteList" />
+		<result property="version" column="version" />
+		<result property="createTime" column="createTime" />
+		<result property="updateTime" column="updateTime" />
+	</resultMap>
+
+	<sql id="cols">
+		id,merchantNo, publicKey, privateKey,whiteList, version,createTime, updateTime
+	</sql>
+	<!-- 新增商户密钥对 -->
+	<insert id="addKeyPair" parameterType="com.iqb.consumer.data.layer.bean.merchant.MerchantKeypair"
+		keyProperty="id" useGeneratedKeys="true">
+		INSERT INTO 
+		  inst_merchantkeypair 
+		  (
+			  merchantNo, publicKey, privateKey, whiteList,
+			  version, createTime, updateTime
+		  ) 
+		VALUES 
+		  (
+		  #{merchantNo}, #{publicKey}, #{privateKey}, #{whiteList},
+		  #{version}, #{createTime}, #{updateTime}
+		  )
+	</insert>
+	
+	<!-- 查询商户密钥对 -->
+	<select id="queryKeyPair" parameterType="String" resultMap="merchantKeypair">
+		SELECT <include refid="cols"></include> FROM inst_merchantkeypair WHERE merchantNo = #{merchantNo} LIMIT 1;
+	</select>
+	
+	<select id="getKeyPairList" resultMap="merchantKeypair">
+        SELECT 
+            a.id, a.publickey, a.privatekey,a.whitelist , b.merchantshortname as merchantno
+        FROM 
+            inst_merchantkeypair a
+        LEFT JOIN
+            inst_merchantinfo b
+        ON
+            a.merchantno = b.merchantno
+        <where>
+        <if test="merList != null and merList.size() > 0">
+            AND a.merchantno in
+            <foreach item="item" index="index" collection="merList" open="("
+                separator="," close=")">
+                #{item.merchantNo}
+            </foreach>
+        </if>
+        </where>
+    </select>
+    
+    <update id="updateKeyPair" parameterType="com.iqb.consumer.data.layer.bean.merchant.MerchantKeypair" >
+        UPDATE
+            inst_merchantkeypair
+        SET
+            publicKey = #{publicKey}, privateKey = #{privateKey}, 
+            updatetime = NOW(), version = #{version}
+        WHERE 
+            merchantNo = #{merchantNo}
+    </update>
+    
+    <update id="updateIpsById" parameterType="Map" >
+        UPDATE
+            inst_merchantkeypair
+        SET
+            whitelist = #{whiteList}
+        WHERE 
+            id = #{id}
+    </update>
+    
+    <select id="getSecurityInfoById" parameterType="Map" resultMap="merchantKeypair">
+        SELECT 
+            * 
+        FROM 
+            inst_merchantkeypair 
+        WHERE 
+            id = #{id}
+    </select>
+</mapper>

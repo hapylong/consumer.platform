@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	    <title>业务模板</title>
+	    <meta charset="UTF-8" />
+	    <meta name="Author" content="" />
+	    <meta name="Keywords" content="" />
+	    <meta name="Description" content="" />
+	    
+	    <!-- 基础CSS库 -->
+	    <link rel="stylesheet" href="../../../js/bootstrap/themes/default/bootstrap.css" />
+	    <link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+	    <link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+	    <link rel="stylesheet" href="../../../css/jquery.select2.css" />
+	    <link rel="stylesheet" href="../../../css/jquery.select2-bootstrap.css" />
+	    
+	    <!-- 业务CSS库 -->
+	    <link rel="stylesheet" href="../../../css/common/base.css" />
+	    <link rel="stylesheet" href="../../../css/common/scrollbar.css" />
+	    
+	    <!-- 基础JS库 -->
+	    <script src="../../../js/common/package.js"></script>
+		<script src="../../../js/common/url.js"></script>
+		<script src="../../../js/common/json2.js"></script>	
+		<script src="../../../js/common/jquery-1.11.3.min.js"></script>		
+		<script src="../../../js/bootstrap/bootstrap.js"></script>
+		<script src="../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+		<script src="../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+		<script src="../../../js/common/jquery.select2.js"></script>
+		<script src="../../../js/common/jquery.form.js"></script>
+		
+		<!-- 业务JS库 -->
+		<script src="../../../js/common/base.js"></script>
+		<script src="../../../js/common/datagrid2.js"></script>
+		<script src="../../../js/common/formatter.js"></script>	    
+	    <script src="../../../js/each/ec/template/biz.js"></script>
+		
+		<!-- 页面样式 -->
+		<style type="text/css">
+			.container-fluid {
+				padding-top: 4px;
+			}
+			.modal-form {
+				margin-top: 5px;
+				margin-left: 0;
+				margin-bottom: 15px;
+				margin-right: 0;
+				max-height: 410px;
+			    overflow-y: scroll;
+			    overflow-x: hidden;
+			}
+			#btn-maintain-insert {
+				margin: 5px;
+			}
+			#maintainForm {
+				margin-top: 15px;
+			}
+		</style>
+	    
+	</head>
+	<body>
+	
+		<div class="container-fluid">
+			<div class="row">				
+				<div class="col-md-12">
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<h4 class="panel-title">查询信息</h4>
+					  	</div>
+					  	<div class="panel-body">	
+					  		<form id="searchForm" class="form-horizontal">
+							  	<div class="form-group">
+							    	<label class="control-label col-lg-1 col-md-1 col-sm-1">业务代码 </label>
+							    	<div class="col-lg-2 col-md-2 col-sm-2">
+							    	    <input name="bizTplCode" type="text" class="form-control input-sm" placeholder="请输入业务代码" />
+							  	    </div>
+							  	    <label class="control-label col-lg-1 col-md-1 col-sm-1">业务名称 </label>
+							  	    <div class="col-lg-2 col-md-2 col-sm-2">
+							  	        <input name="bizTplName" type="text" class="form-control input-sm" placeholder="请输入业务名称 " />
+							  	    </div>
+							  	    <label class="control-label col-lg-1 col-md-1 col-sm-1">业务状态 </label>
+								  	<div class="col-lg-2 col-md-2 col-sm-2">
+								  	    <select name="status" style="width: 100%">
+								    		<option value="" selected>全部 </option>
+										  	<option value="1">启用</option>
+										  	<option value="0">停用</option>
+										</select>
+									</div>
+									<div class="col-lg-3 col-md-3 col-sm-3">
+										<button id="btn-search" type="button" class="btn btn-default btn-sm">查询</button>
+									    <button id="btn-reset" type="button" class="btn btn-default btn-sm">重置</button> 
+							  	    </div>
+							  	</div>
+							</form>		  												 	
+					  	</div>
+					</div>
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<h4 class="panel-title">模板信息</h4>
+					  	</div>
+					  	<div class="panel-body">
+					    	<form id="listForm">					    		
+					    		<button id="btn-insert" type="button" class="btn btn-primary btn-sm">添加业务模板</button>
+					    		<button id="btn-update" type="button" class="btn btn-warning btn-sm">修改业务模板</button>
+					    		<button id="btn-remove" type="button" class="btn btn-danger btn-sm hidden">删除业务模板</button>
+					    		<button id="btn-maintain" type="button" class="btn btn-info btn-sm">合同维护</button>
+					    	</form>
+					  	</div>
+						<table id="datagrid" class="table table-bordered table-hover table-condensed">
+						    <thead>
+						    	<tr>						    		
+							    	<th field="ck" align="text-center" class="text-center"></th>	
+							    	<th field="rn" align="text-center" class="text-center">序号</th>						    	
+							    	<th field="id" idField="true" hidden="true">ID</th>
+							    	<th field="bizTplCode" align="text-center" class="text-center">业务代码</th>
+							    	<th field="bizTplName" align="text-center" class="text-center">业务名称</th>
+							    	<th field="bizType" align="text-center" class="text-center" formatter="IQB.biz.getBizName(val)">业务类型</th>
+							    	<th field="orgCode" hidden="true">机构代码</th>
+							    	<th field="orgName" align="text-center" class="text-center">机构名称</th>								    	
+							    	<th field="isIncludeJunior" align="text-center" class="text-center" formatter="Formatter.isIncludeJunior(val)">下级机构是否可用</th>							    	
+							    	<th field="status" align="text-center" class="text-center" formatter="Formatter.isEnableHtml(val)">业务状态</th>
+							    	<th field="remark" align="text-center" class="text-center">备注</th>
+						    	</tr>
+						    </thead>
+						    <tbody></tbody>
+						</table>
+					  	<div class="panel-footer">
+							<div id="paginator"></div>
+						</div>
+					</div>
+				</div>
+			</div>		 	
+		</div>
+		
+
+		<div id="update-win" class="modal fade" role="dialog" aria-labelledby="update-win-label" aria-describedby="……">
+			<div class="modal-dialog" role="document">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<h5 class="modal-title" id="update-win-label">业务模板</h5>
+		      		</div>
+	      			<div class="modal-form">
+	      				<form id="updateForm" class="form-horizontal">
+							<input name="id" type="text" class="hidden" />	
+							<input id="type" name="type" type="text" class="hidden" value="1" />
+							<div class="form-group">
+				    			<label class="col-sm-3 control-label">业务代码</label>
+				    			<div class="col-sm-8">
+				      				<input name="bizTplCode" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入业务代码" required="required" validType="maxLength[30]" />
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">业务名称</label>
+				    			<div class="col-sm-8">
+				      				<input name="bizTplName" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入业务名称" required="required" validType="maxLength[30]" />
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">业务类型</label>
+				    			<div class="col-sm-8">
+				    				<select id="bizType" name="bizType"></select>
+				    			</div>
+				  			</div>	
+				  				
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">机构名称</label>
+				    			<div class="col-sm-8">
+				    				<select id="orgCode" name="orgCode"></select>
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">下级机构是否可用</label>
+				    			<div class="col-sm-8">
+				    				<select id="isIncludeJunior" name="isIncludeJunior">
+									  <option value="1" selected>可用</option>
+									  <option value="0">不可用</option>
+									</select>
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">业务状态</label>
+				    			<div class="col-sm-8">
+				    				<div>
+				    					<select id="status" name="status">
+										  <option value="1" selected>启用</option>
+										  <option value="0">停用</option>
+										</select>
+				    				</div>				    				
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">备注</label>
+				    			<div class="col-sm-8">
+				      				<textarea name="remark" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入备注" validType="maxLength[100]"></textarea>
+				    			</div>
+				  			</div>				 			
+						</form>
+	      			</div>		      		
+		      		<div class="modal-footer">
+				        <button id="btn-save" type="button" class="btn btn-success btn-sm">保存</button>
+				        <button id="btn-close" type="button" class="btn btn-default btn-sm">关闭</button>		        
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+		
+		
+		
+		<div id="maintain-win" class="modal fade" role="dialog" aria-labelledby="update-win-label" aria-describedby="">
+			<div class="modal-dialog modal-lg" role="document">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<h5 class="modal-title" id="maintain-win-label">合同维护</h5>
+		      		</div>
+	      			<div class="modal-form">
+	      				<button id="btn-maintain-insert" type="button" class="btn btn-success btn-sm maintainDatagrid">添加</button>
+	      				<table id="maintainDatagrid" class="table table-bordered table-hover table-condensed maintainDatagrid">
+						    <thead>
+						    	<tr>						    		
+							    	<th field="ck" hidden="true"></th>	
+							    	<th field="rn" align="text-center" class="text-center">序号</th>						    	
+							    	<th field="id" idField="true" hidden="true">ID</th>
+							    	<th field="bizConfigId" hidden="true">业务模板主键</th>
+							    	<th field="templateId" hidden="true">合同模板主键</th>
+							    	<th field="ecTplCode" align="text-center" class="text-center">合同代码</th>
+							    	<th field="ecTplName" align="text-center" class="text-center">合同名称</th>
+							    	<th field="templateSignSeq" align="text-center" class="text-center">合同权值</th>	
+							    	<th field="operation" align="text-center" class="text-center" formatter="IQB.biz.updateAndRemoveOperation(val, row, rowIndex)">操作</th>						    	
+						    	</tr>
+						    </thead>
+						    <tbody></tbody>
+						</table>
+						<div class="panel-footer hidden">
+							<div id="maintainPaginator"></div>
+						</div>
+						<form id="maintainForm" class="form-horizontal maintainForm">
+							<input name="id" type="text" class="hidden" />
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">合同名称</label>
+				    			<div class="col-sm-8">
+				    				<select id="templateId" name="templateId"></select>
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-sm-3 control-label">合同权值</label>
+				    			<div class="col-sm-8">
+				      				<input name="templateSignSeq" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入合同权值" data-options="required:true, validType:['num', 'maxNum[125]']" />
+				    			</div>
+				  			</div>
+				  			<div class="form-group">
+							    <div class="col-sm-offset-3 col-sm-8">
+							      <button id="btn-maintain-save" type="button" class="btn btn-success btn-sm maintainForm">保存</button>
+							    </div>
+							</div>	
+						</form>
+	      			</div>		      		
+		      		<div class="modal-footer">		      				      			
+				        <button id="btn-maintain-back" type="button" class="btn btn-default btn-sm maintainForm">返回</button>		      			      			
+				        <button id="btn-maintain-close" type="button" class="btn btn-default btn-sm maintainDatagrid">关闭</button>		        
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+		
+			
+	</body>
+</html>

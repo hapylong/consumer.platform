@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	    <title>菜单</title>
+	    <meta charset="UTF-8" />
+	    <meta name="Author" content="" />
+	    <meta name="Keywords" content="" />
+	    <meta name="Description" content="" />
+	    
+	    <!-- 基础CSS库 -->
+	    <link rel="stylesheet" href="../../../../js/bootstrap/themes/default/bootstrap.css" />
+	    <link rel="stylesheet" href="../../../../js/jquery-easyui-1.5/themes/bootstrap/menu.css"/>
+	    <link rel="stylesheet" href="../../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+	    <link rel="stylesheet" href="../../../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+	    <link rel="stylesheet" href="../../../../js/jquery-easyui-1.5/themes/icon.css"/>
+	    <link rel="stylesheet" href="../../../../js/ztree/css/zTreeStyle/zTreeStyle.css"/>
+	    <link rel="stylesheet" href="../../../../css/jquery.select2.css" />
+	    <link rel="stylesheet" href="../../../../css/jquery.select2-bootstrap.css" />
+	    
+	    <!-- 基础CSS库 -->
+	    <link rel="stylesheet" href="../../../../css/common/base.css" />
+	    <link rel="stylesheet" href="../../../../css/common/scrollbar.css" />
+	    
+	    <!-- 基础JS库 -->
+	    <script src="../../../../js/common/package.js"></script>
+		<script src="../../../../js/common/url.js"></script>
+		<script src="../../../../js/common/json2.js"></script>	
+		<script src="../../../../js/common/jquery-1.11.3.min.js"></script>		
+		<script src="../../../../js/bootstrap/bootstrap.js"></script>
+		<script src="../../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+		<script src="../../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+		<script src="../../../../js/ztree/js/jquery.ztree.all.min.js"></script>
+		<script src="../../../../js/common/jquery.select2.js"></script>
+		
+		<!-- 业务JS库 -->
+		<script src="../../../../js/common/base.js"></script>
+		<script src="../../../../js/common/datagrid.js"></script>
+		<script src="../../../../js/common/tree.js"></script>
+		<script src="../../../../js/common/formatter.js"></script>	    
+	    <script src="../../../../js/each/etep/sys/sysmenu/sysmenu.js"></script>
+		
+		<!-- 页面样式 -->
+		<style type="text/css">
+			.container-fluid {
+				padding-top: 4px;
+			}
+			.left-panel {
+				height: calc(100% - 3px);
+			}
+			.left-panel-body {
+				height: calc(100% - 39px);
+			}
+			.scroll-div {
+				overflow: scroll;
+			}
+		</style>
+	    
+	</head>
+	<body>
+	
+		<div class="container-fluid height-fill-100">
+			<div class="row height-fill-100">
+				<div class="col-md-2 height-fill-100">
+					<div class="panel panel-success left-panel">
+						<div class="panel-heading">
+							<h3 class="panel-title">菜单树</h3>
+					  	</div>
+					  	<div class="panel-body left-panel-body scroll-div">
+					  		<ul id="tree" class="ztree"></ul>
+					  	</div>					
+					</div>
+				</div>
+				<div class="col-md-10 height-fill-100">					
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<h3 class="panel-title">菜单信息</h3>
+					  	</div>
+					  	<div class="panel-body">
+					    	<form id="listForm">					    		
+					    		<button id="btn-insert" type="button" class="btn btn-primary btn-sm hidden">添加下级菜单</button>
+					    		<button id="btn-remove" type="button" class="btn btn-danger btn-sm hidden">删除菜单</button>
+					    	</form>
+					  	</div>
+						<form id="updateForm" class="form-horizontal">
+							<input id="update-id" name="id" type="text" class="hidden" />	
+							<input id="update-parentId" name="parentId" type="text" class="hidden" value="-1" />	
+				  			<div class="form-group">
+				    			<label class="col-md-1 control-label">菜单名称</label>
+				    			<div class="col-md-4">
+				      				<input name="menuName" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入菜单名称" required="required" validType="maxLength[20]" />
+				    			</div>
+				    			<label class="col-md-1 control-label">菜单描述</label>
+				    			<div class="col-md-4">
+				      				<input name="menuDescription" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入菜单描述" validType="maxLength[20]" />
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-md-1 control-label">菜单编码</label>
+				    			<div class="col-md-4">
+				      				<input name="menuCode" type="text" class="form-control input-sm" disabled placeholder="请输入菜单编码" />
+				    			</div>
+				    			<label class="col-md-1 control-label">菜单等级</label>
+				    			<div class="col-md-4">
+				      				<input name="menuLevel" type="text" class="form-control input-sm" disabled placeholder="请输入菜单等级" />
+				    			</div>
+				  			</div>			
+				  			<div class="form-group">
+				    			<label class="col-md-1 control-label">菜单顺序</label>
+				    			<div class="col-md-4">
+				      				<input name="sequence" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入菜单顺序" data-options="required:true,validType:['num','maxNum[127]']" />
+				    			</div>
+				    			<label class="col-md-1 control-label">菜单类型</label>
+				    			<div class="col-md-4">
+				    				<select id="menuType" name="menuType" style="width: 100%;">
+									  <option value="1" selected>目录</option>
+									  <option value="2">页面</option>
+									</select>
+				    			</div>
+				  			</div>		
+				  						  			
+				  			<div class="form-group">
+				  				<label class="col-md-1 control-label">菜单URL</label>
+				    			<div class="col-md-4">
+				      				<input name="menuUrl" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入菜单URL" data-options="validType:['url','maxLength[100]']" />
+				    			</div>
+				    			<label class="col-md-1 control-label">上级菜单</label>
+				    			<div class="col-md-4">
+				      				<input id="parentMenuName" name="parentMenuName" type="text" class="form-control input-sm" disabled placeholder="请输入上级菜单" />
+				    			</div>				    		
+				  			</div>		
+				  			<div class="form-group">				  		
+				    			<label class="col-md-1 control-label">备注</label>
+				    			<div class="col-md-9">
+				      				<textarea name="remark" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入备注" validType="maxLength[50]"></textarea>
+				    			</div>
+				  			</div>				  			
+						</form>
+					  	<div id="update-win" class="panel-footer">
+							<button id="btn-save" type="button" class="btn btn-success btn-sm">保存</button>
+						</div>
+					</div>
+				</div>
+			</div>		 	
+		</div>
+		
+		<div id="menu" class="easyui-menu" style="width:120px;">			
+		    <div id="men-insert" iconCls="icon-add">添加下级菜单</div>
+		    <div id="men-cancel" iconCls="icon-add">添加一级菜单</div>
+		    <div id="men-remove" iconCls="icon-remove">删除菜单</div>    		
+		</div>
+			
+			
+	</body>
+</html>

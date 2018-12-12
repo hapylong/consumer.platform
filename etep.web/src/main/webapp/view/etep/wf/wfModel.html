@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>部门</title>
+<meta charset="UTF-8" />
+<meta name="Author" content="" />
+<meta name="Keywords" content="" />
+<meta name="Description" content="" />
+
+<link rel="stylesheet"
+	href="../../../js/bootstrap/themes/default/bootstrap.css" />
+<link rel="stylesheet"
+	href="../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+<link rel="stylesheet"
+	href="../../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+<link rel="stylesheet" href="../../../css/jquery.select2.css" />
+<link rel="stylesheet"
+	href="../../../css/jquery.select2-bootstrap.css" />
+
+<script src="../../../js/common/package.js"></script>
+<script src="../../../js/common/url.js"></script>
+<script src="../../../js/common/jquery-1.11.3.min.js"></script>
+<script src="../../../js/bootstrap/bootstrap.js"></script>
+<script src="../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+<script src="../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+<script src="../../../js/common/jquery.select2.js"></script>
+<script src="../../../js/common/json2.js"></script>
+<script src="../../../js/common/base.js"></script>
+<script src="../../../js/common/datagrid.js"></script>
+<script src="../../../js/each/etep/wf/wfModel.js"></script>
+<script src="../../../js/common/formatter.js"></script>
+<script src="../../../js/common/wflow.js"></script>
+<style type="text/css">
+body {
+	background: #eee url("../../../img/back.png") repeat;
+}
+
+.container-fluid {
+	padding: 5px;
+}
+</style>
+</head>
+<body>
+	<div class="container-fluid">
+		<div class="col-md-12">
+			<div class="panel panel-info">
+				<div class="panel-heading">
+					<h3 class="panel-title">查询栏</h3>
+				</div>
+				<div class="panel-body">
+					<form id="searchForm" class="form-horizontal">
+						<div class="form-group">
+							<label class="control-label col-lg-1 col-md-1 col-sm-1">模型KEY:</label>
+						    <div class="col-lg-2 col-md-2 col-sm-2">
+						        <input type="text" name="key" class="form-control" placeholder="模型ID">
+						    </div>
+						    <label class="control-label col-lg-1 col-md-1 col-sm-1">模型名称:</label>
+						    <div class="col-lg-2 col-md-2 col-sm-2">
+						        <input type="text" name="name" class="form-control" placeholder="请输入名称">
+						    </div>
+						    <div class="col-lg-3 col-md-3 col-sm-3">
+							    <button id="btn-search" type="button" class="btn btn-default btn-sm">查询</button>
+								<button id="btn-reset" type="button" class="btn btn-default btn-sm">重置</button>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+			<div class="panel panel-info">
+				<div class="panel-heading">
+					<h3 class="panel-title">数据表格</h3>
+				</div>
+				<div class="panel-body">
+					<form id="listForm">
+						<button id="insert-model-btn" type="button"
+							class="btn btn-primary btn-sm">新增(A)</button>
+						<button id="update-model-btn" type="button"
+							class="btn btn-primary btn-sm">编辑(M)</button>
+						<button id="del-model-btn" type="button"
+							class="btn btn-primary btn-sm">删除(D)</button>
+						<button id="deploy-model-btn" type="button"
+							class="btn btn-danger btn-sm">发布(P)</button>
+					</form>
+				</div>
+				<table class="table table-bordered table-hover datagrid">
+					<thead>
+						<tr>
+							<th field="ck"></th>
+							<th field="rn">序号</th>
+							<th field="id" hidden="true">ID</th>
+							<th field="key">模型KEY</th>
+							<th field="name">模型名称</th>
+							<th field="version">版本号</th>
+							<th field="createTime" formatter=WF.time(val)>创建时间</th>
+							<th field="lastUpdateTime" formatter=WF.time(val)>更新时间</th>
+							<th field="metaInfo" hidden="true">元数据</th>
+							<th field="export"  hidden="true" formatter=WF.exportxml(val,row)>导出xml</th>
+						</tr>
+					</thead>
+					<tbody></tbody>
+				</table>
+				<div class="panel-footer">
+					<div id="paginator"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	</div>
+	
+	<a id="btn-export" href="javascript:void(0);" class='hidden'></a>
+	
+	<div id="insert-model-win" class="modal fade" tabindex="-1"
+		role="dialog" aria-labelledby="insert-win-label"
+		aria-describedby="添加或修改信息对话框">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="insert-win-label">对话框</h5>
+				</div>
+				<div class="modal-body">
+					<form id="insertModelForm" class="form-horizontal">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">模型KEY：</label>
+							<div class="col-sm-9">
+								<input name="procDefId" type="text" class="form-control"
+									placeholder="请输入模型KEY">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">模型名称：</label>
+							<div class="col-sm-9">
+								<input name="procDefName" type="text" class="form-control"
+									placeholder="请输入模型名称">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">流程摘要：</label>
+							<div class="col-sm-9">
+								<input name="procBizMemo" type="text" class="form-control"
+									placeholder="请输入流程摘要">
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button id="insert-model-save" type="button"
+						class="btn btn-success btn-sm">保存</button>
+					<button id="insert-model-close" type="button"
+						class="btn btn-default btn-sm">关闭</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div id="update-win" class="modal fade" tabindex="-1" role="dialog"
+		aria-labelledby="update-win-label" aria-describedby="添加或修改信息对话框">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="update-win-label">对话框</h5>
+				</div>
+				<div class="modal-body">
+					<form id="updateForm" class="form-horizontal">
+						<input name="id" type="text" class="hidden" />
+						<div class="form-group">
+							<label class="col-sm-3 control-label">全称</label>
+							<div class="col-sm-9">
+								<input name="deptName" type="text" class="form-control"
+									placeholder="请输入全称">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">简称</label>
+							<div class="col-sm-9">
+								<input name="deptShortName" type="text" class="form-control"
+									placeholder="请输入简称">
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button id="btn-save" type="button" class="btn btn-success btn-sm">保存</button>
+					<button id="btn-close" type="button" class="btn btn-default btn-sm">关闭</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
+
+
+

@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+	Apache License, Version 2.0 (the "License"); you may not use this file except 
+	in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.batch.dao.SettleApplyBeanDao">
+
+	<!-- 配置映射字段 -->
+	<resultMap type="com.iqb.consumer.batch.data.pojo.SettleApplyBean"
+		id="settleApplyBean">
+		<result property="id"                 column="id" />
+		<result property="orderId"            column="orderId" />
+		<result property="userId"             column="userId" />
+		<result property="overdueAmt"         column="overdueAmt" />
+		<result property="cutOverdueAmt"      column="cutOverdueAmt" />
+		<result property="finalOverdueAmt"    column="finalOverdueAmt" />
+		
+		<result property="cutOverdueRemark"   column="cutOverdueRemark" />
+		<result property="payAmt"             column="payAmt" />
+		<result property="payPrincipal"       column="payPrincipal" />
+		<result property="surplusPrincipal"   column="surplusPrincipal" />
+		<result property="margin"             column="margin" />
+		
+		<result property="feeAmount"          column="feeAmount" />
+		<result property="settleStatus"       column="settleStatus" />
+		<result property="refundAmt"          column="refundAmt" />
+		<result property="refundMargin"       column="refundMargin" />
+		<result property="shouldRepayAmt"     column="shouldRepayAmt" />
+		
+		<result property="totalRepayAmt"      column="totalRepayAmt" />
+		<result property="receiveAmt"         column="receiveAmt" />
+		<result property="amtStatus"          column="amtStatus" />
+		<result property="hiddenFee"          column="hiddenFee" />
+		<result property="curItems"           column="curItems" />
+		
+		<result property="reason"             column="reason" />
+		<result property="remark"             column="remark" />
+		<result property="expiryDate"         column="expiryDate" />
+		<result property="procInstId"         column="procInstId" />
+		<result property="payMethod"          column="payMethod" />
+		
+		
+		<result property="totalOverdueInterest"   column="totalOverdueInterest" />
+		<result property="remainInterest"         column="remainInterest" />
+		<result property="realName"           column="realName" />
+		<result property="orderItems"         column="orderItems" />
+		<result property="monthInterest"      column="monthInterest" /><!-- 月供 --> 
+		
+		
+		<result property="cutOverdueFlag"     column="cutOverdueFlag" />
+		<result property="monthPrincipal"     column="monthPrincipal" />
+		<result property="orderAmt"           column="orderAmt" />
+        <result property="merchantName"       column="merchantName" />
+	</resultMap>
+	<update id="updateSettleBean" parameterType="com.iqb.consumer.batch.data.pojo.SettleApplyBean">
+        UPDATE 
+        inst_settleapply
+        <set>
+            <if test="overdueAmt != null and overdueAmt != '' ">
+                overdueAmt = #{overdueAmt},
+            </if>
+            <if test="cutOverdueAmt != null and cutOverdueAmt != '' ">
+                cutOverdueAmt = #{cutOverdueAmt},
+            </if>
+            <if test="finalOverdueAmt != null and finalOverdueAmt != '' ">
+                finalOverdueAmt = #{finalOverdueAmt},
+            </if>
+            <if test="cutOverdueRemark != null and cutOverdueRemark != '' ">
+                cutOverdueRemark = #{cutOverdueRemark},
+            </if>
+            <if test="payAmt != null and payAmt != '' ">
+                payAmt = #{payAmt},
+            </if>
+            <if test="payPrincipal != null and payPrincipal != '' ">
+                payPrincipal = #{payPrincipal},
+            </if>
+            <if test="surplusPrincipal != null and surplusPrincipal != '' ">
+                surplusPrincipal = #{surplusPrincipal},
+            </if>
+            <if test="margin != null and margin != '' ">
+                margin = #{margin},
+            </if>
+            <if test="feeAmount != null and feeAmount != '' ">
+                feeAmount = #{feeAmount},
+            </if>
+             <if test="settleStatus != null ">
+                settleStatus = #{settleStatus},
+            </if>
+             <if test="refundAmt != null and refundAmt != '' ">
+                refundAmt = #{refundAmt},
+            </if>
+            <if test="refundMargin != null and refundMargin != '' ">
+                refundMargin = #{refundMargin},
+            </if>
+             <if test="shouldRepayAmt != null and shouldRepayAmt != '' ">
+                shouldRepayAmt = #{shouldRepayAmt},
+            </if>
+             <if test="totalRepayAmt != null and totalRepayAmt != '' ">
+                totalRepayAmt = #{totalRepayAmt},
+            </if>
+            <if test="receiveAmt != null and receiveAmt != '' ">
+                receiveAmt = #{receiveAmt},
+            </if>
+             <if test="amtStatus != null and amtStatus != '' ">
+                amtStatus = #{amtStatus},
+            </if>
+            <if test="hiddenFee != null and hiddenFee != '' ">
+                hiddenFee = #{hiddenFee},
+            </if>
+            <if test="curItems != null">
+                curItems = #{curItems},
+            </if>
+            <if test="reason != null and reason != '' ">
+                reason = #{reason},
+            </if>
+            <if test="remark != null and remark != '' ">
+                REMARK = #{remark},
+            </if>
+            <if test="expiryDate != null and expiryDate != '' ">
+                expiryDate = #{expiryDate},
+            </if>
+            <if test="procInstId != null and procInstId != '' ">
+                procInstId = #{procInstId},
+            </if>
+            <if test="payMethod != null and payMethod != '' ">
+                payMethod = #{payMethod},
+            </if>
+            <if test="totalOverdueInterest != null and totalOverdueInterest != '' ">
+                totalOverdueInterest = #{totalOverdueInterest},
+            </if>
+            <if test="remainInterest != null and remainInterest != '' ">
+                remainInterest = #{remainInterest},
+            </if>
+            <if test="cutOverdueFlag != null and cutOverdueFlag != '' ">
+                cutOverdueFlag = #{cutOverdueFlag},
+            </if>
+            <if test="monthPrincipal != null and monthPrincipal != '' ">
+                monthPrincipal = #{monthPrincipal},
+            </if>
+            UPDATETIME = NOW()
+        </set>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+    <!-- 提前还款代偿查询接口 -->
+    <select id="selectPrepaymentList" parameterType="com.alibaba.fastjson.JSONObject"  resultMap="settleApplyBean">
+		 SELECT * from inst_settleapply WHERE settleStatus = 1
+    </select>
+</mapper>

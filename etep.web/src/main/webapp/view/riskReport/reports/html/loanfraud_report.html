@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>贷前反欺诈报告</title>
+<meta charset="UTF-8" />
+<meta name="Author" content="" />
+<meta name="Keywords" content="" />
+<meta name="Description" content="" />
+<link rel="stylesheet" href="../../common/css/bootstrap.min.css">
+<link rel="stylesheet" href="../../common/css/font-awesome.min.css">
+<link rel="stylesheet" href="../../common/css/ui.jqgrid-bootstrap.css">
+<link rel="stylesheet" href="../../common/css/metroStyle.css">
+<link rel="stylesheet" href="../../common/css/main.css">
+<script src="../../../../js/common/url.js"></script>
+<script src="../../common/js/jquery.min.js"></script>
+<script src="../../common/js/layer.js"></script>
+<script src="../../common/js/bootstrap.min.js"></script>
+<script src="../../common/js/vue.min.js"></script>
+<script src="../../common/js/vue-validator.min.js"></script>
+<script src="../../common/js/grid.locale-cn.js"></script>
+<script src="../../common/js/jquery.jqGrid.min.js"></script>
+<script src="../../common/js/jquery.ztree.all.min.js"></script>
+<script src="../../common/js/common.js"></script>
+<script src="../../common/js/formatter.js"></script>
+<script src="../../common/js/base.js"></script>
+<script src="../../common/js/jquery-ui.custom.min.js"></script>
+<script src="../../common/js/jquery-ui-1.10.4.min.js"></script>
+<script src="../../common/js/jquery.multi-select.js"></script>
+<link rel="stylesheet" href="../../common/css/multi-select.css">
+<script src="../../common/js/jquery-barcode.js"></script>
+<script src="../js/loanfraud_report.js"></script>  
+<script>
+var pay_custom_feedback_success_code = '000000';
+</script>     
+<style>
+.title{
+	color:#000000;
+	text-align: center;
+}
+.title h1{
+	font-weight: bold;
+}
+.infoNum{
+	float: left;
+    margin-top: 3%;
+}
+.bcTarget{
+	float: left;
+    margin-top: 2%;
+}
+.searchTime{
+	float: left;
+    margin-top: 3%;
+    margin-left: 15%;
+}
+.answerTime{
+	margin-left: 15%;
+    display: inline-flex;
+    padding-top: 3%;
+}
+.qrCode{
+	float: right;
+    width: 3%;
+    margin-top: 2%;
+}
+.qrCode img{
+	width:100%;
+	height:100%;
+}
+hr{
+    border-top: 1px solid #000000;
+    margin-top: 1%;
+}
+.infoMajor{
+	overflow: hidden;
+	padding-top: 33px;
+    padding-bottom: 33px;
+    display:none;
+}
+.infoMajorL{
+	float:left;
+	display:none;
+}
+.damageImg{
+	float: left;
+    width: 21px;
+    position: relative;
+    top: 3px
+}
+.damageImg img{
+	width:100%;
+	height:100%;
+}
+.damageTitle span{
+	font-size: 18px;
+    font-weight: bold;
+    margin-left: 18px;
+    position: relative;
+    top: 3px;
+}
+.detailText{
+	margin-top: 21px;
+}
+.detailText p{
+	margin-left: 39px;
+    font-size: 15px;
+}
+.detailImg{
+	width: 15px;
+    display: inline-block;
+    margin-left: 12px;
+    position: relative;
+    top: -3px;
+}
+.detailImg img{
+	width:100%;
+	height:100%;
+}
+.infoMajorR{
+	float:right;
+	margin-right: 201px;
+	display:none;
+}
+.infoMajorRImg{
+	width: 180px;
+}
+.infoMajorRImg img{
+	width:100%;
+	height:100%;
+}
+.score{
+	font-size: 21px;
+    font-weight: bold;
+    margin-top: 12px;
+    margin-left: 12px;
+}
+.status{
+	font-size: 13px;
+    color: #929292;
+    margin-top: -12px;
+    margin-left: 12px;
+}
+.list-group-item{
+	background-color: #98a1b3;
+	color: white;
+}
+.list-group-item1{
+	position: relative;
+    display: block;
+    padding: 10px 15px;
+    margin-bottom: -1px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+}
+.form-control{
+	display: block;
+    width: 100%;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #999999;
+    border: 0px;
+    background-color: #fff;
+    webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,0);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,0);
+}
+#td-property{
+	line-height: 33px;
+	background-color: #f2f3f5;
+}
+td span{
+    margin-left: 13px;
+    line-height: 34px;
+    color: #999999;
+}
+.infoDetail{
+	float: right;
+    color: #448aca;
+    margin-right: 27px;
+    margin-top: 15px;
+    border-bottom: 1px solid;
+    cursor: pointer;
+    padding-bottom: 12px;
+    line-height: 0px;
+}
+.w13{
+	width:13%;
+}
+</style>
+</head>
+<body style='padding:50px;'>
+<!-- 报告标题 -->
+<div class="title">
+	<h1>贷前反欺诈报告</h1>
+</div>
+<!-- 报告号段 -->
+<div class="infoCode">
+	<div class="infoNum">
+		<span>报表编号 :</span>
+	</div>
+	<div class="bcTarget"></div>
+	<div class="searchTime">
+		<span>查询时间 :</span>
+		<span id="createTime"></span>
+	</div>
+	<div class="answerTime">
+		<span>报告时间 :</span>
+		<span id="updateTime"></span>
+	</div>
+<!-- 	<div class="qrCode">
+		<img src="${rc.contextPath}/statics/img/qrCode.png"/>
+	</div> -->
+	<hr>
+</div>
+<!-- 信息摘要 -->
+<div class="infoMajor">
+	<div class="infoMajorL">
+		<div class="infoMajorLBox">
+			<div class="damageImg">
+				<img src="../../common/img/damage.png"/>
+			</div>
+			<div class="damageTitle">
+				<span>风险摘要</span>
+			</div>
+		</div>
+		<div class="detailText">
+			<p>风险分数：<span id="final_score"></span></p>
+			<p>风险等级：<span id="final_decision_level"></span></p>
+			<p>风险建议：<span id="final_decision"></span></p>
+		</div>
+	</div>
+	<div class="infoMajorR">
+		<div class="infoMajorRImg">
+			<img src="../../common/img/infoScore.png"/>
+		</div>
+		<p class="score">暂未评分</p>
+		<p class="status">您的风险分析结果尚不明确</p>
+	</div>
+</div>
+<form id="userForm" action="" method="post" runat="server"> 
+<!-- 借款人基本信息 -->
+  <table class="table table-bordered personal" style="display:none">
+  	<li class="list-group-item personal" style="display:none">借款人基本信息</li>
+    <tbody>   	
+      	<tr>
+        	<td id="td-property">类型</td>
+        	<td id="td-property">姓名</td>
+        	<td id="td-property">身份证号</td>
+        	<td id="td-property">手机号</td>
+        	<td id="td-property">银行卡号</td>
+        	<td id="td-property">社会关系</td>
+      	</tr> 
+      	<tr>
+        	<td>借款人</td>
+        	<td><span id="name"></span></td>
+        	<td><span id="idNo"></span></td>
+        	<td><span id="phone"></span></td>
+        	<td><span id="bankCard"></span></td>
+        	<td><span id=""></span></td>
+      	</tr> 
+      	<tr id="contact1" style="display:none">
+        	<td>紧急联系人1</td>
+        	<td><span id="contact1Name"></span></td>
+        	<td><span id="contact1IdNumber"></span></td>
+        	<td><span id="contact1Mobile"></span></td>
+        	<td><span id=""></span></td>
+        	<td><span id="contact1Relation"></span></td>
+      	</tr> 
+      	<tr id="contact2" style="display:none">
+        	<td>紧急联系人2</td>
+        	<td><span id="contact2Name"></span></td>
+        	<td><span id="contact2IdNumber"></span></td>
+        	<td><span id="contact2Mobile"></span></td>
+        	<td><span id=""></span></td>
+        	<td><span id="contact2Relation"></span></td>
+      	</tr>
+      	<tr id="contact3" style="display:none">
+        	<td>紧急联系人3</td>
+        	<td><span id="contact3Name"></span></td>
+        	<td><span id="contact3IdNumber"></span></td>
+        	<td><span id="contact3Mobile"></span></td>
+        	<td><span id=""></span></td>
+        	<td><span id="contact3Relation"></span></td>
+      	</tr>
+      	<tr id="contact4" style="display:none">
+        	<td>紧急联系人4</td>
+        	<td><span id="contact4Name"></span></td>
+        	<td><span id="contact4IdNumber"></span></td>
+        	<td><span id="contact4Mobile"></span></td>
+        	<td><span id=""></span></td>
+        	<td><span id="contact4Relation"></span></td>
+      	</tr>
+      	<tr id="contact5" style="display:none">
+        	<td>紧急联系人1</td>
+        	<td><span id="contact5Name"></span></td>
+        	<td><span id="contact5IdNumber"></span></td>
+        	<td><span id="contact5Mobile"></span></td>
+        	<td><span id=""></span></td>
+        	<td><span id="contact5Relation"></span></td>
+      	</tr>
+    </tbody>
+  </table>
+<!-- 借款人基本信息空 --> 
+  <table class="table table-bordered personalNull" style="display:none">
+  	<li class="list-group-item personalNull" style="display:none">借款人基本信息 </li>
+  		<tbody class="personalNull">
+      		<tr>
+      			<td id="td-property" style="width: 262px;line-height: 66px;text-align: center;vertical-align: middle;">借款人基本信息</td>
+      			<td style="line-height: 66px;text-align: center;vertical-align: middle;">未查到相关数据</td>
+     	 	</tr>
+    	</tbody>
+  </table>
+<!-- 群体风险检测 --> 
+  <table class="table table-bordered" style="margin-bottom:0px;display:none">
+  <li class="list-group-item" style="display:none">群体风险检测 </li>
+  	<tbody>
+      	<tr>
+      		<td id="td-property" rowspan="7" style="width:262px;text-align: center;vertical-align: middle;">xx规则</td>
+      	</tr>
+      	<tr>
+        	<td id="td-property">匹配类型</td>
+        	<td><span id=""></span></td>
+        	<td id="td-property">匹配值</td>
+        	<td><span id=""></span></td>
+        	<td id="td-property">疑似风险群体成员数</td>
+        	<td><span id=""></span></td>
+      	</tr> 
+      	<tr>
+        	<td id="td-property">风险名单成员数</td>
+        	<td><span id=""></span></td>
+        	<td id="td-property">关注名单成员数</td>
+        	<td><span id=""></span></td>
+        	<td id="td-property">核心节点距离</td>
+        	<td><span id=""></span></td>
+      	</tr> 
+      	<tr>
+        	<td id="td-property">风险名单占比</td>
+        	<td><span id=""></span></td>
+        	<td id="td-property">关注名单占比</td>
+        	<td><span id=""></span></td>
+        	<td id="td-property">风险节点距离</td>
+        	<td><span id=""></span></td>
+      	</tr> 
+      	<tr>
+        	<td id="td-property">风险名单分布</td>
+        	<td><span id=""></span></td></td>
+        	<td id="td-property">成员分布</td>
+        	<td colspan="3"><span id=""></span></td>
+      	</tr> 
+      	<tr>
+        	<td id="td-property">一度关联节点个数</td>
+        	<td><span id=""></span></td>
+        	<td id="td-property">一度风险名单个数</td>
+        	<td><span id=""></span></td>
+        	<td id="td-property">一度风险名单分布</td>
+        	<td><span id=""></span></td>
+      	</tr> 
+      	<tr>
+        	<td id="td-property">二度关联节点个数</td>
+        	<td><span id=""></span></td>
+        	<td id="td-property">二度风险名单个数</td>
+        	<td><span id=""></span></td>
+        	<td id="td-property">二度风险名单分布</td>
+        	<td><span id=""></span></td>
+      	</tr> 
+    </tbody>
+  </table>
+<!-- 司法风险检测 --> 
+<!-- 身份证命中法院失信名单 --> 
+  <table class="table table-bordered courtMiss" style="margin-bottom:0px;display:none">
+  <li class="list-group-item courtMiss1" style="display:none">司法风险检测 </li>
+  	<tbody id="courtMissBox">
+      	<tr>
+      		<td id="td-property" rowspan="1200" style="width:262px;text-align: center;vertical-align: middle;" class="courtMissBoxTitle"></td>
+      	</tr>
+    </tbody>
+  </table>
+<!-- 身份证命中法院执行名单 --> 
+  <table class="table table-bordered courtDone" style="margin-bottom:0px;display:none">
+  	<tbody id="courtDoneBox">
+      	<tr>
+      		<td id="td-property" rowspan="1200" style="width:262px;text-align: center;vertical-align: middle;" class="courtDoneBoxTitle"></td>
+      	</tr>
+    </tbody>
+  </table>
+<!-- 身份证命中法院结案名单 --> 
+  <table class="table table-bordered courtFin" style="display:none">
+  	<tbody id="courtFinBox">
+      	<tr>
+      		<td id="td-property" rowspan="1200" style="width:262px;text-align: center;vertical-align: middle;" class="courtFinBoxTitle"></td>
+      	</tr>
+    </tbody>
+  </table>
+<!-- 司法风险检测空 --> 
+  <table class="table table-bordered courtMissNull" style="display:none">
+  	<li class="list-group-item courtMissNull" style="display:none">司法风险检测 </li>
+  		<tbody class="courtMissNull">
+      		<tr>
+      			<td id="td-property" style="width: 262px;line-height: 66px;text-align: center;vertical-align: middle;">司法风险检测</td>
+      			<td style="line-height: 66px;text-align: center;vertical-align: middle;">未查到相关数据</td>
+     	 	</tr>
+    	</tbody>
+  </table>
+<!-- 历史违约风险检测 -->
+  <table class="table table-bordered courtHis" style="display:none">
+  	<li class="list-group-item courtHis" style="display:none">历史违约风险检测</li>
+    <tbody id="courtHisBox">   	
+      	<tr>
+        	<td id="td-property">风险规则</td>
+        	<td id="td-property">匹配类型</td>
+        	<td id="td-property">风险类型</td>
+        	<td id="td-property">风险详细描述</td>
+      	</tr> 
+    </tbody>
+  </table>
+<!-- 历史违约风险检测空 -->
+  <table class="table table-bordered courtHisNull" style="display:none">
+  	<li class="list-group-item courtHisNull" style="display:none">历史违约风险检测</li>
+    <tbody class="courtHisNull">   	
+      	<tr>
+      		<td id="td-property" style="width: 262px;line-height: 66px;text-align: center;vertical-align: middle;">历史违约风险检测</td>
+      		<td style="line-height: 66px;text-align: center;vertical-align: middle;">未查到相关数据</td>
+     	 </tr>
+    </tbody>
+  </table>
+<!-- 关注名单风险检测 -->
+  <table class="table table-bordered greyDetail" style="display:none">
+  	<li class="list-group-item greyDetail" style="display:none">关注名单风险检测 </li>
+    <tbody id="greyDetailBox">   	
+      	<tr>
+        	<td id="td-property">风险规则</td>
+        	<td id="td-property">匹配类型</td>
+        	<td id="td-property">匹配值</td>
+        	<td id="td-property">风险等级</td>
+        	<td id="td-property">风险类型</td>
+        	<td id="td-property">时间</td>
+      	</tr>  
+    </tbody>
+  </table>
+<!-- 关注名单风险检测空 -->
+  <table class="table table-bordered greyDetailNull" style="display:none">
+  	<li class="list-group-item greyDetailNull" style="display:none">关注名单风险检测 </li>
+    <tbody class="greyDetailNull">   	
+      	<tr>
+      		<td id="td-property" style="width: 262px;line-height: 66px;text-align: center;vertical-align: middle;">关注名单风险检测</td>
+      		<td style="line-height: 66px;text-align: center;vertical-align: middle;">未查到相关数据</td>
+     	 </tr>
+    </tbody>
+  </table>
+<!-- 模糊证据库风险检测 -->
+  <table class="table table-bordered fuzzyBox" style="display:none">
+  	<li class="list-group-item fuzzyBox" style="display:none">模糊证据库风险检测 </li>
+    <tbody id="fuzzyBox">   	
+      	<tr>
+        	<td id="td-property">风险规则</td>
+        	<td id="td-property">模糊匹配姓名</td>
+        	<td id="td-property">模糊匹配身份证</td>
+        	<td id="td-property">风险类型</td>
+      	</tr>  
+    </tbody>
+  </table>
+<!-- 模糊证据库风险检测空 -->
+  <table class="table table-bordered fuzzyBoxNull" style="display:none">
+  	<li class="list-group-item fuzzyBoxNull" style="display:none">模糊证据库风险检测 </li>
+    <tbody calss="fuzzyBoxNull">   	
+      	<tr>
+      		<td id="td-property" style="width: 262px;line-height: 66px;text-align: center;vertical-align: middle;">模糊证据库风险检测</td>
+      		<td style="line-height: 66px;text-align: center;vertical-align: middle;">未查到相关数据</td>
+     	 </tr> 
+    </tbody>
+  </table>
+<!-- 信贷逾期风险检测 -->
+  <table class="table table-bordered discreditBox" style="display:none">
+  	<li class="list-group-item discreditBox" style="display:none">信贷逾期风险检测</li>
+    <tbody id="discreditBox">   	
+      	<tr>
+        	<td id="td-property">风险规则</td>
+        	<td id="td-property">信贷逾期次数</td>
+        	<td id="td-property">信贷金额区间</td>
+        	<td id="td-property">逾期笔数</td>
+        	<td id="td-property">逾期时间区间</td>
+        	<td id="td-property">逾期入库时间</td>
+      	</tr>  
+    </tbody>
+  </table>
+<!-- 信贷逾期风险检测空 -->
+  <table class="table table-bordered discreditBoxNull" style="display:none">
+  	<li class="list-group-item discreditBoxNull" style="display:none">信贷逾期风险检测</li>
+    <tbody class="discreditBoxNull">   	
+      	<tr>
+      		<td id="td-property" style="width: 262px;line-height: 66px;text-align: center;vertical-align: middle;">信贷逾期风险检测</td>
+      		<td style="line-height: 66px;text-align: center;vertical-align: middle;">未查到相关数据</td>
+     	 </tr>
+    </tbody>
+  </table>
+<!-- 频度风险检测 -->
+  <table class="table table-bordered frequencyBox" style="display:none">
+  	<li class="list-group-item frequencyBox" style="display:none">频度风险检测 </li>
+    <tbody id="frequencyBox">   	
+      	<tr>
+        	<td id="td-property">风险规则</td>
+        	<td id="td-property">风险信息摘要</td>
+        	<td id="td-property">风险详情</td>
+      	</tr>  
+    </tbody>
+  </table>
+<!-- 频度风险检测空 -->
+  <table class="table table-bordered frequencyBoxNull" style="display:none">
+  	<li class="list-group-item frequencyBoxNull" style="display:none">频度风险检测 </li>
+    <tbody class="frequencyBoxNull">   	
+      	<tr>
+      		<td id="td-property" style="width: 262px;line-height: 66px;text-align: center;vertical-align: middle;">频度风险检测</td>
+      		<td style="line-height: 66px;text-align: center;vertical-align: middle;">未查到相关数据</td>
+     	 </tr>
+    </tbody>
+  </table>
+<!-- 跨事件频度风险检测 -->
+  <table class="table table-bordered crossFrequencyBox" style="display:none">
+  	<li class="list-group-item crossFrequencyBox" style="display:none">跨事件频度风险检测 </li>
+    <tbody id="crossFrequencyBox">   	
+      	<tr>
+        	<td id="td-property">风险规则</td>
+        	<td id="td-property">风险信息摘要</td>
+        	<td id="td-property">风险详情</td>
+      	</tr>  
+    </tbody>
+  </table>
+<!-- 跨事件频度风险检测空 -->
+  <table class="table table-bordered crossFrequencyBoxNull" style="display:none">
+  	<li class="list-group-item crossFrequencyBoxNull" style="display:none">跨事件频度风险检测</li>
+    <tbody class="crossFrequencyBoxNull">   	
+      	<tr>
+      		<td id="td-property" style="width: 262px;line-height: 66px;text-align: center;vertical-align: middle;">跨事件频度风险检测</td>
+      		<td style="line-height: 66px;text-align: center;vertical-align: middle;">未查到相关数据</td>
+     	 </tr>
+    </tbody>
+  </table>
+<!-- 多平台风险检测 -->
+  <table class="table table-bordered platformBox" style="display:none">
+  	<li class="list-group-item platformBox" style="display:none">多平台风险检测 </li>
+    <tbody id="platformBox">   	
+      	<tr>
+        	<td id="td-property" style="width:12%;text-align: center;vertical-align: middle;">风险规则</td>
+        	<td id="td-property" style="width:12%;text-align: center;vertical-align: middle;">关联平台个数</td>
+        	<td id="td-property">分行业多平台统计</td>
+        	<td id="td-property" style="width:12%;text-align: center;vertical-align: middle;">维度名称</td>
+        	<td id="td-property" style="width:12%;text-align: center;vertical-align: middle;">个数</td>
+        	<td id="td-property">多维度分行业多平台统计</td>
+      	</tr>  
+    </tbody>
+  </table>
+<!-- 多平台风险检测空 -->
+  <table class="table table-bordered platformBoxNull" style="display:none">
+  	<li class="list-group-item platformBoxNull" style="display:none">多平台风险检测 </li>
+    <tbody class="platformBoxNull">   	
+      	<tr>
+      		<td id="td-property" style="width: 262px;line-height: 66px;text-align: center;vertical-align: middle;">多平台风险检测</td>
+      		<td style="line-height: 66px;text-align: center;vertical-align: middle;">未查到相关数据</td>
+     	 </tr>
+    </tbody>
+  </table>
+<!-- 自定义风险检测 -->
+  <table class="table table-bordered customBox" style="display:none">
+  	<li class="list-group-item customBox" style="display:none">自定义风险检测 </li>
+    <tbody id="customBox">   	
+      	<tr>
+        	<td id="td-property">风险规则</td>
+        	<td id="td-property">高风险区域</td>
+        	<td id="td-property">列表数据</td>
+      	</tr>  
+    </tbody>
+  </table>
+<!-- 自定义风险检测空 -->
+  <table class="table table-bordered customBoxNull" style="display:none">
+  	<li class="list-group-item customBoxNull" style="display:none">自定义风险检测 </li>
+    <tbody class="customBoxNull">   	
+      	<tr>
+      		<td id="td-property" style="width: 262px;line-height: 66px;text-align: center;vertical-align: middle;">自定义风险检测</td>
+      		<td style="line-height: 66px;text-align: center;vertical-align: middle;">未查到相关数据</td>
+     	 </tr>
+    </tbody>
+  </table>
+<!-- 位置及设备信息检测 -->
+  <table class="table table-bordered device" style="display:none">
+  	<li class="list-group-item device" style="display:none">位置及设备信息检测 </li>
+    <tbody class="device">   	
+      	<tr>
+        	<td id="td-property" rowspan="3" style="width:262px;text-align: center;vertical-align: middle;">归属地</td>
+      	</tr>  
+      	<tr>
+        	<td id="td-property">身份证所属地</td>
+        	<td><span id="id_card_address"></span></td>
+        	<td id="td-property">手机所属地</td>
+        	<td><span id="mobile_address"></span></td>
+        	<td id="td-property">银行卡所属地</td>
+        	<td><span id="bank_card_address"></span></td>
+      	</tr> 
+      	<!-- <tr>
+        	<td id="td-property">IP所属地</td>
+        	<td><span id="true_ip_address"></span></td>
+        	<td id="td-property">WIFI所属地</td>
+        	<td><span id="wifi_address"></span></td>
+        	<td id="td-property">基站所属地</td>
+        	<td><span id="cell_address"></span></td>
+      	</tr> 	
+      	<tr>
+      		<td id="td-property" style="width:262px;text-align: center;vertical-align: middle;">IP代理信息</td>
+        	<td id="td-property">互联网服务提供商</td>
+        	<td><span id="isp"></span></td>
+        	<td id="td-property">经度</td>
+        	<td><span id="longitude"></span></td>
+        	<td id="td-property">纬度</td>
+        	<td><span id="latitude"></span></td>
+      	</tr>
+      	<tr>
+      		<td id="td-property" style="width:262px;text-align: center;vertical-align: middle;">真实IP信息</td>
+        	<td id="td-property">互联网服务提供商</td>
+        	<td><span id="isp1"></span></td>
+        	<td id="td-property">经度</td>
+        	<td><span id="longitude1"></span></td>
+        	<td id="td-property">纬度</td>
+        	<td><span id="latitude1"></span></td>
+      	</tr>  
+      	<tr>
+        	<td id="td-property" rowspan="4" style="width:262px;text-align: center;vertical-align: middle;">设备解析</td>
+      	</tr>  
+      	<tr>
+        	<td id="td-property">设备ID</td>
+        	<td><span id="deviceId"></span></td>
+        	<td id="td-property">设备智能ID</td>
+        	<td><span id="smartId"></span></td>
+        	<td id="td-property">客户真实IP</td>
+        	<td><span id="trueIp"></span></td>
+      	</tr> 
+      	<tr>
+        	<td id="td-property">设备类型</td>
+        	<td><span id="appOs"></span></td>
+        	<td id="td-property">设备操作系统</td>
+        	<td><span id="os"></span></td>
+        	<td id="td-property">屏幕分辨率</td>
+        	<td><span id="screen"></span></td>
+      	</tr> 
+      	<tr>
+        	<td id="td-property">浏览器</td>
+        	<td><span id="browserType"></span></td>
+        	<td id="td-property">浏览器版本</td>
+        	<td colspan=""><span id="browserVersion"></span></td>
+      	</tr>  -->
+    </tbody>
+  </table>
+<!-- 位置及设备信息检测空 -->
+  <table class="table table-bordered deviceNull" style="display:none">
+  	<li class="list-group-item deviceNull" style="display:none">位置及设备信息检测 </li>
+    <tbody clas="deviceNull">   
+    	<tr>
+      		<td id="td-property" style="width: 262px;line-height: 66px;text-align: center;vertical-align: middle;">位置及设备信息检测</td>
+      		<td style="line-height: 66px;text-align: center;vertical-align: middle;">未查到相关数据</td>
+     	 </tr>	
+    </tbody>
+  </table>
+  <div class="tips">
+  	<h3 style="font-weight: bold;">报告说明：</h3>
+  	<p>1、本报告信息均由用户或与我司合作的数据服务机构提供，我司不保证其真实性和准确性，但承诺在数据汇总、加工、整合的全过程中保持客观、中立的地位。</p>
+  	<p>2、本报告中的金额类数据均以人民币计算，除有特别说明外，默认精确到元。</p>
+  	<p>3、如您发现相关信息存在不准确或错误的情况，可联系数据处理机构及经您授权的第三方进行更正或删除。</p>
+  	<p>4、本报告内容涉及个人隐私，查询者应取得客户授权，依法使用，妥善保管，因使用不当造成个人隐私泄露的，我司将不承担相关责任。</p>
+  	<p>5、本报告内容仅供使用者参考，我司不承担据此报告产生的任何法律责任。</p>
+  	<p>6、本报告内容未经我司书面许可，不得擅自复制、摘录、编辑、转载、披露和发表。</p>
+  	<p>7、本报告相关服务由北京中睿致行科技有限公司提供，更多咨询请访问致行科技官方网站www.zxbit.cn查询。</p>
+  </div>
+  <!-- <div style="text-align: center;">
+  	<input type="button" value="返回" class="btn btn-warning" onclick="javascript:history.go(-1);">
+  </div> -->
+</form>	
+</body>
+</html>

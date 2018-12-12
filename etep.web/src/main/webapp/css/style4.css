@@ -1,0 +1,33 @@
+/*通用样式*/
+*{margin:0px;padding:0px;list-style-type:none;text-decoration:none;font-family:寰蒋闆呴粦}
+.wb100{width: 100%}
+.dib{display: inline-block;}
+.pr{position: relative;}
+.pa{position: absolute;}
+/*头部*/
+.header{height: 79%;background-color:#ed6c44;margin: 0 auto;overflow: hidden;}
+.jinfu{width:24%;margin-left: 28%;}
+.backLogin{display: inline-block;float: right;padding: 21px 30px 26px 19px; border-left: 1px solid#fdb6a0; }
+.logo{	width: 170px; padding: 26px 20px;margin-left: 15px;border-right: 1px solid#fdb6a0;}
+.admin{font-size:24px;margin:0 5px;color:#fff;}
+.fly{width:50px;}
+/*弹窗样式*/
+.tanchuang{height: 6%;right: 0px;width: 9%;background-color:#ed6c44;display:none;}
+.out{left: 20%;top: 18%;font-size: 21px;color: white;}
+.exit{right: -26%;top: 18%;}
+/*背景样式*/
+.bg{width:90%;}
+/*左侧树样式*/
+.left-tree{width: 100%;height:96%;background-color:#5e75c3;float:left;}
+.tree i{float: left;margin-left: 6%;margin-top: 12%;}
+.er i{float: left;margin-left: 12%;margin-top: 14%;}
+.tree{width:100%;background:#4c4743;float:left;}
+.tree li{border-bottom: 2px solid#524c48;}
+.tree li a{text-align:center;padding:15%;color:#ffb230;display:block;cursor:pointer;font-size:18px;}
+.er{display:none;}
+.er li{width:100%;border-bottom: 1px solid #5e75c3;}
+.er li a{display:block;padding:12%;color:#ffb230;background:#3e3a37;font-size: 17px;}
+.thr{display:none;}
+.thr li{width:100%;border-bottom: 2px solid#524c48;}
+.thr li a{text-align:left;display:block;padding: 9%;color:#ffb230;background: #3b342f;font-size: 16px;}
+

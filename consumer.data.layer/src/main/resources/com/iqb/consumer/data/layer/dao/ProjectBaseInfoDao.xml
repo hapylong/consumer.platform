@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+	Apache License, Version 2.0 (the "License"); you may not use this file except 
+	in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.ProjectBaseInfoDao">
+
+	<!-- 用户返回信息映射 -->
+	<resultMap
+		type="com.iqb.consumer.data.layer.bean.project.ProjectBaseInfoBean"
+		id="projectBaseInfoBean">
+		<result property="id" column="id" />
+		<result property="projectName" column="projectName" />
+		<result property="projectInfo" column="projectInfo" />
+		<result property="status" column="status" />
+		<result property="merchantNo" column="merchantNo" />
+		<result property="version" column="version" />
+		<result property="createTime" column="createTime" />
+		<result property="updateTime" column="updateTime" />
+	</resultMap>
+
+	<sql id="table">inst_projectbaseinfo</sql>
+
+	<!-- 用户表中的字段 -->
+	<sql id="cols">
+		id,projectName,projectInfo,status,merchantNo,version,createTime,updateTime
+	</sql>
+
+	<!-- 车配置信息操作 -->
+	<!-- 新增车系 -->
+	<insert id="insertProBaseInfo"
+		parameterType="com.iqb.consumer.data.layer.bean.project.ProjectBaseInfoBean"
+		keyProperty="id" useGeneratedKeys="true">
+		INSERT INTO
+		<include refid="table" />
+		(projectName, projectInfo, status, merchantNo, version, createTime)
+		VALUES
+		(#{projectName}, #{projectInfo}, #{status} , #{merchantNo},
+		#{version}, NOW());
+	</insert>
+
+	<!-- 修改基础车系 -->
+	<update id="updateProBaseInfo"
+		parameterType="com.iqb.consumer.data.layer.bean.project.ProjectBaseInfoBean">
+		UPDATE
+		<include refid="table" />
+		SET
+		<if test="projectName !=null and projectName != '' ">projectName = #{projectName}</if>
+		<if test="projectInfo !=null and projectInfo != '' ">,projectInfo = #{projectInfo}</if>
+		<if test="status !=null and status != '' ">,status = #{status}</if>
+		WHERE id=#{id}
+	</update>
+
+	<!-- 查询指定车详细信息 -->
+	<select id="getProBaseInfoById" parameterType="Long"
+		resultMap="projectBaseInfoBean">
+		SELECT
+		<include refid="cols" />
+		FROM
+		<include refid="table" />
+		WHERE id=#{id}
+	</select>
+
+	<!-- 根据商户列表、品牌查询车系 -->
+	<select id="getProBaseInfoByMerNos" parameterType="java.util.Map"
+		resultMap="projectBaseInfoBean">
+		SELECT * from
+		<include refid="table" />
+		WHERE 1=1
+		<if test="merList != null and merList.size() > 0">
+			AND MERCHANTNO IN
+			<foreach item="item" index="index" collection="merList" open="("
+				separator="," close=")">
+				#{item.merchantNo}
+			</foreach>
+		</if>
+		<if test="projectName !=null and projectName != ''">
+			AND projectName = #{projectName}
+		</if>
+		ORDER BY merchantNo, projectName
+	</select>
+
+	<!-- 删除车系 -->
+	<delete id="delProBaseInfoByID" parameterType="Long">
+		DELETE from
+		<include refid="table" />
+		WHERE ID=#{id}
+	</delete>
+</mapper>

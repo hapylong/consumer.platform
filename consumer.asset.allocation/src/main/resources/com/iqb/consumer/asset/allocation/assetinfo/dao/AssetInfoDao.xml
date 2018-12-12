@@ -1,0 +1,445 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iqb.consumer.asset.allocation.assetinfo.dao.AssetInfoDao" >
+
+    <!-- 获取资产信息列表  -->
+    <select id="getAssetInfoList" parameterType="java.util.Map" resultType="com.iqb.consumer.asset.allocation.assetinfo.bean.AssetInfoBean">
+        SELECT 
+          io.orderId,
+          io.orderName AS proName,
+          im.MERCHANTFULLNAME AS orgName,
+          iu.realName AS borrower,
+          io.orderId AS orderNo,
+          io.orderAmt,
+          ip.PLANFULLNAME AS productPlan,
+          io.createTime AS orderDate,
+          io.orderItems AS orderItems,
+          (
+            orderItems - IFNULL(
+              (SELECT 
+                SUM(APPLYITEMS) 
+              FROM
+                CF_REQUESTMONEY R 
+              WHERE R.ORDERID = io.orderId 
+                AND R.STATUS = 1),
+              0
+            )
+          ) AS surplusItems,
+          io.riskStatus 
+        FROM
+          inst_orderinfo io 
+          LEFT JOIN inst_user iu 
+            ON io.userId = iu.id 
+          LEFT JOIN inst_merchantinfo im 
+            ON io.merchantNo = im.MERCHANTNO 
+          LEFT JOIN inst_plan ip 
+            ON io.planId = ip.ID 
+        WHERE io.riskStatus = 2 
+        <if test="proName != null and proName != ''" >
+            AND io.orderName LIKE '%${proName}%'
+        </if>
+        <if test="orgName != null and orgName != ''" >
+            AND im.MERCHANTFULLNAME = #{orgName}
+        </if>
+        <if test="orderNo != null and orderNo != ''" >
+            AND io.order_no = #{orderNo}
+        </if>
+        <if test="fundSource != null and fundSource != ''" >
+            AND io.order_no = #{fundSource}
+        </if>
+        <if test="orderItems != null and orderItems != ''" >
+            AND io.order_items = #{orderItems}
+        </if>
+        <if test="queryStartOrderTime != null and queryStartOrderTime != ''" >
+            AND io.order_time &gt; #{queryStartOrderTime}
+        </if>
+        <if test="queryEndOrderTime != null and queryEndOrderTime != ''" >
+            AND io.order_time &lt; #{queryEndOrderTime}
+        </if>
+    </select>
+    
+    <!-- 设置资金来源  -->
+    <insert id="setFundSource" parameterType="com.iqb.consumer.asset.allocation.assetinfo.bean.AssetInfoBean">
+        INSERT INTO IQB_ASSET_ALLOCATION(ORDER_ID, FUND_RESOURCE) VALUES (#{orderId}, #{fundResource})
+    </insert>
+    
+    <!-- 根据订单id获取资产分配信息  -->
+    <select id="getAssetInfoByOrderId" parameterType="string" resultType="com.iqb.consumer.asset.allocation.assetinfo.bean.AssetInfoBean">
+        SELECT ORDER_ID AS orderId, FUND_RESOURCE AS fundResource FROM IQB_ASSET_ALLOCATION WHERE ORDER_ID = #{orderId} limit 1
+    </select>
+    
+    <!-- 更新资产分配信息  -->
+    <update id="updateFundSource" parameterType="com.iqb.consumer.asset.allocation.assetinfo.bean.AssetInfoBean">
+        UPDATE IQB_ASSET_ALLOCATION SET FUND_RESOURCE = #{fundResource} WHERE ORDER_ID = #{orderId};
+    </update>
+
+    <select id="getAssetInfoDetails" parameterType="string" resultType="com.iqb.consumer.asset.allocation.assetinfo.bean.AssetInfoFormBean">
+        SELECT 
+          oi.orderId,
+          ooi.projectname AS orderName,
+          <!-- FINANCE-2816 资产分配列表车主贷订单的“上标金额”实际取的借款金额，应取上标金额 -->
+          IF(oi.bizType='2400',oi.borrowAmt,oi.orderAmt) as orderAmt,
+          oi.orderItems,
+          oi.createTime AS orderTime,
+          oi.margin AS margin,
+          oi.downPayment AS downPayment,
+          oi.preAmt AS preAmount,
+          oi.serviceFee,
+          oi.chargeWay,
+          oi.feeAmount,
+          oi.monthInterest,
+          ooi.GUARANTEE AS guarantee,
+          ooi.GUARANTEENAME AS guaranteeName,
+          <!-- (
+            orderItems - IFNULL(
+              (SELECT 
+                SUM(APPLYITEMS) 
+              FROM
+                CF_REQUESTMONEY R 
+              WHERE R.ORDERID = oi.orderId),
+              0
+            )
+          ) AS LEFTITEMS, -->
+          <!-- 现在剩余期数显示x月x日这样 -->
+            CONCAT(oi.leftInstIMonth,'月',oi.leftInstIDay,'日') AS LEFTITEMS,
+          IFNULL(
+            (SELECT 
+              SUM(APPLYITEMS) 
+            FROM
+              CF_REQUESTMONEY R 
+            WHERE R.ORDERID = oi.orderId),
+            0
+          ) AS APPLYITEMS,
+          im.MERCHANTFULLNAME AS merchName,
+          im.id AS merchantId,
+          im.riskType AS riskType,
+          ip.PLANFULLNAME AS productPlan,
+          u.realName AS realName,
+          u.idNo AS idCard,
+          u.regId AS acctMobile,
+          u.realName AS contacts,
+          u.regId AS merchPhone,
+          <!-- FINANCE-2382 资产分配明细优化 -->
+          cr.creditname AS creditName,
+          cr.creditcardno AS creditCardNo,
+          cr.creditbankcard AS creditBankCard,
+          cr.creditbank AS creditBank,
+          cr.creditphone AS creditPhone,
+          cr.ISWITHHOLDING as isWithholding,
+          cr.ISPUBLIC as isPublic,
+          cr.ISPUSHFF as isPushff,
+          cr.curRepayNo,
+          cr.pushMode 
+        FROM
+          inst_orderinfo oi 
+          LEFT JOIN inst_user u 
+            ON oi.userId = u.id 
+          LEFT JOIN inst_orderotherinfo ooi 
+            ON oi.orderId = ooi.orderId 
+          LEFT JOIN CF_CREDITORINFO c 
+            ON oi.orderId = c.orderid 
+          LEFT JOIN inst_merchantinfo im 
+            ON oi.merchantNo = im.MERCHANTNO 
+          LEFT JOIN inst_plan ip 
+            ON oi.planId = ip.ID 
+          left join cf_requestmoney cr 
+            on oi.orderId = cr.ORDERID  
+        WHERE oi.orderId = #{orderId} ORDER BY cr.id DESC LIMIT 1
+    </select>
+    
+    <select id="getPushAssetInfo" parameterType="java.util.Map" resultType="com.iqb.consumer.asset.allocation.assetinfo.bean.AssetPushInfo">
+        SELECT 
+          cr.id AS projectId,
+          ioo.projectNo AS projectCode,
+          ioo.projectName AS projectName,
+          ioo.guarantee,
+          ioo.guaranteeName,
+          (SELECT UNIX_TIMESTAMP(io.updateTime)) AS checkTime,
+          io.orderId AS orderId,
+          <!-- FINANCE-2816  资产分配列表车主贷订单的“上标金额”实际取的借款金额，应取上标金额 -->
+          IF(io.bizType='2400',io.borrowAmt,cr.APPLYAMT) AS applyAmt,
+          iu.realName AS userName,
+          iu.idNo AS idCard,
+          cr.applyitems AS applyItems,
+          cr.sourcesfunding AS receive,
+          c.creditname AS loanName,
+          c.creditcardno AS loanIdcard,
+          c.creditbankcard AS cardNum,
+          c.creditbank AS bankName,
+          c.creditphone AS phone,
+          (SELECT UNIX_TIMESTAMP(cr.deadline)) AS deadline,
+          mi.id AS merchantNo,
+          io.planId,
+          io.orderName,
+          io.biztype,
+          io.wfStatus,
+          io.riskStatus,
+          io.merchantNo merchantNoS
+        FROM
+          inst_orderinfo io 
+          LEFT JOIN inst_user iu 
+            ON io.userId = iu.id 
+          LEFT JOIN inst_orderotherinfo ioo 
+            ON io.orderId = ioo.orderId 
+          LEFT JOIN CF_REQUESTMONEY cr 
+            ON io.orderId = cr.orderid 
+          LEFT JOIN CF_CREDITORINFO c 
+            ON io.orderId = c.orderid 
+          LEFT JOIN inst_merchantinfo mi 
+            ON io.merchantNo = mi.MERCHANTNO 
+        WHERE cr.status = 0 
+          AND io.orderId = #{orderId} AND cr.id = #{requestId,jdbcType=BIGINT}
+    </select>
+    
+    <insert id="insertAssetPushRecord" parameterType="com.iqb.consumer.asset.allocation.assetinfo.bean.AssetPushRecord"
+    keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO IQB_ASSET_ALLOCATION (
+          PROJECT_ID, PROJECT_CODE, PROJECT_NAME, PUSH_TIME, APPLY_ITEMS, PUSH_STATUS, APPLY_AMT, RECEIVE_TYPE
+        ) 
+        VALUES
+          (#{projectId}, #{projectCode}, #{projectName},#{pushTime}, #{applyItems}, #{pushStatus}, #{applyAmt},#{receiveType})
+    </insert>
+    
+    <update id="updateRequestMoneyByAsset" parameterType="com.iqb.consumer.asset.allocation.assetinfo.bean.AssetPushInfo">
+        UPDATE 
+          CF_REQUESTMONEY 
+        SET
+          STATUS = 1
+          <if test="responseId != null">
+            , PUSHID = #{responseId}
+          </if>
+        WHERE id = #{projectId}
+    </update>
+    <!-- 修改bychengzhen   查询orderInfo中的剩余月数,天数 -->
+    <select id="validataRequesttimes" parameterType="string" resultType="java.util.Map">
+        SELECT 
+          leftInstIMonth as month,leftInstIDay as day
+        FROM
+          inst_orderinfo O 
+        WHERE
+        
+           O.orderId = #{orderId} LIMIT 1
+    </select>
+    
+    <!-- 获取资产推送信息  -->
+    <select id="getAssertInfoForIQB" resultType="map">
+        SELECT 
+          oi.orderId AS 'order_id',
+          oi.orderName AS 'orderName',
+          ooi.projectNo AS 'borrow_code',
+          ooi.projectName AS 'borrow_name',
+          '2200' AS 'borrow_catalog',
+          oi.orderAmt AS 'borrow_money',
+          cr.APPLYITEMS AS 'borrow_duration',
+          '4' AS 'repayment_type',
+          '0' AS 'repayment_day',
+          ooi.guarantee AS 'company_name',
+          icbi.CUSTOMER_SHORT_NAME AS 'simple_name',
+          icbi.REMARK AS 'gr_introduction',
+          ieci.SOCIAL_CREDIT_CODE AS 'certificate',
+          ieci.IC_REG_CODE AS 'reg_id',
+          ieci.ORGANIZATION_CODE AS 'organization_code',
+          ieci.TAX_CERTIFICATE_CODE AS 'tax_id',
+          ieci.LEGAL_PERSON_PHONE_NUM AS 'gr_phone',
+          cr.ISWITHHOLDING AS 'is_withholding',
+          p.SERVICEFEERATIO AS 'platform_charge',
+          cr.ISPUBLIC AS 'is_public',
+          cr.isPushff AS 'is_pushff',
+          UNIX_TIMESTAMP(cr.DEADLINE) as 'real_repayment_date',
+          '1' AS 'borrow_model',
+          cc.creditname AS 'borrow_realname',
+          cc.creditcardno AS 'borrow_idcard',
+          cc.creditPhone AS 'borrow_phone',
+          cc.creditbankcard AS 'borrow_bindcardid',
+          u.realName AS borrow_money_name,
+          u.idNo AS borrow_money_idcard,
+          u.regId AS borrow_money_phone,
+          ple.registDate AS 'buy_time',
+          ple.carNo AS 'vehicle_identification_code',
+          ple.mileage AS 'borrow_kilometres',
+          oi.assessPrice AS 'borrow_referenceprice',
+          ple.isLoan AS 'isFenqi',
+          ple.purpose AS iqb_info,
+          p.RECHARGE AS top_up_rate 
+        FROM
+          inst_orderinfo oi 
+          LEFT JOIN inst_orderotherinfo ooi 
+            ON oi.orderId = ooi.orderId 
+          LEFT JOIN inst_merchantinfo mi 
+            ON oi.merchantNo = mi.MERCHANTNO 
+          LEFT JOIN iqb_enterprise_customer_info ieci 
+            ON mi.id = ieci.CUSTOMER_CODE 
+          LEFT JOIN iqb_customer_base_info icbi 
+            ON mi.id = icbi.CUSTOMER_CODE 
+          LEFT JOIN cf_requestmoney cr 
+            ON oi.orderId = cr.ORDERID 
+          LEFT JOIN CF_CREDITORINFO cc 
+            ON oi.orderId = cc.orderid 
+          LEFT JOIN inst_user u 
+            ON oi.userId = u.id 
+          LEFT JOIN inst_pledgeinfo ple 
+            ON oi.orderId = ple.orderId 
+          LEFT JOIN inst_plan p 
+            ON oi.planId = p.ID 
+        WHERE oi.orderId = #{orderId} LIMIT 1
+    </select>
+    
+    <!-- 根据订单id获取图片列表  -->
+    <select id="getImgList" resultType="com.iqb.consumer.asset.allocation.assetinfo.bean.ImageBean">
+        SELECT 
+            a.ORDERID AS 'orderId',
+            a.IMGTYPE AS 'imgType', 
+            a.IMGNO AS 'imgNo', 
+            a.IMGNAME AS 'imgName',
+            a.IMGPATH AS 'imgPath'
+         FROM CF_IMAGE a 
+        WHERE a.ORDERID = #{orderId} 
+        ORDER BY a.ID
+    </select>
+    
+    <!-- 删除资产分配信息  -->
+    <delete id="deleteReqMoney">
+        DELETE FROM cf_requestmoney WHERE id = (SELECT cf1.id FROM (SELECT MAX(id) AS id FROM cf_requestmoney WHERE ORDERID = #{orderId}) cf1)
+    </delete>
+        <!-- 根据商户号查询担保人部分信息 -->
+    <select id="selectCustomerBaseInfoById" parameterType="string" resultType="java.util.Map">
+        SELECT
+            A.CORPORATE_CERTIFICATE_CODE AS guaranteeIdCard,
+            A.CUSTOMER_BANKNO AS guaCardNum,
+            A.CUSTOMER_BANKNAME AS guaBankName,
+            A.CITY AS guaBankCity,
+            B.SOCIAL_CREDIT_CODE AS socialCreditCode
+        FROM
+            iqb_customer_base_info A
+        LEFT JOIN iqb_enterprise_customer_info B ON A.CUSTOMER_CODE = B.CUSTOMER_CODE
+        WHERE
+            A.CUSTOMER_CODE = #{merchantId}
+            limit 1
+    </select>
+    <!-- 根据订单号获取车牌号车架号 -->
+    <select id="getCarInfoByOrderId" parameterType="string" resultType="java.util.Map">
+        SELECT
+        A.orderId,
+        A.orderName,
+        B.plate,
+        B.carNo
+    FROM
+        inst_orderinfo A
+    LEFT JOIN inst_authoritycard B ON A.orderId = B.orderId
+    WHERE
+        A.orderId = #{orderId}
+    </select>
+        <!-- 根据订单号查询房屋信息 -->
+    <select id="getHouseInfoByOrderNo" parameterType="string" resultType="java.util.Map">
+        SELECT
+            A.address,
+            B.BUSINESS_SUBTYPE as subBizType,
+            A.BUILDING_ACREAGE as area,
+            A.balance,
+            A.HOUSE_ASSESS as houseValuation
+        FROM
+            eatep_house_mortage A
+        LEFT JOIN eatep_house_order B ON A.id = B.house_id
+        WHERE
+            B.ORDER_No = #{houseNo}
+    </select>
+    <!-- 根据订单号查询借款人银行卡信息 -->
+    <select id="selectCardInfoByOrderId" parameterType="java.lang.String" resultType="com.iqb.consumer.asset.allocation.assetinfo.bean.BankCardBean">
+        SELECT
+            B.regId,
+            C.bankCardNo,
+            C.bankMobile,
+            C.bankName,
+            C.bankCode
+        FROM
+         inst_orderinfo A 
+            LEFT JOIN inst_user B on A.userId = B.id
+        LEFT JOIN (SELECT AA.* FROM ( SELECT * FROM inst_bankcard ORDER BY id DESC ) AA GROUP BY AA.userId ) C ON C.userId = B.id
+        WHERE A.orderId = #{orderId} 
+        limit 1
+    </select>
+    <!-- 根据条件查询资产分配标的信息 -->
+    <select id="selectAssetObjectInfo" parameterType="java.util.Map" resultType="com.iqb.consumer.asset.allocation.assetinfo.bean.AssetObjectInfoBean">
+        SELECT
+            A.orderId,
+            E.projectName,
+            D.MERCHANTSHORTNAME AS merchantName,
+            C.realName,
+            C.regId,
+            B.orderAmt,
+            B.orderItems,
+            B.lendersSubject,
+            G.DICT_NAME as lendersSubjectStr,
+            A.applyItems,
+            A.creditName,            
+             DATE_FORMAT(A.CREATETIME,'%Y-%m-%d') as APPLYTIME,
+             DATE_FORMAT(A.APPLYTIME,'%Y-%m-%d') as PLANLENDINGTIME,
+                DATE_FORMAT(A.DEADLINE,'%Y年%m月%d日') as DEADLINE,
+            DATE_FORMAT(date_add(AF.CREATETIME, interval ifnull(B.orderItems,0) MONTH),'%Y年%m月%d日') as assetDueDateStr,
+            A.SOURCESFUNDING,
+            F.DICT_NAME as sourcesFundingStr,
+            A.remark,
+                CONCAT(
+                    B.leftInstIMonth,
+                    '月',
+                    B.leftInstIDay,
+                    '日'
+            ) AS LEFTITEMS,
+            (SELECT max(REAL_NAME) from iqb_sys_user where REAL_NAME is not null and REAL_NAME != '' and ID = A.ALLOT_REGID) as allotRealName,
+            A.pushMode,
+            A.APPLYAMT
+		FROM
+		    cf_requestmoney A 
+		JOIN cf_requestmoney AF on A.ORDERID = AF.ORDERID and AF.ID = 
+             (select ID from cf_requestmoney where ORDERID = A.ORDERID order by CREATETIME limit 1)
+		JOIN inst_orderinfo B ON A.ORDERID = B.orderId
+		LEFT JOIN inst_user C ON B.userId = C.id
+		LEFT JOIN inst_merchantinfo D ON B.merchantNo = D.MERCHANTNO
+		LEFT JOIN inst_orderotherinfo E ON B.orderId = E.orderId 
+		LEFT JOIN iqb_sys_dict_item F ON F.DICT_TYPE_CODE='fund_source' AND F.DICT_VALUE = A.SOURCESFUNDING 
+		LEFT JOIN iqb_sys_dict_item G ON G.DICT_TYPE_CODE='Lenders_Subject ' AND G.DICT_VALUE = B.lendersSubject 
+		where 1=1 
+		<if test="merList !=null and merList.size() != 0">
+            AND D.MERCHANTNO in
+            <foreach item="item" index="index" collection="merList" open="("
+                separator="," close=")">
+                #{item.merchantNo}
+            </foreach>
+        </if>       
+        <if test="projectName != null and projectName != ''">
+            AND E.projectName like CONCAT('%',#{projectName},'%' )
+        </if>        
+        <if test="orderId != null and orderId != ''">
+            AND A.orderId  = #{orderId}
+        </if>        
+        <if test="realName !=null and realName != ''">
+            AND C.realName = #{realName}
+        </if>
+        <if test="regId !=null and regId != ''">
+            AND C.regId = #{regId}
+        </if>
+        <if test="sourcesFunding !=null and sourcesFunding != ''">
+            AND A.SOURCESFUNDING = #{sourcesFunding}
+        </if>        
+        <if test="lendersSubject !=null and lendersSubject != ''">
+            AND B.lendersSubject = #{lendersSubject} 
+        </if> 
+        <if test="startTime !=null and startTime != ''">
+            AND DATE_FORMAT(A.CREATETIME,'%Y-%m-%d') &gt;= #{startTime}
+        </if>
+        <if test="endTime !=null and endTime != ''">
+            AND DATE_FORMAT(A.CREATETIME,'%Y-%m-%d') &lt;= #{endTime}
+        </if>
+        <if test="creditName !=null and creditName !='' ">
+            AND A.creditName = #{creditName}
+        </if>
+        <if test="deadLineStartTime !=null and deadLineStartTime != ''">
+            AND DATE_FORMAT(A.DEADLINE,'%Y-%m-%d') &lt;= #{deadLineStartTime}
+        </if>
+        <if test="assetDueDate !=null and assetDueDate != ''">
+            AND DATE_FORMAT(date_add(AF.CREATETIME, interval ifnull(B.orderItems,0) MONTH),'%Y-%m-%d') &lt;= #{assetDueDate} 
+        </if>
+        order by A.createTime DESC
+    </select>
+    
+</mapper>

@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:p="http://www.springframework.org/schema/p"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	   					   http://www.springframework.org/schema/beans/spring-beans.xsd 
+                           http://www.springframework.org/schema/context 
+                           http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+  
+	<context:property-placeholder location="classpath:/config.properties" />
+	
+	<!-- 配置Redis的配置文件 -->
+	<bean id="JedisPoolConfig_platform_new" class="redis.clients.jedis.JedisPoolConfig">
+		<property name="maxTotal" value="${common.platform.redis.pool.maxTotal}" />
+		<property name="maxIdle" value="${common.platform.redis.pool.maxIdle}" />
+		<property name="minIdle" value="${common.platform.redis.pool.minIdle}" />
+		<property name="testOnBorrow" value="${common.platform.redis.pool.testOnBorrow}" />
+	</bean>
+
+	<bean id="jedisConnFactory_platform0"
+		class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+		<property name="hostName" value="${common.platform.redis.ip}" />
+		<property name="port" value="${common.platform.redis.port}" />
+		<property name="password" value="${common.platform.redis.pwd}" />
+		<property name="database" value="${common.platform.redis.db0}"></property>
+		<property name="poolConfig" ref="JedisPoolConfig_platform_new" />
+	</bean>
+	<bean id="redisTemplate_platform0" class="org.springframework.data.redis.core.RedisTemplate" p:connection-factory-ref="jedisConnFactory_platform0">
+		<property name="keySerializer">
+			<bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+		<property name="valueSerializer">
+			<bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+		<property name="hashKeySerializer">
+			<bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+		<property name="hashValueSerializer">
+			<bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+	</bean>
+	
+	<bean id="jedisConnFactory_platform1"
+		class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+		<property name="hostName" value="${common.platform.redis.ip}" />
+		<property name="port" value="${common.platform.redis.port}" />
+		<property name="password" value="${common.platform.redis.pwd}" />
+		<property name="database" value="${common.platform.redis.db1}"></property>
+		<property name="poolConfig" ref="JedisPoolConfig_platform_new" />
+	</bean>
+	<bean id="redisTemplate_platform1" class="org.springframework.data.redis.core.RedisTemplate" p:connection-factory-ref="jedisConnFactory_platform1">
+		<property name="keySerializer">
+			<bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+		<property name="valueSerializer">
+			<bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+		<property name="hashKeySerializer">
+			<bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+		<property name="hashValueSerializer">
+			<bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+	</bean>
+	
+	<bean id="jedisConnFactory_platform2"
+		class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+		<property name="hostName" value="${common.platform.redis.ip}" />
+		<property name="port" value="${common.platform.redis.port}" />
+		<property name="password" value="${common.platform.redis.pwd}" />
+		<property name="database" value="${common.platform.redis.db2}"></property>
+		<property name="poolConfig" ref="JedisPoolConfig_platform_new" />
+	</bean>
+	<bean id="redisTemplate_platform2" class="org.springframework.data.redis.core.RedisTemplate" p:connection-factory-ref="jedisConnFactory_platform2">
+		<property name="keySerializer">
+			<bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+		<property name="valueSerializer">
+			<bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+		<property name="hashKeySerializer">
+			<bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+		<property name="hashValueSerializer">
+			<bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+	</bean>
+	
+	<bean id="jedisConnFactory_platform3"
+		class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+		<property name="hostName" value="${common.platform.redis.ip}" />
+		<property name="port" value="${common.platform.redis.port}" />
+		<property name="password" value="${common.platform.redis.pwd}" />
+		<property name="database" value="${common.platform.redis.db3}"></property>
+		<property name="poolConfig" ref="JedisPoolConfig_platform_new" />
+	</bean>
+	<bean id="redisTemplate_platform3" class="org.springframework.data.redis.core.RedisTemplate" p:connection-factory-ref="jedisConnFactory_platform3">
+		<property name="keySerializer">
+			<bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+		<property name="valueSerializer">
+			<bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+		<property name="hashKeySerializer">
+			<bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+		<property name="hashValueSerializer">
+			<bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+	</bean>
+	
+	<bean id="jedisConnFactory_platform4"
+		class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+		<property name="hostName" value="${common.platform.redis.ip}" />
+		<property name="port" value="${common.platform.redis.port}" />
+		<property name="password" value="${common.platform.redis.pwd}" />
+		<property name="database" value="${common.platform.redis.db4}"></property>
+		<property name="poolConfig" ref="JedisPoolConfig_platform_new" />
+	</bean>
+	<bean id="redisTemplate_platform4" class="org.springframework.data.redis.core.RedisTemplate" p:connection-factory-ref="jedisConnFactory_platform4">
+		<property name="keySerializer">
+			<bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+		<property name="valueSerializer">
+			<bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+		<property name="hashKeySerializer">
+			<bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+		<property name="hashValueSerializer">
+			<bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+	</bean>
+	
+	<bean id="jedisConnFactory_platform5"
+		class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+		<property name="hostName" value="${common.platform.redis.ip}" />
+		<property name="port" value="${common.platform.redis.port}" />
+		<property name="password" value="${common.platform.redis.pwd}" />
+		<property name="database" value="${common.platform.redis.db5}"></property>
+		<property name="poolConfig" ref="JedisPoolConfig_platform_new" />
+	</bean>
+	<bean id="redisTemplate_platform5" class="org.springframework.data.redis.core.RedisTemplate" p:connection-factory-ref="jedisConnFactory_platform5">
+		<property name="keySerializer">
+			<bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+		<property name="valueSerializer">
+			<bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+		<property name="hashKeySerializer">
+			<bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+		<property name="hashValueSerializer">
+			<bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+	</bean>
+	
+	<bean id="jedisConnFactory_platform6"
+		class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+		<property name="hostName" value="${common.platform.redis.ip}" />
+		<property name="port" value="${common.platform.redis.port}" />
+		<property name="password" value="${common.platform.redis.pwd}" />
+		<property name="database" value="${common.platform.redis.db6}"></property>
+		<property name="poolConfig" ref="JedisPoolConfig_platform_new" />
+	</bean>
+	<bean id="redisTemplate_platform6" class="org.springframework.data.redis.core.RedisTemplate" p:connection-factory-ref="jedisConnFactory_platform6">
+		<property name="keySerializer">
+			<bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+		<property name="valueSerializer">
+			<bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+		<property name="hashKeySerializer">
+			<bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+		<property name="hashValueSerializer">
+			<bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+	</bean>
+</beans>

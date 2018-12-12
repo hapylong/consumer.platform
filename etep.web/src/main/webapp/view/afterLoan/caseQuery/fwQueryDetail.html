@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	    <title>法务查询</title>
+	    <meta charset="UTF-8" />
+	    <meta name="Author" content="" />
+	    <meta name="Keywords" content="" />
+	    <meta name="Description" content="" />
+	    
+	    <!-- 基础CSS库 -->
+	    <link rel="stylesheet" href="../../../js/bootstrap/themes/default/bootstrap.css" />
+	    <link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+	    <link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+	    <link rel="stylesheet" href="../../../css/jquery.select2.css" />
+	    <link rel="stylesheet" href="../../../css/jquery.select2-bootstrap.css" />
+	    <link rel="stylesheet" href="../../../js/prettyphoto/css/prettyPhoto.css" />
+	    <link rel="stylesheet" href="../../../js/viewer/viewer.css" />
+	    
+	    <!-- 业务CSS库 -->
+		<link rel="stylesheet" href="../../../css/common/base.css"/>
+		<link rel="stylesheet" href="../../../css/common/scrollbar.css" />
+		<link rel="stylesheet" href="../../../css/jquery.datetimepicker.css" /> 
+	    
+	    <!-- 基础JS库 -->
+	    <script src="../../../js/common/package.js"></script>
+		<script src="../../../js/common/url.js"></script>
+		<script src="../../../js/common/json2.js"></script>	
+		<script src="../../../js/common/jquery-1.11.3.min.js"></script>
+		<script src="../../../js/common/jquery.form.js"></script>		
+		<script src="../../../js/bootstrap/bootstrap.js"></script>
+		<script src="../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+		<script src="../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+		<script src="../../../js/common/jquery.select2.js"></script>	
+		<script src="../../../js/viewer/viewer.js"></script>
+		<script src="../../../js/bootstrap/prettify/js/prettify.js"></script>
+		<script src="../../../js/bootstrap/prettify/js/mockjax.js"></script>
+		<script src="../../../js/bootstrap/prettify/js/bootstrap-typeahead.js"></script>
+
+		<script src="../../../js/common/jquery.datetimepicker.js"></script>	
+		
+		<!-- 业务JS库 -->
+		<script src="../../../js/common/base.js"></script>
+		<script src="../../../js/common/datagrid2.js"></script>
+		<script src="../../../js/common/formatter.js"></script>	    
+	    <script src="../../../js/each/afterLoan/caseQuery/fwQueryDetail.js"></script>
+	    <script src="../../../js/common/wflow.js"></script>
+		
+		<!-- 页面样式 -->
+		<style type="text/css">
+			.container-fluid {
+				padding-top: 4px;
+			}
+			.text-right {
+				text-align: right;
+			}
+			.text-muted {
+				font-weight: bold;
+			}
+			.text-stress {
+				font-weight: bold;
+			}
+			.list-group-blank {
+				background-color: #f5f5f5;
+			}
+			th {
+				text-align: center;
+			}
+			td {
+				text-align: center;
+			}
+			.modal-form {
+				margin: 15px 0;
+			}
+			.float-left {
+				float: left;
+				margin-right: 8px;
+			}
+			.special-panel {
+				border-top-left-radius: 0 !important;
+			}
+			.nav-tabs {
+				border-bottom: 1px solid #fff;				
+			}
+			h5 {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				-o-text-overflow: ellipsis;
+				-webkit-text-overflow: ellipsis;
+				-moz-text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+		</style>
+		
+	    
+	</head>
+	<body>
+		<div class="container-fluid">	
+		   <ul id="tab" class="nav nav-tabs" role="tablist">
+		  	   <li role="presentation" class="active"><a href="#law-tab" role="tab" data-toggle="tab">法务详情</a></li>
+		   </ul>
+		   <div class="tab-content">
+			<div role="tabpanel" class="tab-pane fade in active" id="law-tab">
+			     <div class="panel panel-default">
+			         <ul class="list-group">
+				    	<li class="list-group-item" style="border-bottom: 1px solid #fff;">
+							<div class="row">				
+								<div class="col-md-1 text-right"><span class="text-stress">机构名称</span></div>
+								<div class="col-md-2"><span id="merchantName" class="text-muted merchantName"></span></div>
+								<div class="col-md-1 text-right"><span class="text-stress">姓名</span></div>
+								<div class="col-md-2"><span id="realName" class="text-muted realName"></span></div>
+								<div class="col-md-1 text-right"><span class="text-stress">手机号</span></div>
+								<div class="col-md-2"><span id="regId" class="text-muted regId"></span></div>
+								<div class="col-md-1 text-right"><span class="text-stress">订单号</span></div>
+								<div class="col-md-2"><span id="orderId" class="text-muted orderId"></span></div>
+							</div>
+						</li>
+						<li class="list-group-item" style="border-top: none;">
+							<div class="row">				
+								<div class="col-md-1 text-right"><span class="text-stress">借款金额</span></div>
+								<div class="col-md-2"><span id="orderAmt" class="text-muted orderAmt"></span></div>
+								<div class="col-md-1 text-right"><span class="text-stress">月供</span></div>
+								<div class="col-md-2"><span id="monthInterest" class="text-muted monthInterest"></span></div>
+								<div class="col-md-1 text-right"><span class="text-stress">总期数</span></div>
+								<div class="col-md-2"><span id="orderItems" class="text-muted orderItems"></span></div>
+								<div class="col-md-1 text-right"><span class="text-stress">已还期数</span></div>
+								<div class="col-md-2"><span id="repayNo" class="text-muted repayNo"></span></div>
+							</div>
+						</li>
+						<li class="list-group-item" style="border-top: none;">
+							<div class="row">				
+								<div class="col-md-1 text-right"><span class="text-stress">案由</span></div>
+				    			<div class="col-sm-8">
+				    			    <textarea id='cause' type="text" class="form-control input-sm" required="required" readonly></textarea>
+				    			</div>
+							</div>
+						</li>
+						<li class="list-group-item" style="border-top: none;">
+							<div class="row">
+							    <div class="col-md-1 text-right"><span class="text-stress">是否为原告</span></div>
+								<div class="col-md-2"><span id="accuser" class="text-muted"></span></div>
+								<div class="col-md-1 text-right"><span class="text-stress">是否准备立案</span></div>
+								<div class="col-md-2"><span id="record" class="text-muted"></span></div>
+								<div class="col-md-1 text-right"><span class="text-stress">到达法务时间</span></div>
+								<div class="col-md-2"><span id="createTime" class="text-muted"></span></div>
+							</div>
+						</li>
+						<li class="list-group-item" style="border-top: none;">
+							<div class="row">	
+							    <div class="col-md-1 text-right"><span class="text-stress">诉讼请求</span></div>			
+				    			<div class="col-sm-8">
+				    			    <textarea id='claims' type="text" class="form-control input-sm" required="required" readonly></textarea>
+				    			</div>
+							</div>
+						</li>
+						<li class="list-group-item" style="border-top: none;">
+							<div class="row">				
+								<div class="col-md-1 text-right"><span class="text-stress">立案方</span></div>
+								<div class="col-md-2"><span id="register" class="text-muted"></span></div>
+								<div class="col-md-1 text-right registerAbout"><span class="text-stress">委托机构</span></div>
+								<div class="col-md-2 registerAbout"><span id="associatedAgency" class="text-muted"></span></div>
+								<div class="col-md-1 text-right registerAbout"><span class="text-stress">委托律师</span></div>
+								<div class="col-md-2 registerAbout"><span id="mandatoryLawyer" class="text-muted"></span></div>
+								<div class="col-md-1 text-right"><span class="text-stress">受理机构</span></div>
+								<div class="col-md-2"><span id="acceptingInstitution" class="text-muted"></span></div>
+								
+							</div>
+						</li>
+						<li class="list-group-item" style="border-top: none;">
+							<div class="row">	
+								<div class="col-md-1 text-right"><span class="text-stress">诉讼费</span></div>
+								<div class="col-md-2"><span id="legalFare" class="text-muted"></span></div>	
+								<div class="col-md-1 text-right"><span class="text-stress">律师费</span></div>
+								<div class="col-md-2"><span id="counselFee" class="text-muted"></span></div>
+								<div class="col-md-1 text-right"><span class="text-stress">立案时间</span></div>
+								<div class="col-md-2"><span id="filingTime" class="text-muted"></span></div>
+								<div class="col-md-1 text-right"><span class="text-stress">案件编号</span></div>
+							    <div class="col-md-2"><span id="caseNo" class="text-muted"></span></div>
+							</div>
+						</li>
+					    <li class="list-group-item" style="border-top: none;">
+							<div class="row">	
+								<div class="col-md-1 text-right"><span class="text-stress">是否庭前调解</span></div>
+								<div class="col-md-2"><span id="mediateFlag" class="text-muted"></span></div>	
+								<div class="col-md-1 text-right reconciliationAbout"><span class="text-stress">是否和解</span></div>
+								<div class="col-md-2 reconciliationAbout"><span id="reconciliationFlag" class="text-muted"></span></div>
+							</div>
+						</li>
+						<form id='updateForm'>
+						    <li class="list-group-item" style="border-top: none;">
+								<div class="row">	
+									<div class="col-md-1 text-right"><span class="text-stress">实际到账时间</span></div>
+									<div class="col-md-2"><span id="arriveDate" class="text-muted"></span></div>	
+									<div class="col-md-1 text-right"><span class="text-stress">实际到账金额</span></div>
+									<div class="col-md-2"><span id="arriveMoney" class="text-muted"></span></div>
+								</div>
+							</li>
+						</form>
+						<div class='reconciliationAbout addOrDelete'>
+	                        <table class="table table-bordered" id='backTable'>
+	                            <tbody>
+	                                <tr>     
+	                                    <td><span class="text-stress">回款时间</span></td>                         
+	                                    <td><span class="text-stress">回款金额</span></td>
+	                                </tr>
+	                            </tbody>
+	                        </table>
+						</div>
+						<li class="list-group-item" style="border-top: none;">
+							<div class="row">				
+								<div class="col-md-1 text-right"><span class="text-stress">调解备注</span></div>
+								<div class="col-md-8">
+								    <textarea class='form-control input-sm easyui-validatebox' id='adjustRemark' readonly></textarea>
+								</div>
+							</div>
+						</li>
+						<li class="list-group-item" style="border-top: none;">
+							<div class="row">				
+								<div class="col-md-1 text-right"><span class="text-stress">立案备注</span></div>
+								<div class="col-md-8">
+								    <textarea class='form-control input-sm easyui-validatebox' id='filingRemark' readonly></textarea>
+								</div>
+							</div>
+						</li>
+						
+						<li class="list-group-item list-group-blank">庭审登记</li>
+						<table id='datagrid4' class="table table-striped table-bordered table-hover table-condensed">
+							    <thead>
+							    	<tr>
+	                                    <th field="rn">序号</th>
+	                                    <th field="createTime" formatter='Formatter.timeCfm2(val)'>操作时间</th>
+	                                    <th field="caseResult">庭审结果</th>
+	                                    <th field="executeFlag" formatter='Formatter.yOrn(val)'>是否执行</th>
+	                                    <th field="courtRemark">庭审登记备注</th>
+										<th field="realName">操作人</th>
+	                                </tr>
+							 </thead>
+							 <tbody></tbody>
+						</table>
+						<div class="panel-footer">
+							<div id="paginator4"></div>
+						</div>
+						<li class="list-group-item list-group-blank">案件执行</li>
+						<table id='datagrid5' class="table table-striped table-bordered table-hover table-condensed">
+							    <thead>
+							    	<tr>
+	                                    <th field="rn">序号</th>
+	                                    <th field="createTimeFormat">操作时间</th>
+	                                    <th field="executeResult" formatter='Formatter.executeResult(val)'>执行结果</th>
+	                                    <th field="executeRemark">执行进度</th>
+										<th field="realName">操作人</th>
+	                                </tr>
+							 </thead>
+							 <tbody></tbody>
+						</table> 
+						<div class="panel-footer">
+							<div id="paginator5"></div>
+						</div>
+						<table class="table table-bordered">
+                            <tbody>
+                                <tr>
+                                    <td><span class="text-stress">判决书</span></td>       
+                                    <td id='td-104'>
+                                       
+                                    </td>                         
+                                </tr>
+                                <tr>
+                                    <td><span class="text-stress">裁定书</span></td>       
+                                    <td id='td-105'>
+                                        
+                                    </td>                         
+                                </tr>
+                                <tr>
+                                    <td><span class="text-stress">其它</span></td>       
+                                    <td id='td-106'>
+                                        
+                                    </td>                         
+                                </tr>
+                            </tbody>
+                        </table>
+					</ul>
+			     </div>
+			</div>
+		</div>
+		<div id="open-win" class="modal fade" role="dialog" aria-labelledby="update-win-label" aria-describedby="……">
+			<div class="modal-dialog" role="document">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<span class="modal-title" id="update-win-label" style='font-weight:600'>账单详情</span>
+		        		<button id="btn-close" type="button" class="btn btn-success btn-sm" style='float:right'>关闭</button>	
+		      		</div>
+	      			<div class="modal-form" style='height:600px;overflow-y:scroll;overflow-x:hidden;'>
+	      				<form id="updateForm" class="form-horizontal">
+				  			<div class="form-group">
+				    			<label class="col-sm-2 control-label" style='text-align:center;'>订单号</label>
+				    			<div class="col-sm-4">
+				    			    <input id='billOrderId' type="text" class="form-control input-sm" readonly/>
+				    			</div>
+				    			<label class="col-sm-2 control-label" style='text-align:center;'>姓名</label>
+				    			<div class="col-sm-4">
+				    			    <input id='billRealName' type="text" class="form-control input-sm" readonly >
+				    			</div>
+				  			</div>
+				  			<table class="table table-bordered forBill">
+							 <thead>
+						    	<tr>
+						    	    <th style='width:60px'>期数</th>
+						    	    <th style='width:120px'>本期应还金额</th>
+						    	    <th style='width:120px'>最迟还款日</th>
+						    	    <th style='width:120px'>实际还款金额</th>
+						    	    <th style='width:60px'>罚息</th>
+						    	    <th style='width:100px'>逾期天数</th>
+						    	    <th style='width:120px'>账单状态</th>
+						    	    <th style='width:100px'>电催结果</th>
+						    	    <th style='width:120px'>处理意见</th>
+						    	    <th style='width:120px'>备注</th>
+						    	</tr>
+						     </thead>
+						     <tbody></tbody>
+							</table>
+						</form>
+	      			</div>		      		
+		    	</div>
+		  	</div>
+		</div>
+	</body>
+</html>

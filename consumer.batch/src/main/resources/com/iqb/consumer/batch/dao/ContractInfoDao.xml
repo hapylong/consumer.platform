@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iqb.consumer.batch.dao.ContractInfoDao" >
+
+	<!-- 为合同下载查询合同信息  -->
+	<select id="selectContractInfoForDownload" resultType="map">
+		SELECT 
+		  BIZ_ID AS 'orderId',
+		  TP_SIGNID AS 'tpSignid',
+		  EC_FILE_NAME AS 'ecFileName',
+		  EC_DOWNLOAD_URL AS 'ecDownloadUrl',
+		  EC_DOWNLOAD_TIMES AS 'ecDownloadTimes',
+		  FINISH_SIGN_TIME AS 'finishSignTime' 
+		FROM
+		  iqb_ec_info 
+		WHERE STATUS = 1 AND EC_TYPE = 'dz' AND FINISH_SIGN_TIME &gt; ${ecSendtime}
+	</select>
+
+	<!-- 更新合同下载次数  -->
+	<update id="updateEcDownloadTimes">
+		UPDATE iqb_ec_info SET EC_DOWNLOAD_TIMES = EC_DOWNLOAD_TIMES + 1 WHERE TP_SIGNID = #{tpSignid}
+	</update>
+	
+</mapper>

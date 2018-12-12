@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>还款减免查询</title>
+<meta charset="UTF-8" />
+<meta name="Author" content="" />
+<meta name="Keywords" content="" />
+<meta name="Description" content="" />
+	<!-- 样式库 -->
+	<link rel="stylesheet" href="../../../../../js/bootstrap/themes/default/bootstrap.css" />
+	<link rel="stylesheet" href="../../../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+	<link rel="stylesheet" href="../../../../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+	<link rel="stylesheet" href="../../../../../css/jquery.select2.css" />
+	<link rel="stylesheet" href="../../../../../css/jquery.select2-bootstrap.css" />
+	<link rel="stylesheet" href="../../../../../css/jquery.datetimepicker.css" />
+	<link rel="stylesheet" href="../../../../../js/viewer/viewer.css" />
+	<link rel="stylesheet" href="../../../../../js/ztree/css/zTreeStyle/zTreeStyle.css" />
+	
+	<!-- 插件库 -->
+	<script src="../../../../../js/common/package.js"></script>
+	<script src="../../../../../js/common/url.js"></script>
+	<script src="../../../../../js/common/jquery-1.11.3.min.js"></script>
+	<script src="../../../../../js/bootstrap/bootstrap.js"></script>
+	<script src="../../../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+	<script src="../../../../../js/common/jquery.datetimepicker.js"></script>
+	<script src="../../../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+	<script src="../../../../../js/common/json2.js"></script>
+	<script src="../../../../../js/common/base.js"></script>
+	<script src="../../../../../js/common/jquery.select2.js"></script>
+	<script src="../../../../../js/common/datagrid2.js"></script>
+	<script src="../../../../../js/common/formatter.js"></script>
+	<script src="../../../../../js/ztree/js/jquery.ztree.all.min.js"></script>
+	<script src="../../../../../js/common/tree.js"></script>
+
+	<link rel="stylesheet" href="../../../../../css/each/main/derate.css" />
+	<script src="../../../../../js/each/credit/penalty/derate/wf/penaltySearch.js"></script>
+	<script src="../../../../../js/common/status.js"></script>
+	<script src="../../../../../js/each/cfm/merch/merch.js"></script>
+
+<style type="text/css">
+body {
+	background: #eee url("../../../../../img/back.png") repeat;
+}
+
+.container-fluid {
+	padding: 5px;
+}
+</style>
+</head>
+<body>
+	<div class="container-fluid">
+		<div class="col-md-12">
+			<div class="panel panel-info" >
+				<div class="panel-heading">
+					<h3 class="panel-title">查询栏</h3>
+				</div>
+				<div class="panel-body">
+					<form id="searchForm" class="form-horizontal" role="form">
+						<div class="form-group">
+							<label class="control-label col-lg-1 col-md-1 col-sm-1" for="merchantNo">商户名称:</label>
+							<div class="col-lg-2 col-md-2 col-sm-2">
+								 <input id="merchNames" type="text" readonly value="" name="merchNames" class="form-control merch" onclick="showMenu(); return false;"/>
+							</div>
+							<label class="control-label col-lg-1 col-md-1 col-sm-1" for="orderId">订单号:</label>
+							<div class="col-lg-2 col-md-2 col-sm-2">
+								<input name="orderId" id="orderId" type="text" class="form-control" placeholder="请输入订单号">
+							</div>
+							<label class="control-label col-lg-1 col-md-1 col-sm-1" for="realName">客户姓名:</label>
+							<div class="col-lg-2 col-md-2 col-sm-2">
+								<input name="realName" id="realName" type="text" class="form-control" placeholder="请输入客户姓名">
+							</div>
+						</div>
+						<div class="form-group">
+						    <label class="control-label col-lg-1 col-md-1 col-sm-1" for="regId">手机号:</label>
+							<div class="col-lg-2 col-md-2 col-sm-2">
+								<input name="regId" id="regId" class="form-control" placeholder="请输入手机号">
+							</div>
+							<label class="control-label col-lg-1 col-md-1 col-sm-1" for="createDateStart">开始时间:</label>
+							<div class="col-lg-2 col-md-2 col-sm-2">
+					      		<input type="text" class="form-control input-sm" id="createDateStart" name="applyDateStart" placeholder="请选择开始日期" />
+							</div>
+							<label class="control-label col-lg-1 col-md-1 col-sm-1">至</label>
+					      	<div class="col-lg-2 col-md-2 col-sm-2">
+					      		<input type="text" class="form-control input-sm" id="createDateEnd" name="applyDateEnd" placeholder="请选择结束日期" />
+					      	</div>
+					    </div>
+					    <div class="form-group">
+							<label class="control-label col-lg-1 col-md-1 col-sm-1" for="applyStatus">申请状态:</label>
+							<div class="col-lg-2 col-md-2 col-sm-2">
+								<select class="form-control" id="applyStatus" name="applyStatus" style="width:100%">
+									<option value=""></option>
+									<option value="1">申请中</option>
+									<option value="2">已通过</option>
+									<option value="3">已拒绝</option>
+								</select>
+							</div>
+							<label class="control-label col-lg-1 col-md-1 col-sm-1" for="derateType">减免类型:</label>
+							<div class="col-lg-2 col-md-2 col-sm-2">
+								<select class="form-control" name="derateType" style="width:100%">
+									<option value=""></option>
+									<option value="1">有责减免</option>
+									<option value="2">无责减免</option>
+								</select>
+							</div>
+							<div class="col-lg-3 col-md-3 col-sm-3">
+								<button id="btn-search" class="btn btn-primary btn-sm" type="button">查询</button>
+								<button id="btn-reset" class="btn btn-primary btn-sm" type="button">重置</button>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+			<div class="panel panel-info">
+				<div class="panel-heading">
+					<h3 class="panel-title">减免历史</h3>
+				</div>
+				<div class="panel-body">
+					<form id="listForm">
+						<button id="btn-penalty" type="button" class="btn btn-primary btn-sm" >减免查询</button>
+					</form>
+				</div>
+				<table id='datagrid' class="table table-bordered table-hover">
+					<thead>
+						<tr>
+							<th field="ck"></th>
+							<th field="rn" align="text-center" class="text-center">序号</th>
+							<th field="id" hidden="true">ID</th>
+							<th field="merchantNo" align="text-center" class="text-center">商户名称</th>
+							<th field="derateType" formatter="STATUS.formatter.derateType(val)" class="text-center">减免类型</th>
+							<th field="orderId" class="text-center">订单号</th>
+							<th field="regId" class="text-center">手机号</th>
+							<th field="cutAmt" formatter="Formatter.money(val)" class="text-center">减免金额</th>
+							<th field="realName" class="text-center">客户名称</th>
+							<th field="installTerms" class="text-center">总期数</th>
+							<th field="repayNo" class="text-center">当前期数</th>
+							<th field="curRepayAmt" align="text-center" formatter="Formatter.money(val)" class="text-center">月供</th>
+							<th field="lastRepayDate" align="text-center" formatter="Formatter.timeCfm2(val)" class="text-center">最后还款日</th>
+							<th field="cutOverdueInterestAfter" formatter="Formatter.money(val)" class="text-center">减免后罚息</th>
+							<th field="cutFixedOverdueAmtAfter" formatter="Formatter.money(val)" class="text-center">减免后滞纳金</th>
+							<th field="cutReason" align="text-center" class="text-center">调整原因</th>
+							<th field="remark" align="text-center" class="text-center">备注</th>
+							<th field="applyStatus" formatter="STATUS.formatter.applyStatus(val)" class="text-center">申请状态</th>
+							<th field="applySuccDate" formatter="Formatter.timeCfm2(val)" class="text-center">减免日期</th>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+				<div class="panel-footer">
+					<div id="paginator"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div id="penalty-win" class="modal fade" role="dialog" aria-labelledby="penalty-win-label" aria-describedby="罚息减免">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content">
+				<form id="updateForm" class="form-horizontal">
+					<div class="modal-header">
+						<h5 class="modal-title" id="update-win-label">罚息减免信息</h5>
+					</div>
+					<div class="modal-body">
+						<div class="form-group">
+			    			<label class="col-sm-2 control-label">客户名称</label>
+			    			<div class="col-md-4">
+			      				<input name="realName" type="text" class="form-control easyui-validatebox" />
+			    			</div>
+			    			<label class="col-md-2 control-label">应还期数</label>
+			    			<div class="col-md-4">
+			      				<input name="repayNo" type="text" class="form-control  easyui-validatebox" />
+			    			</div>
+			  			</div>
+			  			
+			  			<div class="form-group">
+			    			<label class="col-sm-2 control-label">总期数</label>
+							<div class="col-md-4">
+								<input name="installTerms" type="text" class="form-control  easyui-validatebox" />
+							</div>
+							
+		    				<label class="col-md-2 control-label">逾期天数</label>
+							<div class="col-md-4">
+								<input name="overdueDays" type="text" class="form-control  easyui-validatebox" />
+							</div>
+			  			</div>	
+						
+						
+						<div class="form-group">
+			    			<label class="col-sm-2 control-label">月供</label>
+							<div class="col-md-4">
+								<input name="curRepayAmt" type="text" class="form-control  easyui-validatebox" />
+							</div>
+							
+		    				<label class="col-md-2 control-label">罚息</label>
+							<div class="col-md-4">
+								<input name="curRepayOverdueInterest" type="text" class="form-control  easyui-validatebox" />
+							</div>
+			  			</div>
+			  			<div class="form-group">
+			    			<label class="col-sm-2 control-label">滞纳金</label>
+							<div class="col-md-4">
+								<input name="fixedOverdueAmt" type="text" class="form-control  easyui-validatebox" />
+							</div>
+			  			</div>
+					</div>
+					<div class="modal-header">
+						<h5 class="modal-title" id="update-win-label">减免调整</h5>
+					</div>
+					<div class="modal-body">
+						<div class="form-group">
+			    			<label class="col-sm-2 control-label">减免类型</label>
+							<div class="col-md-4">
+								<select name="derateType" id="select_derateType" class="form-control" style="width: 100%" >
+									<option value="1">有责减免</option>
+									<option value="2">无责减免</option>
+								</select>
+							</div>
+							
+		    				<label class="col-md-2 control-label">减免罚息金额</label>
+							<div class="col-md-4">
+								<input name="cutOverdueInterest" type="text" class="form-control  easyui-validatebox" />
+							</div>
+			  			</div>
+		  			
+			  			<div class="form-group">
+			    			<label class="col-md-2 control-label">减免后罚息金额</label>
+							<div class="col-md-4">
+								<input name="cutOverdueInterestAfter" type="text" class="form-control  easyui-validatebox" />
+		
+							</div>
+							
+		    				<label class="col-md-2 control-label">减免滞纳金金额</label>
+							<div class="col-md-4">
+								<input name="cutFixedOverdueAmt" type="text" class="form-control  easyui-validatebox" />
+							</div>
+			  			</div>
+					
+						<div class="form-group">
+			    			<label class="col-md-2 control-label">减免后滞纳金</label>
+							<div class="col-md-4">
+								<input name="cutFixedOverdueAmtAfter" type="text" class="form-control  easyui-validatebox" />
+							</div>
+							
+		    				<label class="col-md-2 control-label">减免总金额</label>
+							<div class="col-md-4">
+								<input name="cutAmt" type="text" class="form-control  easyui-validatebox" />
+							</div>
+			  			</div>
+					
+						<div class="form-group">
+			    			<label class="col-md-2 control-label">应还总金额</label>
+							<div class="col-md-4">
+								<input name="curRepayAmtTotal" type="text" class="form-control  easyui-validatebox" />
+							</div>
+			  			</div>
+			  			
+			  			<div class="form-group">
+							<label class="col-md-2 control-label">减免原因</label>
+							<div class="col-sm-9">
+								<textarea rows="4" cols="5" class="form-control easyui-validatebox"  name="cutReason" 
+									 validType="maxLength[50]" readonly="readonly" placeholder="减免原因" ></textarea>
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<label class="col-md-2 control-label">备注</label>
+							<div class="col-sm-9">
+								<textarea rows="4" cols="5" class="form-control easyui-validatebox"  name="remark"  
+									validType="maxLength[50]" readonly="readonly" placeholder="备注" ></textarea>
+							</div>
+						</div>
+					</div>
+					<div role="tabpanel" class="tab-pane" id="program-tab">
+						<div class="panel panel-default">
+							<table id="viewerOne" class="table table-bordered">
+							    <tbody>
+							    	<tr>						    		
+								    	<td style="width: 15%; vertical-align: middle;"><span class="text-stress">线上支付失败截图</span></td>						    	
+								    	<td id="td-onlinePayFailImg" style="width: 85%; vertical-align: middle;"></td>
+						    		</tr>
+						    		<tr>						    		
+								    	<td style="width: 15%; vertical-align: middle;"><span class="text-stress">扣款银行日流水</span></td>						    	
+								    	<td id="td-debitBankWaterImg" style="width: 85%; vertical-align: middle;"></td>
+						    		</tr>
+						    		<tr>						    		
+								    	<td style="width: 15%; vertical-align: middle;"><span class="text-stress">其他</span></td>						    	
+								    	<td id="td-otherImg" style="width: 85%; vertical-align: middle;"></td>
+						    		</tr>
+							    </tbody>
+							</table>
+						</div>			
+					</div>
+					<form id="uploadForm">
+						<input id="file" class="hidden" type="file" name="qqfile" multiple />
+					</form>	
+					<div class="modal-footer">
+						<button id="btn-close" type="button" class="btn btn-default btn-sm">关闭</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div id="menuContent" class="menuContent" style="max-height:500px;overflow:scroll;display:none; position: absolute;background:#fff;border:1px solid #ccc;">
+		<ul id="treeDemo" class="ztree" style="margin-top:0;"></ul>
+	</div>
+</body>
+</html>

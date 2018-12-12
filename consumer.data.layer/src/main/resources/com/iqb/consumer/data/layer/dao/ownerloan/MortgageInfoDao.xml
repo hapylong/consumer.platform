@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+	Apache License, Version 2.0 (the "License"); you may not use this file except 
+	in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iqb.consumer.data.layer.dao.ownerloan.MortgageInfoDao">
+	<!-- 配置映射字段 -->
+	<resultMap
+		type="com.iqb.consumer.data.layer.bean.ownerloan.MortgageInfoBean"
+		id="mortgageInfoBean">
+		<result property="id" 					column="id" />
+		<result property="orderId" 				column="orderId" />
+		<result property="orderName" 			column="orderName" />
+		<result property="mortgageType" 		column="mortgageType" />
+		<result property="mortgageCompany" 		column="mortgageCompany" />
+		<result property="instAmt" 				column="instAmt" />
+		
+		<result property="instMonthInterest" 	column="instMonthInterest" />
+		<result property="instItems" 			column="instItems" />
+		<result property="instRepayedItems" 	column="instRepayedItems" />
+		<result property="suggestAmt" 			column="suggestAmt" />
+		<result property="suggestItems" 		column="suggestItems" />
+		
+		<result property="storeRiskAdvice" 		column="storeRiskAdvice" />
+		<result property="trialRiskAdvice" 		column="trialRiskAdvice" />
+		<result property="version" 				column="version" />
+		<result property="createTime" 			column="createTime" />
+		<result property="updateTime" 			column="updateTime" />
+		
+		<result property="riskStatus" 			column="riskStatus" />
+		<result property="riskRetRemark" 		column="riskRetRemark" />
+
+	</resultMap>
+
+	<sql id="table">inst_authoritycard</sql>
+	
+	<!-- 车主贷-保存车辆抵押信息 -->
+	<insert id="insertMortgageInfo" parameterType="com.iqb.consumer.data.layer.bean.ownerloan.MortgageInfoBean"
+		 keyProperty="id" useGeneratedKeys="true">
+		insert into inst_mortgageinfo
+           <trim prefix="(" suffix=")" suffixOverrides=",">
+		     <if test="orderId != null and orderId !=''">
+                orderId,
+            </if>
+            <if test="mortgageType != null and mortgageType !=''">
+                mortgageType,
+            </if>
+            <if test="mortgageCompany != null and mortgageCompany !=''">
+                mortgageCompany,
+            </if>
+            <if test="instAmt != null and instAmt !=''">
+                instAmt,
+            </if>
+            <if test="instMonthInterest != null and instMonthInterest !=''">
+                instMonthInterest,
+            </if>
+            <if test="instItems != null and instItems !=''">
+                instItems,
+            </if>
+            <if test="instRepayedItems != null and instRepayedItems !=''">
+                instRepayedItems,
+            </if>
+            <if test="suggestAmt != null and suggestAmt !=''">
+                suggestAmt,
+            </if>
+            <if test="suggestItems != null and suggestItems !=''">
+                suggestItems,
+            </if>
+            <if test="storeRiskAdvice != null and storeRiskAdvice !=''">
+                storeRiskAdvice,
+            </if>
+            <if test="trialRiskAdvice != null and trialRiskAdvice !=''">
+                trialRiskAdvice,
+            </if>
+            version,createTime
+		</trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+		     <if test="orderId != null and orderId !=''">
+                #{orderId},
+            </if>
+            <if test="mortgageType != null and mortgageType !=''">
+                #{mortgageType},
+            </if>
+            <if test="mortgageCompany != null and mortgageCompany !=''">
+                #{mortgageCompany},
+            </if>
+            <if test="instAmt != null and instAmt !=''">
+                #{instAmt},
+            </if>
+            <if test="instMonthInterest != null and instMonthInterest !=''">
+                #{instMonthInterest},
+            </if>
+            <if test="instItems != null and instItems !=''">
+                #{instItems},
+            </if>
+            <if test="instRepayedItems != null and instRepayedItems !=''">
+                #{instRepayedItems},
+            </if>
+            <if test="suggestAmt != null and suggestAmt !=''">
+                #suggestAmt{},
+            </if>
+            <if test="suggestItems != null and suggestItems !=''">
+                #{suggestItems},
+            </if>
+            <if test="storeRiskAdvice != null and storeRiskAdvice !=''">
+                #{storeRiskAdvice},
+            </if>
+            <if test="trialRiskAdvice != null and trialRiskAdvice !=''">
+                #{trialRiskAdvice},
+            </if>
+            #{version},now()
+		</trim>
+	</insert>
+	<!-- 车主贷-更新车辆抵押信息 -->
+	<update id="updateMortgageInfo" parameterType="java.util.Map">
+		UPDATE
+			inst_mortgageinfo
+		<set>
+			version = #{version,jdbcType=INTEGER} + 1,
+			<if test="mortgageType != null and mortgageType !=''">
+				mortgageType= #{mortgageType},
+			</if>
+			<if test="mortgageCompany != null and mortgageCompany !=''">
+				mortgageCompany = #{mortgageCompany},
+			</if>
+			<if test="instAmt != null and instAmt !=''">
+				instAmt = #{instAmt},
+			</if>
+			<if test="instMonthInterest != null and instMonthInterest !=''">
+				instMonthInterest= #{instMonthInterest},
+			</if>
+			<if test="instItems != null and instItems!=''">
+				instItems= #{instItems},
+			</if>
+			<if test="instRepayedItems != null and instRepayedItems!=''">
+				instRepayedItems= #{instRepayedItems},
+			</if>
+			<if test="suggestAmt != null and suggestAmt !=''">
+				suggestAmt= #{suggestAmt},
+			</if>
+			<if test="suggestItems != null and suggestItems!=''">
+				suggestItems= #{suggestItems},
+			</if>
+			<if test="storeRiskAdvice != null and storeRiskAdvice !=''">
+				storeRiskAdvice= #{storeRiskAdvice},
+			</if>
+			<if test="trialRiskAdvice != null and trialRiskAdvice !=''">
+				trialRiskAdvice= #{trialRiskAdvice},
+			</if>
+
+			updateTime = NOW()
+		</set>
+		where orderId = #{orderId}
+	</update>
+	<!-- 替代，语句中的内容,简写 -->
+	<sql id="cols">
+		id,orderId,mortgageType,mortgageCompany,instAmt,instMonthInterest,instItems,instRepayedItems,suggestAmt,suggestItems,storeRiskAdvice,
+		trialRiskAdvice
+	</sql>
+	<!-- 查询车辆抵押 风控信息 -->
+	<select id="selectOneByOrderId" resultMap="mortgageInfoBean" parameterType="String">
+		SELECT
+			A.id,
+			A.orderId,
+			A.mortgageType,
+			A.mortgageCompany,
+			A.instAmt,
+			A.instMonthInterest,
+			A.instItems,
+			A.instRepayedItems,
+			A.suggestAmt,
+			A.suggestItems,
+			A.storeRiskAdvice,
+			A.trialRiskAdvice,
+			B.riskStatus,
+			B.riskRetRemark
+		FROM
+			inst_mortgageinfo A
+		LEFT JOIN inst_orderinfo B ON A.orderId = b.orderId
+		WHERE
+		 A.orderId = #{orderId}
+		LIMIT 1
+	</select>
+	<!-- 车主贷-获取订单 人员 卡信息接口 -->
+	<select id="getBaseInfo" parameterType="java.util.Map" resultType="com.iqb.consumer.data.layer.bean.ownerloan.OwnerLoanBaseInfoBean">
+		SELECT
+            A.merchantNo,
+            A.orderId,
+            A.orderName,
+            A.applyAmt as orderAmt,
+            A.orderItems,
+            A.riskStatus as status,
+            A.gpsAmt,
+            A.gpsTrafficFee,
+            A.margin,
+            A.preAmt,
+            A.serviceFee,
+            A.monthInterest,
+            A.preAmtStatus,
+            A.bizType,
+            A.riskRetRemark,
+            (
+                SELECT
+                    DICT_NAME
+                FROM
+                    iqb_sys_dict_item
+                WHERE
+                    DICT_TYPE_CODE = 'business_type'
+                AND DICT_CODE = A.BIZTYPE
+            ) AS bizTypeName,
+            B.realName,
+            B.regId,
+            B.idNo,
+            C.bankCardNo,
+            C.bankName,
+            D.MERCHANTSHORTNAME AS merchantName,
+            E.plate,
+            E.carAge,
+            E.gpsInstDate,
+            E.gpsDeviceNum,
+            E.gpsDeviceAddress,
+            E.gpsNum,
+            F.checkInfo
+        FROM
+            inst_orderinfo A
+        LEFT JOIN inst_user B ON A.regId = B.regId
+        LEFT JOIN inst_bankcard C ON b.id = C.userId AND C.id = (SELECT MAX(id) FROM inst_bankcard T WHERE T.userid = B.id)
+        LEFT JOIN inst_merchantinfo D ON A.merchantNo = D.MERCHANTNO
+        LEFT JOIN inst_authoritycard E ON A.orderId = E.orderId
+        LEFT JOIN inst_riskinfo F on A.regId = F.regId and F.riskType=4
+        WHERE A.orderId = #{orderId}
+        ORDER BY F.id desc LIMIT 1;
+	</select>
+	<!-- 获取车辆以及抵押信息 -->
+	<select id="getCarinfo" parameterType="java.util.Map" resultType="com.iqb.consumer.data.layer.bean.ownerloan.MortgageInfoBean">
+	   SELECT
+		    A.orderId,
+		    A.carConfig,
+		    A.carColor,
+		    A.carNo,
+		    A.carEmissions,
+		    A.passengerNum,
+		    A.mileage,
+		    A.firstBuyAmt,
+		    A.regOrg,
+		    A.firstRegDate,
+		    A.transferNum,
+		    B.mortgageType,
+		    B.mortgageCompany,
+		    B.instAmt,
+		    B.instMonthInterest,
+		    B.instItems,
+		    B.instRepayedItems,
+		    B.suggestAmt,
+		    B.suggestItems,
+		    B.storeRiskAdvice,
+		    B.trialRiskAdvice,
+		    C.assessPrice,
+			C.assessSuggest
+		FROM
+		    inst_authoritycard A
+		LEFT JOIN inst_mortgageinfo B ON A.orderId = b.orderId
+		LEFT JOIN inst_orderinfo C on A.orderId = C.orderId
+		WHERE A.orderId=#{orderId}
+	</select>
+	<!-- 获取门店签约信息 -->
+	<select id="getDeptSignInfo" parameterType="java.util.Map" resultType="com.iqb.consumer.data.layer.bean.ownerloan.DeptSignInfoBean">
+	   SELECT
+		    A.orderId,
+		    A.preAmt,
+		    A.orderAmt,
+		    A.gpsAmt,
+		    A.gpsTrafficFee,
+		    A.preAmtStatus,
+		    A.margin,
+		    A.serviceFee,
+		    A.monthInterest,
+		    A.finalRiskAdvice,
+		    A.riskStatus,
+		    A.regId,
+		    (
+		        SELECT
+		            DICT_NAME
+		        FROM
+		            iqb_sys_dict_item
+		        WHERE
+		            DICT_TYPE_CODE = 'business_type'
+		        AND DICT_CODE = A.BIZTYPE
+		    ) AS bizTypeName,
+		    (
+		        SELECT
+		            CONCAT(installPeriods,'+',remark)
+		        FROM
+		            inst_plan
+		        WHERE
+		            ID = A.planId
+		    ) AS planName,
+		    B.projectName,
+		    B.guarantee,
+		    B.guaranteeName,
+		    D.outOrderId as tradeNo,
+		    E.MERCHANTSHORTNAME as merchantName,
+		    F.realName,
+		    G.gpsInstDate,
+		    G.gpsDeviceNum,
+		    G.gpsDeviceAddress,
+		    G.gpsNum
+		FROM
+		    inst_orderinfo A
+		LEFT JOIN inst_orderotherinfo B ON A.orderId = B.orderId
+		LEFT JOIN inst_paymentlog D ON A.orderId = D.orderId
+		LEFT JOIN inst_merchantinfo E ON A.merchantNo = E.merchantNo
+		LEFT JOIN inst_user F ON A.regId = F.regId
+		LEFT JOIN inst_authoritycard G ON A.orderId = G.orderId
+		WHERE
+			<![CDATA[ 
+			  NOT EXISTS(SELECT 1 FROM inst_paymentlog WHERE A.ORDERID=ORDERID AND D.id<id)
+			]]>
+		and A.orderId = #{orderId}
+	</select>
+	<!-- 查看放款确认信息 -->
+	<select id="getLoanInfo" parameterType="java.util.Map" resultType="com.iqb.consumer.data.layer.bean.ownerloan.DeptSignInfoBean">
+	      SELECT
+                A.orderId,
+                A.preAmt,
+                A.orderAmt,
+                A.gpsAmt,
+                A.gpsTrafficFee,
+                A.preAmtStatus,
+                A.margin,
+                A.serviceFee,
+                A.monthInterest,
+                A.finalRiskAdvice,
+                A.loanAmt,
+                A.loanDate,
+                (
+                    SELECT
+                        PLANFULLNAME
+                    FROM
+                        inst_plan
+                    WHERE
+                        ID = A.planId
+                ) AS planName,
+                B.projectName,
+                B.guarantee,
+                B.guaranteeName,
+                C.tradeNo,
+                D.realName,
+                E.bankCardNo,
+                E.bankName,
+                icsi.CREDITOR_NAME AS creditorName,
+                icsi.CREDITOR_ID_NO AS creditorIdNo,
+                icsi.CREDITOR_BANK_NO AS creditorBankNo,
+                icsi.CREDITOR_BANK_NAME AS creditorBankName,
+                icsi.CREDITOR_PHONE AS creditorPhone
+            FROM
+                inst_orderinfo A
+            LEFT JOIN inst_orderotherinfo B ON A.orderId = B.orderId
+    LEFT JOIN inst_paymentlog C ON A.orderId = C.orderId AND C.id = (SELECT MAX(id) FROM inst_paymentlog T WHERE T.orderId = A.orderId)
+            LEFT JOIN inst_user D ON D.regId = A.regId
+            LEFT JOIN inst_bankcard E ON D.id = E.userId AND E.id = (SELECT MAX(id) FROM inst_bankcard T WHERE T.userid = D.id)
+            LEFT JOIN inst_merchantinfo F ON A.merchantNo = F.MERCHANTNO
+            LEFT JOIN iqb_customer_store_info icsi ON icsi.CUSTOMER_CODE = F.ID
+            WHERE A.orderid = #{orderId}
+            ORDER BY E.createtime desc LIMIT 1
+
+	</select>
+</mapper>

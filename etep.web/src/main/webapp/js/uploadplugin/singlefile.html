@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!--GALLERY TEMPLATE-->
+
+  <title>Fine Uploader Development</title>
+  <meta charset="utf-8"/>
+  <link href="bootstrap.min.css" rel="stylesheet" type="text/css"/>
+  <link href="fine-uploader-gallery.css" rel="stylesheet" type="text/css"/>
+  <link href="fine-uploader-new.css" rel="stylesheet" type="text/css"/>
+  <link href="styles.css" rel="stylesheet" type="text/css"/>
+  <script src="all.fine-uploader.js"></script>
+  <script src="pica.js"></script>
+
+</head>
+<body>
+  <div id="examples">
+    <script>
+      new qq.createUploadElement("examples");
+      var urls = [];
+      var deletePath =[];
+      var galleryUploader = new qq.FineUploader({
+        rederElementId:"examples",
+        element: document.getElementById("manual-example"),
+        autoUpload: true,
+        template: 'qq-template',
+        request: {
+            endpoint: "/etep.front/fileUploads/uploads/etep"
+        },
+        thumbnails: {
+          placeholders: {
+            waitingPath: './placeholders/waiting-generic.png',
+            notAvailablePath: './placeholders/not_available-generic.png'
+          }
+        },
+        cors: {
+            expected: true
+        },
+        chunking: {
+            enabled: true
+        },
+        resume: {
+            enabled: true
+        },
+        deleteFile: {
+            enabled: true,
+            method: "POST",
+            endpoint: "/etep.front/fileUploads/remove/etep",
+            params:{
+            	filePath:function rr(){ return deletePath[0];}
+            }
+        },
+        validation: {
+          allowedExtensions: ['jpeg', 'jpg', 'gif', 'png']
+        },
+        callbacks: {
+            onComplete: function(id, name, response) {
+                if (response.success) {
+                	 urls.push({id:id,filePath:response.iqbResult.result});
+                	console.log(response.iqbResult.result);
+                }
+            },
+            onDeleteComplete: function(id,name,response){
+            	 if (response.success) {
+            		 console.log(response.iqbResult.result);
+            	 }
+            },
+            onDelete: function(id) {
+            	var j = 0;
+            	for (var i=0;i<urls.length;i++){
+            		if(id == urls[i].id){
+            			deletePath.push(urls[i].filePath);
+            			j = i;
+            		}
+            	}
+            	urls.splice(1,1);
+            }
+        }
+      });
+    </script>
+  </div>
+</body>
+</html>
+

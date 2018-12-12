@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>案件执行</title>
+        <meta charset="UTF-8" />
+        <meta name="Author" content="" />
+        <meta name="Keywords" content="" />
+        <meta name="Description" content="" /> 
+        <!-- 基础CSS库 -->
+        <link rel="stylesheet" href="../../../js/ztree/css/zTreeStyle/zTreeStyle.css" />
+		<link rel="stylesheet" href="../../../js/bootstrap/themes/default/bootstrap.css" />
+		<link rel="stylesheet" href="../../../css/font-awesome/css/font-awesome.min.css" />
+		<link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+		<link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+		<link rel="stylesheet" href="../../../css/jquery.select2.css" />
+		<link rel="stylesheet" href="../../../css/jquery.select2-bootstrap.css" />
+		<link rel="stylesheet" href="../../../js/viewer/viewer.css" />
+		<link rel="stylesheet" href="../../../js/bootstrap/prettify/css/prettify.css" />
+
+		<!-- 业务CSS库 -->
+		<link rel="stylesheet" href="../../../css/common/base.css"/>
+		<link rel="stylesheet" href="../../../css/common/scrollbar.css" />
+
+		<!-- 基础JS库 -->
+		<script src="../../../js/common/package.js"></script>
+		<script src="../../../js/common/url.js"></script>
+		<script src="../../../js/common/json2.js"></script>
+		<script src="../../../js/common/jquery-1.11.3.min.js"></script>
+		<script src="../../../js/common/jquery.form.js"></script>
+		<script src="../../../js/bootstrap/bootstrap.js"></script>
+		<script src="../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+		<script src="../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+		<script src="../../../js/common/jquery.select2.js"></script>
+		<script src="../../../js/viewer/viewer.js"></script>
+		<script src="../../../js/bootstrap/prettify/js/prettify.js"></script>
+		<script src="../../../js/bootstrap/prettify/js/mockjax.js"></script>
+		<script src="../../../js/ztree/js/jquery.ztree.all.min.js"></script>
+		<script src="../../../js/bootstrap/prettify/js/bootstrap-typeahead.js"></script>
+
+		<!-- 业务JS库 -->
+		<script src="../../../js/common/base.js"></script>
+		<script src="../../../js/common/url.js"></script>
+		<script src="../../../js/common/datagrid2.js"></script>
+		<script src="../../../js/common/formatter.js"></script>
+		<script src="../../../js/common/wflow.js"></script> 
+		<script src="../../../js/each/cfm/merch/merch.js"></script>  
+	    <script src="../../../js/each/afterLoan/caseExecution/caseExecution.js"></script>
+	    
+		
+		<!-- 页面样式 -->
+		<style type="text/css">
+			body {
+				font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif !important;
+				background:#eee url("../../../img/back.png") repeat;
+			}
+			.container-fluid {
+				padding:5px;
+			}
+			.left-part {
+				height:800px;
+			}
+			.modal-form {
+				margin:8px;
+			}
+			#datagrid2 td{
+			   white-space:nowrap;
+			}
+			#datagrid2 th{
+			   white-space:nowrap;
+			}
+		</style>
+    </head>
+    <body>  
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12" style="overflow-y: scroll;overflow-x: scroll;height: 870px;">
+                    <div class="panel panel-info">
+                    <div class="panel-heading">
+                    	<h3 class="panel-title">查询信息</h3>
+                    </div>
+                        <div class="panel-body">    
+                            <form id="searchForm" class="form-horizontal">                               
+                                <div class="form-group">
+                                    <label class="control-label col-lg-1 col-md-1 col-sm-1">机构名称:</label>
+                                    <div class="col-lg-2 col-md-2 col-sm-2">
+							    	    <input id="merchNames" type="text" readonly value="全部商户" name="merchNames" class="form-control merch" onclick="showMenu(); return false;"/>
+							  	    </div>
+							  	    <label class="control-label col-lg-1 col-md-1 col-sm-1">订单号:</label>
+                                    <div class="col-lg-2 col-md-2 col-sm-2">
+                                        <input name="orderId" type="text" class="form-control" placeholder="请输入订单号">
+                                    </div>
+                                    <label class="control-label col-lg-1 col-md-1 col-sm-1">姓名:</label>
+                                    <div class="col-lg-2 col-md-2 col-sm-2">
+                                        <input name="realName" type="text" class="form-control" placeholder="请输入姓名">
+                                    </div>
+                                    <label class="control-label col-lg-1 col-md-1 col-sm-1">手机号:</label>
+                                    <div class="col-lg-2 col-md-2 col-sm-2">
+                                        <input name="regId" type="text" class="form-control" placeholder="请输入手机号">
+	                                </div>
+                                </div>
+                                <div class="form-group">
+							    	<div class="col-lg-3 col-md-3 col-sm-3">
+	                                    <button id="btn-search" type="button" class="btn btn-default btn-sm">查询</button>
+	                                    <button id="btn-reset" type="button" class="btn btn-default btn-sm">重置</button>
+                                    </div>
+                                </div>
+                            </form>                                                         
+                        </div>
+					</div>		
+					<div class="panel panel-info">	
+                        <div class="panel-heading">
+                            <h3 class="panel-title">登记列表</h3>
+                        </div>
+                        <div class="panel-body">
+                            <form id="listForm">                                
+                                <button id="btn-register" type="button" class="btn btn-info btn-sm">登记进度</button>
+                            </form>
+                        </div>
+                        <div class='scrollbar' style='width:100%;overflow-x:scroll'>
+                        <table id="datagrid" class="table table-bordered table-hover" style="text-align:center">
+                            <thead>
+                                <tr>
+                                    <th field="ck"></th>
+                                    <th field="orderId">订单号</th>
+                                    <th field="realName">姓名</th>
+                                    <th field="regId">手机号</th>
+                                    <th field="merchantName">商户</th>
+                                    <th field="registerDate">立案时间</th>
+                                    <th field="caseNo">案件编号</th>
+                                    <th field="register" formatter='Formatter.register(val)'>立案方</th>
+                                    <th field="acceptOrg">受理机构</th>
+                                    <th field="orderAmt" formatter='Formatter.money(val)'>借款金额</th>
+                                    <th field="monthInterest" formatter='Formatter.money(val)'>月供</th>
+                                    <th field="orderItems">总期数</th>
+                                    <th field="hasRepayNo">已还期数</th>
+                                    <th field="caseSource" formatter="Formatter.caseSource(val)">案件来源</th>
+                                    <th field="caseId" hidden='true'>caseId</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                        </div>
+                        <div class="panel-footer">
+                            <div id="paginator">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>          
+        </div>
+        
+        <div id="open-win" class="modal fade" role="dialog" aria-labelledby="update-win-label" aria-describedby="……">
+			<div class="modal-dialog" role="document">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<h5 class="modal-title" id="update-win-label">执行进度</h5>
+		      		</div>
+	      			<div class="modal-form">
+	      				<form id="updateForm" class="form-horizontal">
+	      				    <div class="form-group" style='margin-top:10px'>
+	      				        <label class="col-sm-3 control-label text-center"><span style='color:red'>*</span>执行结果</label>
+				    			<div class="col-sm-8">
+				    			    <select class="form-control input-sm easyui-validatebox" id='postCondition' required="required">
+				    			       <option value=''>请选择</option>
+				    			       <option value='1'>全部执行</option>
+				    			       <option value='2'>部分执行</option>
+				    			       <option value='3'>未执行</option>
+				    			       <option value='4'>失信被执行人</option>
+				    			    </select>
+				    			</div>
+	      				    </div>
+	      				    <!-- <div class="btn-group">
+							  	<button id="btn-upload" type="button" class="btn btn-warning btn-sm dropdown-toggle" data-toggle="dropdown">
+							  		<span class="fa fa-folder-open-o"></span> 上传 <span class="caret"></span>							    	
+							  	</button>
+							  	<ul class="dropdown-menu" role="menu">	
+							  	     <li><span class="text-stress" style="margin-left: 8px;">上传</span></li>							  		
+						    	     <li><a id="btn-judge" href="#">判决书</a></li>						    	
+						    	     <li><a id="btn-adjudication" href="#">裁定书</a></li>
+						    	     <li><a id="btn-other" href="#">其它</a></li>
+							  	</ul>
+						  	</div> -->
+	      				    <table class="table table-bordered">
+	                            <tbody>
+	                                <tr>
+	                                    <td><span class="text-stress">判决书</span></td>       
+	                                    <td id='td-104'>
+	                                       <button type="button" class='btn btn-default' id="btn-104" style='float:right'>上传</button>
+	                                    </td>                         
+	                                </tr>
+	                                <tr>
+	                                    <td><span class="text-stress">裁定书</span></td>       
+	                                    <td id='td-105'>
+	                                        <button type="button" class='btn btn-default' id="btn-105" style='float:right'>上传</button>
+	                                    </td>                         
+	                                </tr>
+	                                <tr>
+	                                    <td><span class="text-stress">其它</span></td>       
+	                                    <td id='td-106'>
+	                                        <button type="button" class='btn btn-default' id="btn-106" style='float:right'>上传</button>
+	                                    </td>                         
+	                                </tr>
+	                            </tbody>
+	                        </table>
+	      				    <div class="form-group payFlagAbout" style='margin-top:10px'>
+				    			<label class="col-sm-3 control-label text-center">执行进度</label>
+				    			<div class="col-sm-8">
+				    			    <textarea id='schedule' type="text" class="form-control input-sm easyui-validatebox"></textarea>
+				    			</div>
+				  			</div>
+						</form>
+						<div style='width:100%;height:auto;overflow-x:scroll'>
+							<table id='datagrid2' class="table table-striped table-bordered table-hover table-condensed">
+								 <thead>
+								    	<tr>
+		                                    <th field="rn">序号</th>
+		                                    <th field="createTimeFormat">操作时间</th>
+		                                    <th field="executeResult" formatter='Formatter.executeResult(val)'>执行结果</th>
+		                                    <th field="executeRemark">执行进度</th>
+											<th field="realName">操作人</th>
+		                                </tr>
+								 </thead>
+								 <tbody></tbody>
+							</table>
+						</div>	
+						<div class="panel-footer">
+							<div id="paginator2"></div>
+						</div>
+	      			</div>		      		
+		      		<div class="modal-footer">
+				        <button id="btn-sure" type="button" class="btn btn-success btn-sm">确定</button>
+				        <button id="btn-close" type="button" class="btn btn-default btn-sm">取消</button>		        
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+		<form id="uploadForm">
+			<input id="file" class="hidden" type="file" name="qqfile" multiple />
+		</form>
+		<div id="menuContent" class="menuContent" style="max-height:500px;overflow:scroll;display:none; position: absolute;background:#fff;border:1px solid #ccc;">
+	        <ul id="treeDemo" class="ztree" style="margin-top:0;"></ul>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+	Apache License, Version 2.0 (the "License"); you may not use this file except 
+	in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.RiskInfoDao">
+
+	<resultMap type="com.iqb.consumer.data.layer.bean.riskinfo.RiskInfoBean"
+		id="RiskInfoResult">
+		<result property="id" column="id" />
+		<result property="regId" column="regId" />
+		<result property="riskType" column="riskType" />
+		<result property="checkInfo" column="checkInfo" />
+		<result property="step1" column="step1" />
+		<result property="step2" column="step2" />
+		<result property="step3" column="step3" />
+		<result property="step4" column="step4" />
+	</resultMap>
+
+	<sql id="table">inst_riskinfo</sql>
+	
+	<!-- 保存风控信息 -->
+	<insert id="saveRiskInfo" parameterType="com.iqb.consumer.data.layer.bean.riskinfo.RiskInfoBean"
+			useGeneratedKeys="true"  keyProperty="id">
+		INSERT INTO inst_riskinfo (regId, riskType, checkInfo) VALUES (#{regId},#{riskType},#{checkInfo});
+	</insert>
+	
+	<select id="getRiskInfoByRegId" resultMap="RiskInfoResult">
+		select
+		id,regId,
+		riskType ,checkInfo,step1,step2,step3,step4 from
+		<include refid="table" /> where
+		regId = #{regId} and riskType = #{riskType}
+		LIMIT 1
+	</select>
+	
+	<!-- 保存风控结果  -->
+	<insert id="saveRiskResultInfo" parameterType="com.iqb.consumer.data.layer.bean.riskinfo.RiskResultBean">
+		INSERT INTO inst_riskresult (
+		  orderId,
+		  content,
+		  riskStatus,
+		  sendUrl,
+		  status,
+		  type,
+		  flag
+		) VALUE (#{orderId}, #{content}, #{riskStatus}, #{sendUrl}, #{status}, #{type},#{flag}) 
+	</insert>
+	<!-- 保存风控结果  -->
+	<insert id="saveReportNo" parameterType="com.iqb.consumer.data.layer.bean.riskinfo.LocalRiskInfoBean">
+		INSERT INTO inst_localriskinfo (
+		  orderId,tradeNo,reportType,reportState,createTime,reportName,effect
+		) VALUES (#{orderId},#{tradeNo},#{reportType},#{reportState},new(),#{reportName},#{effect})
+	</insert>
+	
+	<!-- 更新风控信息 -->
+	<update id="updateCheckInfo" parameterType="com.iqb.consumer.data.layer.bean.riskinfo.RiskInfoBean">
+		UPDATE inst_riskinfo SET checkInfo =#{checkInfo} WHERE regId=#{regId} AND riskType=#{riskType};
+	</update>
+	
+	<!-- 更新风控结果  -->
+	<update id="updateRiskResultInfo" parameterType="com.iqb.consumer.data.layer.bean.riskinfo.LocalRiskInfoBean">
+		UPDATE 
+		  inst_riskresult 
+		SET
+		  status = #{status} ,
+		  req_times = req_times + 1
+		WHERE orderId = #{orderId} 
+	</update>
+	
+	<!-- 获取风控结果列表  -->
+	<select id="getRiskResultInfoList" parameterType="com.iqb.consumer.data.layer.bean.riskinfo.RiskResultBean" resultType="com.iqb.consumer.data.layer.bean.riskinfo.RiskResultBean">
+		SELECT 
+		  orderId,
+		  content,
+		  riskStatus,
+		  sendUrl 
+		FROM
+		  inst_riskresult 
+		WHERE STATUS = 2 
+		  AND req_times &lt;= #{reqTimes}
+		  AND flag IS NULL
+	</select>
+	<!-- 获取风控结果列表  -->
+	<select id="getRiskResultInfoList2" parameterType="com.iqb.consumer.data.layer.bean.riskinfo.RiskResultBean" resultType="com.iqb.consumer.data.layer.bean.riskinfo.RiskResultBean">
+		SELECT 
+		  orderId,
+		  content,
+		  riskStatus,
+		  sendUrl 
+		FROM
+		  inst_riskresult 
+		WHERE STATUS = 2 
+		  AND req_times &lt;= #{reqTimes}
+		  AND flag = 1
+	</select>
+	
+	<select id="getRiskInfoByRIAndRT" resultMap="RiskInfoResult">
+        SELECT
+            a.checkinfo, b.idno as id
+        FROM
+            inst_riskinfo a
+        LEFT JOIN
+            inst_user b
+        ON
+            a.regid = b.regid
+        WHERE
+            a.regId = #{regId} 
+        AND 
+            a.riskType = #{riskType}
+        ORDER BY a.id desc 
+        LIMIT 1
+    </select>
+		<update id="updateLocalRiskInfo" parameterType="com.iqb.consumer.data.layer.bean.order.OrderBean">
+		UPDATE 
+		  inst_localriskinfo 
+		SET
+		  effect = 2 
+		WHERE orderId = #{orderId}
+	</update>
+	<!-- 根据手机号查询比当前系统时间小于7天的风控信息 -->
+	<select id="getRiskListInfoByOrderId" resultMap="RiskInfoResult">
+      SELECT
+		    AA.*
+		FROM
+		    (
+		        SELECT
+		            A.orderId,
+		            A.createTime,
+		            C.regId
+		        FROM
+		            inst_localriskinfo A
+		        LEFT JOIN inst_orderinfo B ON A.orderId = b.orderId
+		        LEFT JOIN inst_user C ON B.userId = C.id
+		        WHERE
+		            A.effect = 1
+		        AND B.bizType = #{bizType}  
+		        AND C.regId = #{regId}
+		        ORDER BY
+		            A.createTime desc
+		    ) AA
+		WHERE
+		    DATE_FORMAT(
+		        AA.createTime,
+		        '%Y-%m-%d %T'
+		    ) > DATE_SUB(now(), INTERVAL 7 DAY)
+    </select>
+</mapper>

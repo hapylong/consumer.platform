@@ -1,0 +1,829 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+	Apache License, Version 2.0 (the "License"); you may not use this file except 
+	in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.carstatus.CarStatusRepository">
+
+	<!-- 配置映射字段 -->
+	<resultMap type="com.iqb.consumer.data.layer.bean.carstatus.pojo.ManageCarInfoBean" id="ManageCarInfoMap">
+		<result property="merchantNo" 			column="merchantNo" />
+		<result property="orderId" 				column="orderId" />
+		<result property="realName" 			column="realName" />
+		<result property="regId" 				column="regId" />
+		<result property="orderAmt" 			column="orderAmt" />
+		<result property="orderItems" 			column="orderItems" />
+		<result property="monthInterest" 		column="monthInterest" />
+		<result property="orderName" 			column="orderName" />
+		<result property="carNo" 				column="carNo" />
+		<result property="plate" 				column="plate" />
+		<result property="trailerReason" 		column="trailer_reason" />
+		<result property="intoGarageDate" 		column="into_garage_date" />
+		<result property="intoGarageRemark" 	column="into_garage_remark" />
+		<result property="lostContactReason" 	column="lost_contact_reason" />
+		<result property="assessAmt" 			column="assess_amt" />
+		<result property="dealerEvaluatesInfo" 	column="dealer_evaluates_info" />
+		<result property="afterLoanDate" 		column="after_loan_date" />
+		<result property="saleRemark" 			column="sale_remark" />
+		<result property="hqEvaluatesAmt" 		column="hq_evaluates_amt" />
+		<result property="hqCheckAmt" 			column="hq_check_amt" />
+		<result property="evaluatesRemark" 		column="evaluates_remark" />
+		<result property="shouldPayAmt" 		column="should_pay_amt" />
+		<result property="dealAmt" 				column="deal_amt" />
+		<result property="receivedAmt" 			column="received_amt" />
+		<result property="serialNumber" 		column="serial_number" />
+		<result property="subleaseInfo" 		column="sublease_info" />
+		<result property="returnInfo" 			column="return_info" />
+		<result property="preAmt" 				column="preAmt" />
+		<result property="planName" 			column="planfullname" />
+		<result property="subleaseRemark" 		column="sublease_remark" />
+		<!-- 承租人信息 -->
+		<result property="subleaseOrderId" 			column="subleaseOrderId" />
+		<result property="subleaseRegId" 			column="subleaseRegId" />
+		<result property="subleaseRealName" 		column="subleaseRealName" />
+		<result property="subleaseOrderItems" 		column="subleaseOrderItems" />
+		<result property="subleaseAmount" 			column="subleaseAmount" />
+		<result property="subleasePlan" 			column="subleasePlan" />
+		<result property="subleasePreAmount" 		column="subleasePreAmount" />
+		<result property="subleaseMonthInterest" 	column="subleaseMonthInterest" />
+		
+		<result property="clearCarloanFlag"         column="clear_carloan_flag"/>
+		
+	</resultMap>
+	
+	<select id="cgetInfo" parameterType="java.util.Map" resultType="com.iqb.consumer.data.layer.bean.carstatus.pojo.CgetCarStatusInfoResponseMessage">
+		SELECT 
+		  a.orderid, a.regid, a.orderamt, a.orderitems, a.monthinterest, a.ordername, a.createtime,
+          b.realname,
+          c.carno, c.plate,
+          d.merchantshortname, d.id AS merchantId,e.gpsStatus
+		FROM
+		  inst_orderinfo a
+		LEFT JOIN
+		  inst_user b
+		ON
+		  a.regid = b.regid
+		LEFT JOIN
+		  inst_authoritycard c
+		ON
+		  a.orderid = c.orderid
+		LEFT JOIN
+		  inst_merchantinfo d
+		ON
+		  a.merchantno = d.merchantno
+		LEFT JOIN
+			inst_gpsinfo e
+		ON
+			e.orderId = a.orderId
+		<where>
+				<!-- FINANCE-2447 车辆状态跟踪优化,不查询车秒贷订单 -->
+		        (a.riskstatus = 3 or a.riskstatus = 7) AND a.bizType <![CDATA[ <> ]]> 2300
+		    AND 
+		        ( a.carstatus  <![CDATA[ <> ]]> 1 
+		         OR 
+		          a.carstatus 
+		         IS NULL)
+		    <if test="gpsStatus != null and gpsStatus != '' and gpsStatus == '0'.toString()">
+                AND (e.gpsStatus = #{gpsStatus} or e.gpsStatus IS NULL)
+            </if>
+            <if test="gpsStatus != null and gpsStatus != '' and gpsStatus != '0'.toString()">
+                AND e.gpsStatus = #{gpsStatus} 
+            </if>
+		    <if test="orderId != null and orderId != ''">
+                AND a.orderid = #{orderId}
+            </if>
+            <if test="realName != null and realName != ''">
+                AND b.realname = #{realName}
+            </if>
+            <if test="regId != null and regId != ''">
+                AND a.regid = #{regId}
+            </if>
+            <if test="startDate != null and startDate != ''">
+                AND DATE_FORMAT(a.createtime,'%Y-%m-%d') &gt;= #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND DATE_FORMAT(a.createtime,'%Y-%m-%d') &lt;= #{endDate}
+            </if>
+            <if test="plate != null and plate != ''">
+                AND c.plate = #{plate}
+            </if>
+	        <if test="merList != null and merList.size() > 0">
+	            AND a.merchantno in
+	            <foreach item="item" index="index" collection="merList" open="("
+	                separator="," close=")">
+	                #{item.merchantNo}
+	            </foreach>
+	        </if>
+	        AND NOT EXISTS(SELECT 1 FROM inst_gpsinfo g WHERE g.orderId=e.orderId AND g.id>e.id)
+        </where>
+        ORDER BY a.createTime DESC
+	</select>
+	<!--     FINANCE-2838 车辆状态跟踪：GPS状态更新FINANCE-2859车辆状态跟踪  -->
+	<select id="cgetInfo2" parameterType="java.util.Map" resultType="com.iqb.consumer.data.layer.bean.carstatus.pojo.CgetCarStatusInfoResponseMessage">
+       <!--  SELECT 
+          a.id, a.orderid, a.status, a.into_garage_date AS intogaragedate, a.trailer_reason AS trailerreason, 
+          a.into_garage_remark AS intogarageremark, a.lost_contact_reason AS lostcontactreason,
+          b.regid, b.orderamt, b.orderitems, b.monthinterest, b.ordername, b.createtime,
+          c.realname,
+          d.carno, d.plate,
+          e.merchantshortname, e.id AS merchantId
+        FROM
+          inst_managecar_info a
+        LEFT JOIN
+          inst_orderinfo b
+        ON
+          a.orderid = b.orderid
+        LEFT JOIN
+          inst_user c
+        ON
+          b.regid = c.regid
+        LEFT JOIN
+          inst_authoritycard d
+        ON
+          a.orderid = d.orderid
+        LEFT JOIN
+          inst_merchantinfo e
+        ON
+          b.merchantno = e.merchantno
+        <where>
+            <if test="status != null and status != ''">
+                AND a.status = #{status}
+            </if>
+            <if test="orderId != null and orderId != ''">
+                AND a.orderid = #{orderId}
+            </if>
+            <if test="realName != null and realName != ''">
+                AND c.realname = #{realName}
+            </if>
+            <if test="regId != null and regId != ''">
+                AND b.regid = #{regId}
+            </if>
+            <if test="startDate != null and startDate != ''">
+                AND DATE_FORMAT(b.createtime,'%Y-%m-%d') &gt;= #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND DATE_FORMAT(b.createtime,'%Y-%m-%d') &lt;= #{endDate}
+            </if>
+            <if test="lintoGarageDate != null and lintoGarageDate != ''">
+                AND DATE_FORMAT(a.into_garage_date,'%Y-%m-%d') &gt;= #{lintoGarageDate}
+            </if>
+            <if test="hintoGarageDate != null and hintoGarageDate != ''">
+                AND DATE_FORMAT(a.into_garage_date,'%Y-%m-%d') &lt;= #{hintoGarageDate}
+            </if>
+            <if test="lafterLoanDate != null and lafterLoanDate != ''">
+                AND DATE_FORMAT(a.after_loan_date,'%Y-%m-%d') &gt;= #{lafterLoanDate}
+            </if>
+            <if test="hafterLoanDate != null and hafterLoanDate != ''">
+                AND DATE_FORMAT(a.after_loan_date,'%Y-%m-%d') &lt;= #{hafterLoanDate}
+            </if>
+            <if test="plate != null and plate != ''">
+                AND d.plate = #{plate}
+            </if>
+            <if test="merList != null and merList.size() > 0">
+                AND b.merchantno in
+                <foreach item="item" index="index" collection="merList" open="("
+                    separator="," close=")">
+                    #{item.merchantNo}
+                </foreach>
+            </if>
+        </where> -->
+		SELECT
+			t.*, p.gpsStatus
+		FROM
+			(
+				SELECT
+					e.id AS id,
+					a.orderid AS orderId,
+					e. STATUS AS STATUS,
+					e.into_garage_date AS intogaragedate,
+					e.trailer_reason AS trailerreason,
+					e.into_garage_remark AS intogarageremark,
+					e.lost_contact_reason AS lostcontactreason,
+					a.regid AS regId,
+					a.orderamt AS orderAmt,
+					a.orderitems AS orderItems,
+					a.monthinterest AS monthInterest,
+					a.ordername AS orderName,
+					a.createtime AS createTime,
+					b.realname AS realName,
+					c.carno AS carNo,
+					c.plate AS plate,
+					d.merchantshortname AS merchantShortName,
+					d.id AS merchantId,
+					d.merchantno AS merchantno,
+					e.after_loan_date,
+					'' as processStatus
+				FROM
+					inst_orderinfo a
+				LEFT JOIN inst_user b ON a.regid = b.regid
+				LEFT JOIN inst_authoritycard c ON a.orderid = c.orderid
+				LEFT JOIN inst_merchantinfo d ON a.merchantno = d.merchantno
+				LEFT JOIN inst_managecar_info e ON e.orderId = a.orderId
+				WHERE
+					(
+						a.riskstatus = 3
+						OR a.riskstatus = 7
+						OR a.riskstatus = 10
+					)
+				AND a.bizType <![CDATA[ <> ]]> 2300
+				AND (
+					a.carstatus <![CDATA[ <> ]]>1
+					OR a.carstatus IS NULL
+				)
+				UNION 
+					SELECT
+						a.id AS id,
+						a.orderid AS orderId,
+						a. STATUS AS STATUS,
+						a.into_garage_date AS intogaragedate,
+						a.trailer_reason AS trailerreason,
+						a.into_garage_remark AS intogarageremark,
+						a.lost_contact_reason AS lostcontactreason,
+						b.regid regId,
+						b.orderamt AS orderAmt,
+						b.orderitems AS orderItems,
+						b.monthinterest AS monthInterest,
+						b.ordername AS orderName,
+						b.createtime AS createTime,
+						c.realname AS realName,
+						d.carno AS carNo,
+						d.plate AS plate,
+						e.merchantshortname AS merchantShortName,
+						e.id AS merchantId,
+						e.merchantno AS merchantno,
+						a.after_loan_date,
+						a.processStatus
+					FROM
+						inst_managecar_info a
+					LEFT JOIN inst_orderinfo b ON a.orderid = b.orderid
+					LEFT JOIN inst_user c ON b.regid = c.regid
+					LEFT JOIN inst_authoritycard d ON a.orderid = d.orderid
+					LEFT JOIN inst_merchantinfo e ON b.merchantno = e.merchantno
+					WHERE
+                    (
+                        b.riskstatus = 3
+                        OR b.riskstatus = 7
+                        OR b.riskstatus = 10
+                    )
+			) t
+		LEFT JOIN inst_gpsinfo p ON t.orderId = p.orderId
+			<where>
+            <if test="status != null and status != '' and status!='70'.toString()">
+                       AND t.status = #{status}
+            </if>
+            <if test="status != null and status != '' and status=='70'.toString()">
+                   (t.status is null or t.status =70) 
+            </if>
+            <if test="orderId != null and orderId != ''">
+                AND t.orderid = #{orderId}
+            </if>
+            <if test="realName != null and realName != ''">
+                AND t.realname = #{realName}
+            </if>
+            <if test="regId != null and regId != ''">
+                AND t.regid = #{regId}
+            </if>
+            <if test="startDate != null and startDate != ''">
+                AND DATE_FORMAT(t.createtime,'%Y-%m-%d') &gt;= #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND DATE_FORMAT(t.createtime,'%Y-%m-%d') &lt;= #{endDate}
+            </if>
+            <if test="lintoGarageDate != null and lintoGarageDate != ''">
+                AND DATE_FORMAT(t.into_garage_date,'%Y-%m-%d') &gt;= #{lintoGarageDate}
+            </if>
+            <if test="hintoGarageDate != null and hintoGarageDate != ''">
+                AND DATE_FORMAT(t.into_garage_date,'%Y-%m-%d') &lt;= #{hintoGarageDate}
+            </if>
+            <if test="lafterLoanDate != null and lafterLoanDate != ''">
+                AND DATE_FORMAT(t.after_loan_date,'%Y-%m-%d') &gt;= #{lafterLoanDate}
+            </if>
+            <if test="hafterLoanDate != null and hafterLoanDate != ''">
+                AND DATE_FORMAT(t.after_loan_date,'%Y-%m-%d') &lt;= #{hafterLoanDate}
+            </if>
+            <if test="plate != null and plate != ''">
+                AND t.plate = #{plate}
+            </if>
+            <if test="gpsStatus != null and gpsStatus != '' and gpsStatus == '0'.toString()">
+                AND (p.gpsStatus = #{gpsStatus} or p.gpsStatus IS NULL)
+            </if>
+            <if test="gpsStatus != null and gpsStatus != '' and gpsStatus != '0'.toString()">
+                AND p.gpsStatus = #{gpsStatus} 
+            </if>
+            <if test="processStatus != null and processStatus != '' and processStatus == '0'.toString()">
+                AND (p.processStatus = #{processStatus} or p.processStatus IS NULL)
+            </if>
+            <if test="processStatus != null and processStatus != '' and processStatus != '0'.toString()">
+                AND p.processStatus = #{processStatus} 
+            </if>
+            <if test="merList != null and merList.size() > 0">
+                AND t.merchantno in
+                <foreach item="item" index="index" collection="merList" open="("
+                    separator="," close=")">
+                    #{item.merchantNo}
+                    
+                </foreach>
+            </if>
+            AND NOT EXISTS(SELECT 1 FROM inst_gpsinfo g WHERE g.orderId=p.orderId AND g.id>p.id)
+            </where>
+            ORDER BY t.createTime DESC
+    </select>
+    
+    <update id="updateIMCI" parameterType="com.iqb.consumer.data.layer.bean.carstatus.entity.InstManageCarInfoEntity">
+        UPDATE
+            inst_managecar_info
+        <set>
+            <if test="intoGarageDate != null and intoGarageDate != ''">
+				into_garage_date = #{intoGarageDate},
+			</if>
+            <if test="afterLoanDate != null and afterLoanDate != ''">
+                DATE_FORMAT(after_loan_date,'%Y-%m-%d') = #{afterLoanDate},
+            </if>
+            <if test="trailerReason != null and trailerReason != ''">
+                trailer_reason = #{trailerReason},
+            </if>
+            <if test="intoGarageRemark != null and intoGarageRemark != ''">
+                into_garage_remark = #{intoGarageRemark},
+            </if>            
+            <if test="lostContactReason != null and lostContactReason != ''">
+                lost_contact_reason = #{lostContactReason},
+            </if>
+            <if test="assessAmt != null and assessAmt != ''">
+                assess_amt = #{assessAmt},
+            </if>
+            <if test="dealerEvaluatesInfo != null and dealerEvaluatesInfo != ''">
+                dealer_evaluates_info = #{dealerEvaluatesInfo},
+            </if>
+            <if test="hqEvaluatesAmt != null and hqEvaluatesAmt != ''">
+                hq_evaluates_amt = #{hqEvaluatesAmt},
+            </if>
+            <if test="hqCheckAmt != null and hqCheckAmt != ''">
+                hq_check_amt = #{hqCheckAmt},
+            </if>
+            <if test="evaluatesRemark != null and evaluatesRemark != ''">
+                evaluates_remark = #{evaluatesRemark},
+            </if>
+            <if test="shouldPayAmt != null and shouldPayAmt != ''">
+                should_pay_amt = #{shouldPayAmt},
+            </if>
+            <if test="dealAmt != null and dealAmt != ''">
+                deal_amt = #{dealAmt},
+            </if>
+            <if test="receivedAmt != null and receivedAmt != ''">
+                received_amt = #{receivedAmt},
+            </if>
+            <if test="serialNumber != null and serialNumber != ''">
+                serial_number = #{serialNumber},
+            </if>
+            <if test="subleaseInfo != null and subleaseInfo != ''">
+                sublease_info = #{subleaseInfo},
+            </if>
+            <if test="returnInfo != null and returnInfo != ''">
+                return_info = #{returnInfo},
+            </if>
+            
+            <if test="repaymentFlag != null and repaymentFlag != ''">
+                repaymentFlag = #{repaymentFlag},
+            </if>
+            <if test="lostContactFlag != null and lostContactFlag != ''">
+                lostContactFlag = #{lostContactFlag},
+            </if>
+            <if test="lostContactReason != null and lostContactReason != ''">
+                lost_contact_reason = #{lostContactReason},
+            </if>
+            <if test="collectFlag != null and collectFlag != ''">
+                collectFlag = #{collectFlag},
+            </if>
+            <if test="intoGarageName != null and intoGarageName != ''">
+                into_garage_name = #{intoGarageName},
+            </if>
+            <if test="collectOpinion != null and collectOpinion != ''">
+                collectOpinion = #{collectOpinion},
+            </if>
+            
+            
+            <if test="afterLoanOpinion != null and afterLoanOpinion != ''">
+                afterLoanOpinion = #{afterLoanOpinion},
+            </if>
+            <if test="checkOpinion != null and checkOpinion != ''">
+                checkOpinion = #{checkOpinion},
+            </if>
+            <if test="riskRemark != null and riskRemark != ''">
+                riskRemark = #{riskRemark},
+            </if>
+            <if test="gpsArea != null and gpsArea != ''">
+                gpsArea = #{gpsArea},
+            </if>  
+            <if test="collectOpinionConfirm != null and collectOpinionConfirm != ''">
+                collectOpinionConfirm = #{collectOpinionConfirm},
+            </if> 
+            <if test="orderId != null and orderId != ''">
+                orderId = #{orderId},
+            </if>
+            <if test="processMethod != null and processMethod != ''">
+                processMethod = #{processMethod},
+                processTime = NOW() , 
+            </if>    
+                             
+        </set>
+        WHERE 
+            orderid = #{orderId}
+    </update>
+    
+    <update id="markIOIEByCarstatus" parameterType="java.lang.String">
+        UPDATE
+            inst_orderinfo
+        SET
+            carstatus = 1, updatetime = NOW()
+        WHERE 
+            orderid = #{orderId}
+    </update>
+    
+    <insert id="persisitImci" parameterType="java.lang.String" >
+        INSERT INTO 
+            inst_managecar_info 
+            (orderId, after_loan_date, status,processStatus)
+        VALUES
+            (#{orderId}, NOW(), '70',5)
+    </insert>
+    
+	<!-- 根据订单号查询车辆状态跟踪回显信息 -->
+	<select id="selectOrderInfoByOrderId" parameterType="java.util.Map" resultMap="ManageCarInfoMap">
+		SELECT
+			C.MERCHANTSHORTNAME as merchantNo,
+			A.orderId,
+			D.realName,
+			D.regId,
+			B.orderAmt,
+			B.orderItems,
+			B.monthInterest,
+			B.orderName,
+			B.preAmt,
+			E.carNo,
+			E.plate,
+			A.trailer_reason,
+			A.into_garage_date,
+			A.into_garage_remark,
+			A.lost_contact_reason,
+			A.assess_amt as assessAmt,
+			A.dealer_evaluates_info,
+			A.sublease_info,
+			A.hq_evaluates_amt,
+			A.hq_check_amt,
+			A.evaluates_remark,
+			A.should_pay_amt,
+			A.deal_amt,
+			A.received_amt,
+			A.sublease_remark,
+			A.return_info,
+			A.sale_remark,
+			A.serial_number,
+			F.planfullname,
+			A.clear_carloan_flag 
+		FROM
+			inst_managecar_info A
+		LEFT JOIN inst_orderinfo B ON A.orderId = B.orderId
+		LEFT JOIN inst_merchantinfo C ON B.merchantNo = C.MERCHANTNO
+		LEFT JOIN inst_user D ON B.regId = D.regId
+		LEFT JOIN inst_authoritycard E ON A.orderId = E.orderId
+		LEFT JOIN inst_plan F on F.ID=B.planId
+		WHERE
+			A.orderId = #{orderId}
+	</select>
+	<!-- 根据订单号修改inst_managercar_info 信息 -->
+	<update id="updateManagerCarInfoByOrderId" parameterType="java.util.Map">
+		update
+		inst_managecar_info
+		a
+		<set>
+			<if test="status != null and status != ''">
+				a.status = #{status},
+			</if>
+			<if test="intoGarageDate != null and intoGarageDate != ''">
+                into_garage_date = #{intoGarageDate},
+            </if>
+            <if test="afterLoanDate != null and afterLoanDate != ''">
+                DATE_FORMAT(after_loan_date,'%Y-%m-%d') = #{afterLoanDate},
+            </if>
+            <if test="trailerReason != null and trailerReason != ''">
+                trailer_reason = #{trailerReason},
+            </if>
+            <if test="intoGarageRemark != null and intoGarageRemark != ''">
+                into_garage_remark = #{intoGarageRemark},
+            </if>            
+            <if test="lostContactReason != null and lostContactReason != ''">
+                lost_contact_reason = #{lostContactReason},
+            </if>
+            <if test="assessAmt != null and assessAmt != ''">
+                assess_amt = #{assessAmt},
+            </if>
+            <if test="dealerEvaluatesInfo != null and dealerEvaluatesInfo != ''">
+                dealer_evaluates_info = #{dealerEvaluatesInfo},
+            </if>
+            <if test="hqEvaluatesAmt != null and hqEvaluatesAmt != ''">
+                hq_evaluates_amt = #{hqEvaluatesAmt},
+            </if>
+            <if test="hqCheckAmt != null and hqCheckAmt != ''">
+                hq_check_amt = #{hqCheckAmt},
+            </if>
+            <if test="evaluatesRemark != null and evaluatesRemark != ''">
+                evaluates_remark = #{evaluatesRemark},
+            </if>
+            <if test="shouldPayAmt != null and shouldPayAmt != ''">
+                should_pay_amt = #{shouldPayAmt},
+            </if>
+            <if test="dealAmt != null and dealAmt != ''">
+                deal_amt = #{dealAmt},
+            </if>
+            <if test="receivedAmt != null and receivedAmt != ''">
+                received_amt = #{receivedAmt},
+            </if>
+            <if test="serialNumber != null and serialNumber != ''">
+                serial_number = #{serialNumber},
+            </if>
+            <if test="subleaseInfo != null and subleaseInfo != ''">
+                sublease_info = #{subleaseInfo},
+            </if>
+            <if test="returnInfo != null and returnInfo != ''">
+                return_info = #{returnInfo},
+            </if>
+            
+            <if test="repaymentFlag != null and repaymentFlag != ''">
+                repaymentFlag = #{repaymentFlag},
+            </if>
+            <if test="lostContactFlag != null and lostContactFlag != ''">
+                lostContactFlag = #{lostContactFlag},
+            </if>
+            <if test="lostContactReason != null and lostContactReason != ''">
+                lost_contact_reason = #{lostContactReason},
+            </if>
+            <if test="collectFlag != null and collectFlag != ''">
+                collectFlag = #{collectFlag},
+            </if>
+            <if test="intoGarageName != null ">
+                into_garage_name = #{intoGarageName},
+            </if>
+            <if test="collectOpinion != null">
+                collectOpinion = #{collectOpinion},
+            </if>                       
+            <if test="afterLoanOpinion != null and afterLoanOpinion != ''">
+                afterLoanOpinion = #{afterLoanOpinion},
+            </if>
+            <if test="checkOpinion != null and checkOpinion != ''">
+                checkOpinion = #{checkOpinion},
+            </if>
+            <if test="riskRemark != null and riskRemark != ''">
+                riskRemark = #{riskRemark},
+            </if>
+            <if test="gpsArea != null and gpsArea != ''">
+                gpsArea = #{gpsArea},
+            </if>  
+            <if test="collectOpinionConfirm != null and collectOpinionConfirm != ''">
+                collectOpinionConfirm = #{collectOpinionConfirm},
+            </if> 
+            <if test="orderId != null and orderId != ''">
+                orderId = #{orderId},
+            </if>
+            <if test="processMethod != null and processMethod != ''">
+                processMethod = #{processMethod},
+                processTime = NOW() , 
+            </if>  
+			<if test="clearCarloanFlag != null and clearCarloanFlag != ''">
+                clear_carloan_flag = #{clearCarloanFlag},
+            </if>
+		</set>
+		where a.orderId = #{orderId}
+	</update>
+	
+	<!-- 根据订单号查询承租人回显信息 -->
+	<select id="selectSubleaseInfoByOrderId" parameterType="java.util.Map" resultMap="ManageCarInfoMap">
+		SELECT
+			A.orderId as subleaseOrderId,
+			A.regId as subleaseRegId,
+			B.realName as subleaseRealName,
+			A.orderItems as subleaseOrderItems,
+			A.orderAmt as subleaseAmount,
+			C.PLANFULLNAME as subleasePlan,
+			A.preAmt as subleasePreAmount,
+			A.monthInterest as subleaseMonthInterest
+		FROM
+			inst_orderinfo A
+		LEFT JOIN inst_user B ON A.regId = B.regId
+		LEFT JOIN inst_plan C ON A.planId = C.ID
+		WHERE
+			A.orderId = #{orderId}
+			limit 1
+	</select>
+	<!-- 根据订单号修改inst_managercar_info 状态 -->
+	<update id="updateStatusByOrderId" parameterType="java.util.Map">
+		update inst_managecar_info a
+		<set>
+            <if test="status != null and status != ''">
+                a.status = #{status},
+            </if>
+		    <if test="startDate != processStatus and processStatus != ''">
+                processStatus = #{processStatus},
+            </if>
+         </set>
+		 where a.orderId = #{orderId}
+	</update>
+	
+	<!-- 根据订单号查询车辆管理状态 -->
+	<select id="getCarStatusByOrderId" parameterType="String" resultType="Integer">
+		SELECT STATUS FROM inst_managecar_info WHERE orderId=#{orderId} LIMIT 1;
+	</select>
+	<!-- 根据orderId和procKey查询审批页面和procId -->
+	<select id="getProcHtml" parameterType="String" resultType="java.util.HashMap">
+		SELECT proc.proc_inst_id procInstId,proc.proc_bizid procBizId,proc.PROC_DISPLAYURL procDisplayurl FROM
+		iqb_wf_proc proc
+		LEFT JOIN iqb_wf_proc_task task ON task.proc_inst_id = proc.proc_inst_id
+		<!--  FINANCE-2681 兼容以租代购提前还款 objs.getString("orderId") -->
+		AND task.PROC_TASK_STATUS IN ('1', '2') WHERE proc.PROC_BIZID = #{orderId} AND proc.PROC_KEY like CONCAT('%',#{procKey}) ORDER BY proc.PROC_CREATETIME DESC LIMIT 1;
+	</select>
+	<!-- 根据订单号查询以及GPS状态回显信息       FINANCE-2838 车辆状态跟踪：GPS状态更新FINANCE-2859车辆状态跟踪 -->
+	<select id="getOrderInfoAndGPSInfoByOrderId" parameterType="com.alibaba.fastjson.JSONObject" resultType="com.iqb.consumer.data.layer.bean.carstatus.pojo.CgetCarStatusInfoResponseMessage">
+
+		SELECT
+			t.*, p.gpsStatus,
+			p.remark,
+			p.disposalScheme
+		FROM
+			(
+				SELECT
+					e.id AS id,
+					a.orderid AS orderId,
+					e. STATUS AS STATUS,
+					e.into_garage_date AS intogaragedate,
+					e.trailer_reason AS trailerreason,
+					e.into_garage_remark AS intogarageremark,
+					e.lost_contact_reason AS lostcontactreason,
+					a.regid AS regId,
+					a.orderamt AS orderAmt,
+					a.orderitems AS orderItems,
+					a.monthinterest AS monthInterest,
+					a.ordername AS orderName,
+					a.createtime AS createTime,
+					b.realname AS realName,
+					c.carno AS carNo,
+					c.plate AS plate,
+					d.merchantshortname AS merchantShortName,
+					d.id AS merchantId,
+					d.merchantno AS merchantno
+				FROM
+					inst_orderinfo a
+				LEFT JOIN inst_user b ON a.regid = b.regid
+				LEFT JOIN inst_authoritycard c ON a.orderid = c.orderid
+				LEFT JOIN inst_merchantinfo d ON a.merchantno = d.merchantno
+				LEFT JOIN inst_managecar_info e ON e.orderId = a.orderId
+				WHERE
+					(
+						a.riskstatus = 3
+						OR a.riskstatus = 7
+					)
+				AND a.bizType <![CDATA[ <> ]]> 2300
+				AND (
+					a.carstatus <![CDATA[ <> ]]> 1
+					OR a.carstatus IS NULL
+				)
+				UNION 
+					SELECT
+						a.id AS id,
+						a.orderid AS orderId,
+						a. STATUS AS STATUS,
+						a.into_garage_date AS intogaragedate,
+						a.trailer_reason AS trailerreason,
+						a.into_garage_remark AS intogarageremark,
+						a.lost_contact_reason AS lostcontactreason,
+						b.regid regId,
+						b.orderamt AS orderAmt,
+						b.orderitems AS orderItems,
+						b.monthinterest AS monthInterest,
+						b.ordername AS orderName,
+						b.createtime AS createTime,
+						c.realname AS realName,
+						d.carno AS carNo,
+						d.plate AS plate,
+						e.merchantshortname AS merchantShortName,
+						e.id AS merchantId,
+						e.merchantno AS merchantno
+					FROM
+						inst_managecar_info a
+					LEFT JOIN inst_orderinfo b ON a.orderid = b.orderid
+					LEFT JOIN inst_user c ON b.regid = c.regid
+					LEFT JOIN inst_authoritycard d ON a.orderid = d.orderid
+					LEFT JOIN inst_merchantinfo e ON b.merchantno = e.merchantno
+			) t
+		LEFT JOIN inst_gpsinfo p ON t.orderId = p.orderId
+        <where>
+            <if test="orderId != null and orderId != ''">
+                AND t.orderid = #{orderId}
+            </if>
+            AND NOT EXISTS(SELECT 1 FROM inst_gpsinfo g WHERE g.orderId=p.orderId AND g.id>p.id)
+        </where>
+        limit 1
+    </select>
+    <!-- 保存GPS状态到inst_gpsinfo表       FINANCE-2838 车辆状态跟踪：GPS状态更新FINANCE-2859车辆状态跟踪 -->
+     <insert id="saveGPSInfo" parameterType="com.alibaba.fastjson.JSONObject" >
+        INSERT INTO 
+            inst_gpsinfo 
+            (orderId,gpsStatus,remark,disposalScheme,createTime)
+        VALUES
+            (#{orderId},#{gpsStatus},#{remark},#{disposalScheme},NOW())
+    </insert>
+    <!-- 根据orderID查询展示inst_gpsinfo表数据       FINANCE-2838 车辆状态跟踪：GPS状态更新FINANCE-2859车辆状态跟踪 -->
+    <select id="selectGPSInfoListByOrderId" parameterType="com.alibaba.fastjson.JSONObject" resultType="com.iqb.consumer.data.layer.bean.carstatus.pojo.GPSInfo">
+    	select
+    	createTime AS createTime,gpsStatus,remark,disposalScheme
+    	from
+    	inst_gpsinfo
+    	<where>
+            <if test="orderId != null and orderId != ''">
+                AND orderid = #{orderId}
+            </if>
+        </where>
+        ORDER BY ID DESC
+	</select>
+	<!-- 车辆状态跟踪模块列表与查询接口       FINANCE-2838 车辆状态跟踪：GPS状态更新FINANCE-2859车辆状态跟踪 -->
+	<select id="selectCarToGPSList" parameterType="com.alibaba.fastjson.JSONObject" resultType="com.iqb.consumer.data.layer.bean.carstatus.pojo.CgetCarStatusInfoResponseMessage">
+    	SELECT 
+		  a.orderid, a.regid, a.orderamt, a.orderitems, a.monthinterest, a.ordername, a.createtime,
+          b.realname,
+          c.carno, c.plate,
+          d.merchantshortname, d.id AS merchantId,e.status
+		FROM
+		  inst_orderinfo a
+		LEFT JOIN
+		  inst_user b
+		ON
+		  a.regid = b.regid
+		LEFT JOIN
+		  inst_authoritycard c
+		ON
+		  a.orderid = c.orderid
+		LEFT JOIN
+		  inst_merchantinfo d
+		ON
+		  a.merchantno = d.merchantno
+		LEFT JOIN
+			inst_managecar_info e
+		ON
+			e.orderId=a.orderId
+		<where>
+				<!-- FINANCE-2447 车辆状态跟踪优化,不查询车秒贷订单 -->
+		        (a.riskstatus = 3 or a.riskstatus = 7) AND a.bizType <![CDATA[ <> ]]> 2300
+		    AND 
+		        ( a.carstatus  <![CDATA[ <> ]]> 1 
+		         OR 
+		          a.carstatus 
+		         IS NULL)
+		    <if test="orderId != null and orderId != ''">
+                AND a.orderid = #{orderId}
+            </if>
+            <if test="realName != null and realName != ''">
+                AND b.realname = #{realName}
+            </if>
+            <if test="regId != null and regId != ''">
+                AND a.regid = #{regId}
+            </if>
+            <if test="startDate != null and startDate != ''">
+                AND DATE_FORMAT(a.createtime,'%Y-%m-%d') &gt;= #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND DATE_FORMAT(a.createtime,'%Y-%m-%d') &lt;= #{endDate}
+            </if>
+            <if test="plate != null and plate != ''">
+                AND c.plate = #{plate}
+            </if>
+	        <if test="merList != null and merList.size() > 0">
+	            AND a.merchantno in
+	            <foreach item="item" index="index" collection="merList" open="("
+	                separator="," close=")">
+	                #{item.merchantNo}
+	            </foreach>
+	        </if>
+	        <if test="status != null and status != ''">
+                AND e.status = #{status}
+            </if>
+        </where>
+        ORDER BY a.createTime DESC
+	</select>
+	
+	<select id="getCarStatusInfoByOrderId" parameterType="String" resultType="com.iqb.consumer.data.layer.bean.carstatus.entity.InstManageCarInfoEntity">
+        SELECT * FROM inst_managecar_info WHERE orderId=#{orderId} LIMIT 1;
+    </select>
+    
+    <update id="updateRemindPhone" parameterType="java.lang.String">
+        UPDATE
+            inst_remind_phone
+        SET
+            status = 3, updatetime = NOW()
+        WHERE 
+            orderId = #{orderId}
+    </update>
+</mapper>

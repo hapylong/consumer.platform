@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+	Apache License, Version 2.0 (the "License"); you may not use this file except 
+	in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.PenaltyDerateDao">
+
+	<!-- 获取罚息减免申请列表  -->
+	<select id="listPenaltyDerateApply" resultType="com.iqb.consumer.data.layer.bean.penalty.derate.PenaltyDerateBean">
+		SELECT 
+		  iipd.id,
+		  im.MERCHANTSHORTNAME AS 'merchantShortName',
+		  iipd.INSTALL_DETAIL_ID AS 'installDetailId',
+		  iipd.ORDER_ID AS 'orderId',
+		  iipd.PROC_INST_ID AS 'procInstId',
+		  iipd.MERCHANT_NO AS 'merchantNo',
+		  iipd.REG_ID AS 'regId',
+		  iipd.REAL_NAME AS 'realName',
+		  iipd.INSTALL_TERMS AS 'installTerms',
+		  iipd.REPAY_NO AS 'repayNo',
+		  iipd.LAST_REPAY_DATE AS 'lastRepayDate',
+		  iipd.OVERDUE_DAYS AS 'overdueDays',
+		  iipd.CUR_REPAY_OVERDUE_INTEREST AS 'curRepayOverdueInterest',
+		  iipd.FIXED_OVERDUE_AMT AS 'fixedOverdueAmt',
+		  iipd.DERATE_TYPE AS 'derateType',
+		  iipd.CUT_OVERDUE_INTEREST AS 'cutOverdueInterest',
+		  iipd.CUT_OVERDUE_INTEREST_AFTER AS 'cutOverdueInterestAfter',
+		  iipd.CUT_FIXED_OVERDUE_AMT AS 'cutFixedOverdueAmt',
+		  iipd.CUT_FIXED_OVERDUE_AMT_AFTER AS 'cutFixedOverdueAmtAfter',
+		  iipd.CUT_AMT AS 'cutAmt',
+		  iipd.CUR_REPAY_AMT AS 'curRepayAmt',
+		  iipd.CUR_REPAY_AMT_TOTAL AS 'curRepayAmtTotal',
+		  iipd.CUT_REASON AS 'cutReason',
+		  iipd.REMARK,
+		  iipd.ONLINE_PAY_FAIL_IMG AS 'onlinePayFailImg',
+		  iipd.DEBIT_BANK_WATER_IMG AS 'debitBankWaterImg',
+		  iipd.OTHER_IMG AS 'otherImg',
+		  iipd.APPLY_DATE AS 'applyDate',
+		  iipd.APPLY_SUCC_DATE AS 'applySuccDate',
+		  iipd.APPLY_STATUS AS 'applyStatus',
+		  iipd.VERSION 
+		FROM
+		  IQB_INST_PENALTY_DERATE iipd 
+		  LEFT JOIN inst_merchantinfo im 
+		    ON iipd.MERCHANT_NO = im.MERCHANTNO 
+		WHERE iipd.APPLY_STATUS != '4'
+		<if test="merchantNos != null and merchantNos.size() > 0">
+			AND iipd.MERCHANT_NO in
+			<foreach item="item" index="index" collection="merchantNos"
+				open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+		<!-- 还款时间开始 -->
+		<if test="applyDateStart !=null and applyDateStart != ''">
+			AND STR_TO_DATE(iipd.LAST_REPAY_DATE,'%Y-%m-%d') &gt;= #{applyDateStart}
+		</if>
+		<!-- 还款时间结束 -->
+		<if test="applyDateEnd !=null and applyDateEnd != ''">
+			AND STR_TO_DATE(iipd.LAST_REPAY_DATE,'%Y-%m-%d') &lt;= #{applyDateEnd}
+		</if>
+		<!-- 订单号 -->
+		<if test="realName !=null and realName != ''">
+			AND iipd.REAL_NAME = #{realName}
+		</if>
+		<!-- 订单号 -->
+		<if test="orderId !=null and orderId != ''">
+			AND iipd.ORDER_ID = #{orderId}
+		</if>
+		<!-- 手机号 -->
+		<if test="regId !=null and regId != ''">
+			AND iipd.REG_ID = #{regId}
+		</if>
+		<!-- 客户名  -->
+		<if test="merchantShortName !=null and merchantShortName != ''">
+			AND im.MERCHANTSHORTNAME = #{merchantShortName}
+		</if>
+		<!-- 商户号  -->
+		<if test="merchantNo !=null and merchantNo != ''">
+			AND iipd.MERCHANT_NO = #{merchantNo}
+		</if>
+		<!-- 申请状态  -->
+		<if test="applyStatus !=null and applyStatus != ''">
+			AND iipd.APPLY_STATUS = #{applyStatus}
+		</if>
+		<!-- 减免类型  -->
+		<if test="derateType !=null and derateType != ''">
+			AND iipd.DERATE_TYPE = #{derateType}
+		</if>
+	</select>
+
+	<!-- 获取罚息减免可申请列表  -->
+	<select id="getPenaltyDerateByInstallDetailId" resultType="com.iqb.consumer.data.layer.bean.penalty.derate.PenaltyDerateBean">
+		select 
+		  a.id,
+		  a.INSTALL_DETAIL_ID as 'installDetailId',
+		  a.ORDER_ID as 'orderId',
+		  a.PROC_INST_ID as 'procInstId',
+		  a.MERCHANT_NO as 'merchantNo',
+		  a.REG_ID as 'regId',
+		  a.REAL_NAME as 'realName',
+		  a.INSTALL_TERMS as 'installTerms',
+		  a.REPAY_NO as 'repayNo',
+		  a.LAST_REPAY_DATE as 'lastRepayDate',
+		  a.OVERDUE_DAYS as 'overdueDays',
+		  a.CUR_REPAY_OVERDUE_INTEREST as 'curRepayOverdueInterest',
+		  a.FIXED_OVERDUE_AMT as 'fixedOverdueAmt',
+		  a.DERATE_TYPE as 'derateType',
+		  a.CUT_OVERDUE_INTEREST as 'cutOverdueInterest',
+		  a.CUT_OVERDUE_INTEREST_AFTER as 'cutOverdueInterestAfter',
+		  a.CUT_FIXED_OVERDUE_AMT as 'cutFixedOverdueAmt',
+		  a.CUT_FIXED_OVERDUE_AMT_AFTER as 'cutFixedOverdueAmtAfter',
+		  a.CUT_AMT as 'cutAmt',
+		  a.CUR_REPAY_AMT as 'curRepayAmt',
+		  a.CUR_REPAY_AMT_TOTAL as 'curRepayAmtTotal',
+		  a.CUT_REASON as 'cutReason',
+		  a.REMARK,
+		  a.ONLINE_PAY_FAIL_IMG as 'onlinePayFailImg',
+		  a.DEBIT_BANK_WATER_IMG as 'debitBankWaterImg',
+		  a.OTHER_IMG as 'otherImg',
+		  a.APPLY_DATE as 'applyDate',
+		  a.APPLY_SUCC_DATE as 'applySuccDate',
+		  a.APPLY_STATUS as 'applyStatus',
+		  a.VERSION,
+		  b.ORDERAMT,
+		  c.MERCHANTSHORTNAME as 'merchantShortName',
+		  TO_DAYS(DATE_FORMAT(NOW(),'%Y-%m-%d'))-TO_DAYS(DATE_FORMAT(APPLY_DATE,'%Y-%m-%d')) as days,
+		  a.MONTH_INTEREST as monthInterest
+		from
+		  IQB_INST_PENALTY_DERATE a
+		LEFT JOIN
+		  inst_orderinfo b
+		ON 
+		  a.order_id = b.orderid
+		LEFT JOIN
+          inst_merchantinfo c
+        ON 
+          a.merchant_no = c.merchantno
+		WHERE INSTALL_DETAIL_ID = #{installDetailId}
+		ORDER BY a.id DESC
+		LIMIT 1
+	</select>
+	
+	<!-- 保存罚息减免申请  -->
+	<insert id="savePenaltyDeratable" parameterType="com.iqb.consumer.data.layer.bean.penalty.derate.PenaltyDerateBean">
+		insert into iqb_inst_penalty_derate (
+		  INSTALL_DETAIL_ID,
+		  ORDER_ID,
+		  PROC_INST_ID,
+		  UUID,
+		  MERCHANT_SHORT_NAME,
+		  MERCHANT_NO,
+		  REG_ID,
+		  REAL_NAME,
+		  INSTALL_TERMS,
+		  REPAY_NO,
+		  LAST_REPAY_DATE,
+		  OVERDUE_DAYS,
+		  CUR_REPAY_OVERDUE_INTEREST,
+		  FIXED_OVERDUE_AMT,
+		  DERATE_TYPE,
+		  CUT_OVERDUE_INTEREST,
+		  CUT_OVERDUE_INTEREST_AFTER,
+		  CUT_FIXED_OVERDUE_AMT,
+		  CUT_FIXED_OVERDUE_AMT_AFTER,
+		  CUT_AMT,
+		  CUR_REPAY_AMT,
+		  CUR_REPAY_AMT_TOTAL,
+		  CUT_REASON,
+		  REMARK,
+		  ONLINE_PAY_FAIL_IMG,
+		  DEBIT_BANK_WATER_IMG,
+		  OTHER_IMG,
+		  APPLY_DATE,
+		  APPLY_SUCC_DATE,
+		  APPLY_STATUS,
+		  MONTH_INTEREST,
+		  VERSION
+		) values (
+		  #{installDetailId},
+		  #{orderId},
+		  #{procInstId},
+		  #{uuid},
+		  #{merchantShortName},
+		  #{merchantNo},
+		  #{regId},
+		  #{realName},
+		  #{installTerms},
+		  #{repayNo},
+		  #{lastRepayDate},
+		  #{overdueDays},
+		  #{curRepayOverdueInterest},
+		  #{fixedOverdueAmt},
+		  #{derateType},
+		  #{cutOverdueInterest},
+		  #{cutOverdueInterestAfter},
+		  #{cutFixedOverdueAmt},
+		  #{cutFixedOverdueAmtAfter},
+		  #{cutAmt},
+		  #{curRepayAmt},
+		  #{curRepayAmtTotal},
+		  #{cutReason},
+		  #{remark},
+		  #{onlinePayFailImg},
+		  #{debitBankWaterImg},
+		  #{otherImg},
+		  #{applyDate},
+		  #{applySuccDate},
+		  #{applyStatus},
+		  #{monthInterest},
+		  #{version}
+		)
+	</insert>
+	
+	<!-- 更新罚息减免申请状态  -->
+	<update id="updatePenaltyDeratableApplyStatus" parameterType="com.iqb.consumer.data.layer.bean.penalty.derate.PenaltyDerateBean">
+		UPDATE iqb_inst_penalty_derate SET APPLY_STATUS = #{applyStatus}, APPLY_SUCC_DATE = #{applySuccDate}  WHERE UUID = #{uuid}
+	</update>
+	
+	<!-- 根据id查询  -->
+	<select id="getPenaltyDerateById" resultType="com.iqb.consumer.data.layer.bean.penalty.derate.PenaltyDerateBean">
+		select 
+		  id,
+		  INSTALL_DETAIL_ID as 'installDetailId',
+		  ORDER_ID as 'orderId',
+		  PROC_INST_ID as 'procInstId',
+		  MERCHANT_SHORT_NAME as 'merchantShortName',
+		  MERCHANT_NO as 'merchantNo',
+		  REG_ID as 'regId',
+		  REAL_NAME as 'realName',
+		  INSTALL_TERMS as 'installTerms',
+		  REPAY_NO as 'repayNo',
+		  LAST_REPAY_DATE as 'lastRepayDate',
+		  OVERDUE_DAYS as 'overdueDays',
+		  CUR_REPAY_OVERDUE_INTEREST as 'curRepayOverdueInterest',
+		  FIXED_OVERDUE_AMT as 'fixedOverdueAmt',
+		  DERATE_TYPE as 'derateType',
+		  CUT_OVERDUE_INTEREST as 'cutOverdueInterest',
+		  CUT_OVERDUE_INTEREST_AFTER as 'cutOverdueInterestAfter',
+		  CUT_FIXED_OVERDUE_AMT as 'cutFixedOverdueAmt',
+		  CUT_FIXED_OVERDUE_AMT_AFTER as 'cutFixedOverdueAmtAfter',
+		  CUT_AMT as 'cutAmt',
+		  CUR_REPAY_AMT as 'curRepayAmt',
+		  CUR_REPAY_AMT_TOTAL as 'curRepayAmtTotal',
+		  CUT_REASON as 'cutReason',
+		  REMARK,
+		  ONLINE_PAY_FAIL_IMG as 'onlinePayFailImg',
+		  DEBIT_BANK_WATER_IMG as 'debitBankWaterImg',
+		  OTHER_IMG as 'otherImg',
+		  APPLY_DATE as 'applyDate',
+		  APPLY_SUCC_DATE as 'applySuccDate',
+		  APPLY_STATUS as 'applyStatus',
+		  VERSION
+		from
+		  IQB_INST_PENALTY_DERATE 
+		WHERE ID = #{id}
+	</select>
+	
+	<!-- 根据uuid查询  -->
+	<select id="getPenaltyDerateByUUId" resultType="com.iqb.consumer.data.layer.bean.penalty.derate.PenaltyDerateBean">
+		select 
+		  a.id,
+		  a.INSTALL_DETAIL_ID as 'installDetailId',
+		  a.ORDER_ID as 'orderId',
+		  a.PROC_INST_ID as 'procInstId',
+		  a.MERCHANT_NO as 'merchantNo',
+		  a.REG_ID as 'regId',
+		  a.REAL_NAME as 'realName',
+		  a.INSTALL_TERMS as 'installTerms',
+		  a.REPAY_NO as 'repayNo',
+		  a.LAST_REPAY_DATE as 'lastRepayDate',
+		  a.OVERDUE_DAYS as 'overdueDays',
+		  a.CUR_REPAY_OVERDUE_INTEREST as 'curRepayOverdueInterest',
+		  a.FIXED_OVERDUE_AMT as 'fixedOverdueAmt',
+		  a.DERATE_TYPE as 'derateType',
+		  a.CUT_OVERDUE_INTEREST as 'cutOverdueInterest',
+		  a.CUT_OVERDUE_INTEREST_AFTER as 'cutOverdueInterestAfter',
+		  a.CUT_FIXED_OVERDUE_AMT as 'cutFixedOverdueAmt',
+		  a.CUT_FIXED_OVERDUE_AMT_AFTER as 'cutFixedOverdueAmtAfter',
+		  a.CUT_AMT as 'cutAmt',
+		  a.CUR_REPAY_AMT as 'curRepayAmt',
+		  a.CUR_REPAY_AMT_TOTAL as 'curRepayAmtTotal',
+		  a.CUT_REASON as 'cutReason',
+		  a.REMARK,
+		  a.ONLINE_PAY_FAIL_IMG as 'onlinePayFailImg',
+		  a.DEBIT_BANK_WATER_IMG as 'debitBankWaterImg',
+		  a.OTHER_IMG as 'otherImg',
+		  a.APPLY_DATE as 'applyDate',
+		  a.APPLY_SUCC_DATE as 'applySuccDate',
+		  a.APPLY_STATUS as 'applyStatus',
+		  a.VERSION,
+		  b.ORDERAMT,
+		  c.MERCHANTSHORTNAME as 'merchantShortName',
+		   a.MONTH_INTEREST as monthInterest
+		from
+		  IQB_INST_PENALTY_DERATE a
+		LEFT JOIN
+          inst_orderinfo b
+        ON 
+          a.order_id = b.orderid
+        LEFT JOIN
+          inst_merchantinfo c
+        ON 
+          a.merchant_no = c.merchantno
+		WHERE a.UUID = #{uuid}
+	</select>
+	
+	<select id="getByUUid" parameterType="String" resultType="com.iqb.consumer.data.layer.bean.penalty.derate.PenaltyDerateBean">
+       SELECT 
+           *
+       FROM
+           iqb_inst_penalty_derate 
+       WHERE
+           uuid = #{uuid,jdbcType=VARCHAR}
+    </select>
+    
+	<select id="getAmtAndMerName" resultType="com.iqb.consumer.data.layer.bean.penalty.derate.PenaltyDerateBean">
+	   SELECT 
+	       a.orderamt, b.merchantshortname
+	   FROM
+	       inst_orderinfo a
+	   LEFT JOIN
+	       inst_merchantinfo b
+        ON 
+          a.merchantno = b.merchantno
+       WHERE 
+            a.orderid = #{orderid}
+	</select>
+    <!-- 根据订单号查询申请状态为申请中的罚息订单信息 -->
+    <select id="getPenaltyDerateBeanByOrderId" parameterType="String" resultType="com.iqb.consumer.data.layer.bean.penalty.derate.PenaltyDerateBean">      
+		SELECT
+		    *
+		FROM
+		    iqb_inst_penalty_derate A WHERE A.APPLY_STATUS=1 and A.ORDER_ID=#{orderId} limit 1 
+    </select>
+</mapper>

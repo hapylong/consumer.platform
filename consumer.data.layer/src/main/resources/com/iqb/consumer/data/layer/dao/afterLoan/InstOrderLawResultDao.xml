@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+    Apache License, Version 2.0 (the "License"); you may not use this file except 
+    in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+    Unless required by applicable law or agreed to in writing, software distributed 
+    under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+    OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+    the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.afterLoan.InstOrderLawResultDao">
+     
+     <insert id="saveInstOrderLawResult" parameterType="com.iqb.consumer.data.layer.bean.afterLoan.InstOrderLawResultBean" keyProperty="id"
+        useGeneratedKeys="true">
+        INSERT INTO 
+            inst_order_law_result
+            (   
+                <if test="caseId != null and caseId != ''">
+                    caseId,
+                </if>
+                <if test="orderId != null and orderId != ''">
+                    orderId,
+                </if>
+                <if test="caseResult != null and caseResult != ''">
+                    caseResult,
+                </if>
+                <if test="executeFlag != null and executeFlag > 0">
+                    executeFlag,
+                </if>
+                <if test="courtRemark != null and courtRemark != ''">
+                    courtRemark,
+                </if>
+                <if test="operatorRegId != null and operatorRegId != ''">
+                    operatorRegId,
+                </if>
+                version,createTime
+            )
+        VALUES
+            (
+                <if test="caseId != null and caseId != ''">
+                    #{caseId},
+                </if>
+                 <if test="orderId != null and orderId != ''">
+                    #{orderId},
+                </if>
+                <if test="caseResult != null and caseResult != ''">
+                    #{caseResult},
+                </if>
+                <if test="executeFlag != null and executeFlag > 0">
+                    #{executeFlag},
+                </if>
+                <if test="courtRemark != null and courtRemark != ''">
+                    #{courtRemark},
+                </if>
+                <if test="operatorRegId != null and operatorRegId != ''">
+                    #{operatorRegId},
+                </if>
+                1, NOW()
+           )
+    </insert>
+    
+    <update id="updateInstOrderLawResult" parameterType="com.iqb.consumer.data.layer.bean.afterLoan.InstOrderLawResultBean">
+        update
+        inst_order_law_result
+        <set>
+                <if test="caseResult != null and caseResult != ''">
+                    caseResult = #{caseResult},
+                </if>
+                <if test="executeFlag != null and executeFlag > 0">
+                    executeFlag = #{executeFlag},
+                </if>
+                <if test="courtRemark != null and courtRemark != ''">
+                    courtRemark = #{courtRemark},
+                </if>
+                <if test="operatorRegId != null and operatorRegId != ''">
+                    operatorRegId = #{operatorRegId},
+                </if>
+        </set>
+        where orderId = #{orderId} 
+        <if test="id != null">
+           and id = #{id}
+        </if>
+    </update>
+    
+    <select id="getInstOrderLawResultByOrderId" resultType="com.iqb.consumer.data.layer.bean.afterLoan.InstOrderLawResultBean">
+        select * from inst_order_law_result where orderId = #{orderId} order by createTime limit 1 
+    </select>
+    
+    <select id="selectInstOrderLawResultByOrderId" resultType="com.iqb.consumer.data.layer.bean.afterLoan.InstOrderLawResultBean">
+        SELECT
+		    A.caseResult,
+		    A.executeFlag,
+		    A.courtRemark,
+		    A.createTime,
+		    C.realName
+		FROM
+		    inst_order_law_result A
+		    LEFT JOIN inst_user C ON A.operatorRegId = C.regId
+		WHERE
+		    A.caseId = #{caseId}
+		ORDER BY
+		    A.createTime desc
+    </select>
+</mapper>

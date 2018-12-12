@@ -1,0 +1,24 @@
+.search-info{width: 100%;}
+.col-hr3{height: 50px;}
+.lable-hr3{
+	float: left;
+    height: auto;
+    margin-top: 6px;
+    text-align: right;
+    vertical-align: middle;
+    width: 8%;
+}
+.input-hr3{  float: left;margin-left: 2px;vertical-align: middle;}
+.bottom-hr3{float: left;margin-left: 70px;}
+
+.hr-blackground{background-color: rgba(22, 155, 213, 1);width: 125px; border-radius:5px;color: #fff;padding: 6px;display: inline;}
+
+.table-voucher{margin: 5px;}
+.table-voucher table{width: 100%;}
+.table-voucher table tr{width: auto;height: 30px;}
+.table-voucher table tr th{width: 20%;text-align: right;border:solid 1px rgba(153, 153, 153, 1);padding-right: 20px;}
+.table-voucher table tr td{text-align: left;border:solid 1px rgba(153, 153, 153, 1);padding-left: 10px;}
+
+.fileField{position:absolute;  filter:alpha(opacity:0);opacity: 0;width: 80px;}
+.btnfield{width: 80px;border: 1px solid #DDD;border-radius: 5px; width: 80px;color: white;background-color:rgba(22, 155, 213, 1);}
+.textfield{	width: 50%;border: 0; border-bottom: 1px solid #0000FF;color: #EEA236;} 

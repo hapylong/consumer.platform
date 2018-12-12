@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	    <title>电催</title>
+	    <meta charset="UTF-8" />
+	    <meta name="Author" content="" />
+	    <meta name="Keywords" content="" />
+	    <meta name="Description" content="" />
+	    
+	    <!-- 样式库 -->
+	    <link rel="stylesheet" href="../../../../js/ztree/css/zTreeStyle/zTreeStyle.css" />
+	    <link rel="stylesheet" href="../../../../js/bootstrap/themes/default/bootstrap.css" />
+	    <link rel="stylesheet" href="../../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+	    <link rel="stylesheet" href="../../../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+	    <link rel="stylesheet" href="../../../../css/jquery.select2.css" />
+	    <link rel="stylesheet" href="../../../../css/jquery.select2-bootstrap.css" />
+	    <link rel="stylesheet" href="../../../../css/jquery.datetimepicker.css" /> 
+	    <link rel="stylesheet" href="../../../../css/common/base2.css" />
+	    
+	    <!-- 插件库 -->
+	    <script src="../../../../js/common/package.js"></script>
+		<script src="../../../../js/common/url.js"></script>
+		<script src="../../../../js/common/json2.js"></script>	
+		<script src="../../../../js/common/jquery-1.11.3.min.js"></script>		
+		<script src="../../../../js/bootstrap/bootstrap.js"></script>
+		<script src="../../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+		<script src="../../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+		<script src="../../../../js/ztree/js/jquery.ztree.all.min.js"></script>
+		<script src="../../../../js/common/jquery.select2.js"></script>
+		<script src="../../../../js/common/jquery.datetimepicker.js"></script>
+		
+		<!-- 业务库 -->
+		<script src="../../../../js/common/base.js"></script>
+		<script src="../../../../js/common/datagrid2.js"></script>
+		<script src="../../../../js/common/tree.js"></script>
+		<script src="../../../../js/common/formatter.js"></script>	    
+	    <script src="../../../../js/each/cfm/cfmSys/orderApprovalNew/telephoneUrging.js"></script>
+	    <script src="../../../../js/each/cfm/merch/merch.js"></script>
+	    <script src="../../../../js/each/cfm/merch/merchModel.js"></script>
+	    
+		
+		<!-- 页面样式 -->
+		<style type="text/css">
+			body {
+				font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif !important;
+				background:#eee url("../../../../img/back.png") repeat;
+			}
+			.container-fluid {
+				padding:5px;
+			}
+			.left-part {
+				height:800px;
+			}
+			.modal-form {
+				margin:8px;
+			}
+			.z-index{
+			    z-index:98;
+			}
+			.z-index2{
+			    z-index:97;
+			}
+		</style>
+	    
+	</head>
+	<body>
+	
+		<div class="container-fluid">
+			<div class="row">				
+				<div class="col-md-12">
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<h4 class="panel-title">查询信息</h4>
+					  	</div>
+					  	<div class="panel-body">	
+					  		<form id="searchForm" class="form-horizontal">            
+							  	<div class="form-group">
+                                    <label class="control-label col-lg-1 col-md-1 col-sm-1">机构名称:</label>
+                                    <div class="col-lg-2 col-md-2 col-sm-2">
+                                        <input id="merchNames" type="text" readonly value="全部商户" name="merchNames" class="form-control merch" onclick="showMenu(); return false;"/>
+                                    </div>
+                                    <label class="control-label col-lg-1 col-md-1 col-sm-1">订单号:</label>
+                                    <div class="col-lg-2 col-md-2 col-sm-2">
+                                        <input id="orderId" name="orderId" type="text" class="form-control" placeholder="请输入订单号">
+                                    </div>
+                                    <label class="control-label col-lg-1 col-md-1 col-sm-1">姓名:</label>
+                                    <div class="col-lg-2 col-md-2 col-sm-2">
+                                        <input id="realName" name="realName" type="text" class="form-control" placeholder="请输入姓名">
+                                    </div> 
+                                </div>
+							  	<div class="form-group">
+                                    <label class="control-label col-lg-1 col-md-1 col-sm-1">手机号:</label>
+                                    <div class="col-lg-2 col-md-2 col-sm-2">
+                                        <input id="regId" name="regId" type="text" class="form-control" placeholder="请输入手机号">
+                                    </div>
+                                    <label class="control-label col-lg-1 col-md-1 col-sm-1">电催结果</label>
+                                    <div class="col-lg-2 col-md-2 col-sm-2">
+                                        <select id="mobileCollection" class='telephone_urging form-control input-sm' name='mobileCollection' style='width:100%'></select>
+                                    </div>
+                                    <label class="control-label col-lg-1 col-md-1 col-sm-1">处理意见</label>
+                                    <div class="col-lg-2 col-md-2 col-sm-2">
+                                        <select id="mobileDealOpinion" class='treatment_suggestion form-control input-sm' name='mobileDealOpinion' style='width:100%'></select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-lg-1 col-md-1 col-sm-1">账单日</label>
+                                    <div class="col-lg-2 col-md-2 col-sm-2">
+                                        <input name="startDate" id='startDate' type="text" class="form-control input-sm" placeholder="请输入开始时间">
+                                    </div>
+                                    <label class="control-label col-lg-1 col-md-1 col-sm-1">至</label>
+                                    <div class="col-lg-2 col-md-2 col-sm-2">
+                                        <input name="endDate" id='endDate' type="text" class="form-control input-sm" placeholder="请输入结束时间">
+                                    </div>
+                                    <label class="control-label col-lg-1 col-md-1 col-sm-1">逾期天数:</label>
+                                    <div class="col-lg-2 col-md-2 col-sm-2">
+                                        <input id="overdueDays" name="overdueDays" type="text" class="form-control" placeholder="请输入逾期天数">
+                                    </div>
+                                    <div class="col-lg-3 col-md-3 col-sm-3">
+                                        <button id="btn-search" type="button" class="btn btn-default btn-sm">查询</button>
+                                        <button id="btn-reset" type="button" class="btn btn-default btn-sm">重置</button>
+                                        <a href='javascript:;' id="btn-export" class="btn btn-default btn-sm">导出</a>    
+                                    </div>
+                                </div>					
+							</form>		  												 	
+					  	</div>
+					</div>
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<h4 class="panel-title">账单列表</h4>
+					  	</div>
+					  	<div class="panel-body">
+					    	<form id="listForm">		    		
+					    		<button id="btn-insert1" type="button" class="btn btn-primary btn-sm">电催</button>
+					    		<button id="btn-update1" type="button" class="btn btn-warning btn-sm">详情</button>
+					    		<button id="btn-riskInfo" type="button" class="btn btn-warning btn-sm">风控信息</button>
+					    	</form>
+					  	</div>
+						<table id='datagrid' class="table table-striped table-bordered table-hover table-condensed">
+						    <thead>
+						    	<tr>
+                                    <th field="ck" formatter="Formatter.checkboxAfterLoan2(val,row,rowIndex)"></th>
+                                    <th field="rn">序号</th>
+                                    <th field="id" hidden='true'>ID</th>
+                                    <th field="orderId">订单号</th>
+                                    <th field="realName">姓名</th>
+                                    <th field="regId">手机号</th>
+                                    <th field="merchantName">商户名称</th>
+                                    <th field="curItems">期数</th>
+                                    <th field="orderItems">总期数</th>
+                                    <th field="billInfoStatus" formatter='Formatter.status(val)'>账单状态</th>
+                                    <th field="lastRepayDate">最后还款日</th>
+                                    <th field="overdueDays">逾期天数</th>
+                                    <th field="curRepayAmt" formatter='Formatter.money(val)'>本期应还</th>
+                                    <th field="perOverdueAmt" formatter='Formatter.money(val)'>罚息</th>
+                                    <th field="overdueAmt" formatter='Formatter.money(val)'>违约金</th>
+                                    <th field="mobileCollection">电催结果</th>
+                                    <th field="mobileDealOpinion">处理意见</th>
+                                    <th field="status">电催状态</th>
+                                </tr>
+						    </thead>
+						    <tbody></tbody>
+						</table>
+					  	<div class="panel-footer">
+							<div id="paginator"></div>
+						</div>
+					</div>
+				</div>
+			</div>		 	
+		</div>
+		<div id="update-win" class="modal fade" role="dialog" aria-labelledby="update-win-label" aria-describedby="风控信息">
+			<div class="modal-dialog modal-lg" role="document">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<h5 class="modal-title" id="update-win-label">紧急联系人</h5>
+		      		</div>
+		      		<div class="modal-form">
+		       			<form id="updateForm" class="form-horizontal">
+				  			<div class="form-group">
+				    			<label class="col-md-2 control-label">姓名(亲属)</label>
+				    			<div class="col-md-4">
+				      				<span id="contactname1" class="text-muted"></span>
+				    			</div>
+				    			<label class="col-md-2 control-label">手机号</label>
+				    			<div class="col-md-4">
+				      				<span id="contactphone1" class="text-muted"></span>
+				    			</div>
+				  			</div>
+				  			<div class="form-group">
+				    			<label class="col-md-2 control-label">姓名(朋友)</label>
+				    			<div class="col-md-4">
+				      				<span id="contactname2" class="text-muted"></span>
+				    			</div>
+				    			<label class="col-md-2 control-label">手机号</label>
+				    			<div class="col-md-4">
+				      				<span id="contactphone2" class="text-muted"></span>
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-md-2 control-label">银行预留手机号</label>
+				    			<div class="col-md-4">
+				      				<span id="smsMobile" class="text-muted"></span>
+				    			</div>
+				    			<label class="col-md-2 control-label">联系电话</label>
+				    			<div class="col-md-4">
+				      				<span id="phone" class="text-muted"></span>
+				    			</div>
+				  			</div>
+				  			<div class="form-group">
+				    			<label class="col-md-2 control-label">常住地址</label>
+				    			<div class="col-md-4">
+				      				<span id="addprovince" class="text-muted"></span>
+				    			</div>
+				    			<label class="col-md-2 control-label">婚姻状况</label>
+				    			<div class="col-md-4">
+				      				<span id="marriedstatus" class="text-muted"></span>
+				    			</div>
+				  			</div>
+				  		</form>
+				  	</div>
+				  	<div class="modal-footer">
+				        <button id="btn-close" type="button" class="btn btn-default btn-sm">关闭</button>		        
+		      		</div>
+				 </div>
+			</div>
+		</div>
+		<div id="menuContent" class="menuContent" style="max-height:500px;overflow:scroll;display:none; position: absolute;background:#fff;border:1px solid #ccc;">
+	        <ul id="treeDemo" class="ztree" style="margin-top:0; width:200px;"></ul>
+        </div>
+        <div id="menuContentModel" class="menuContent" style="max-height:500px;overflow:scroll;display:none; position: absolute;background:#fff;border:1px solid #ccc;">
+	        <ul id="treeDemoModel" class="ztree" style="margin-top:0; width:200px;"></ul>
+        </div>
+	</body>
+</html>

@@ -1,0 +1,2768 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+	Apache License, Version 2.0 (the "License"); you may not use this file except 
+	in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.OrderDao">
+
+	<sql id="table">inst_orderinfo</sql>
+
+	<!-- 配置映射字段 -->
+	<resultMap type="com.iqb.consumer.data.layer.bean.order.OrderBean"
+		id="OrderBeanResultMap">
+		<result property="orderId" column="orderId" />
+		<result property="orderNo" column="orderNo" />
+		<result property="userId" column="userId" />
+		<result property="regId" column="regId" />
+		<result property="merchantNo" column="merchantNo" />
+		<result property="orderName" column="orderName" />
+		<result property="orderAmt" column="orderAmt" />
+		<!-- 借款金额 -->
+		<result property="borrowAmt" column="borrowAmt" />
+		<result property="orderItems" column="orderItems" />
+		<result property="orderRemark" column="orderRemark" />
+		<result property="proInfo" column="proInfo" />
+		<result property="preAmt" column="preAmt" />
+		<result property="receivedPreAmt" column="receivedPreAmt" />
+		<result property="preAmtStatus" column="preAmtStatus" />
+		<result property="status" column="status" />
+		<result property="riskStatus" column="riskStatus" />
+		<result property="riskRetRemark" column="riskRetRemark" />
+		<result property="refundFlag" column="refundFlag" />
+		<result property="margin" column="margin" />
+		<result property="downPayment" column="downPayment" />
+		<result property="serviceFee" column="serviceFee" />
+		<result property="planId" column="planId" />
+		<result property="qrCodeId" column="qrcodeId" />
+		<result property="takePayment" column="takepayment" />
+		<result property="feeYear" column="feeYear" />
+		<result property="feeAmount" column="feeAmount" />
+		<result property="monthInterest" column="monthInterest" />
+		<result property="chargeWay" column="chargeWay" />
+		<result property="procInstId" column="procInstId" />
+		<result property="fee" column="fee" />
+		<result property="sumMoney" column="sumMoney" />
+		<result property="applyAmt" column="applyAmt" />
+		<result property="payOwnerId" column="payOwnerId" />
+		<result property="gpsAmt" column="gpsAmt" />
+		<result property="assessPrice" column="assessPrice" />
+		<result property="wfStatus" column="wfStatus" />
+		<result property="bizType" column="bizType" />
+		<result property="version" column="version" />
+		<result property="gpsTrafficFee" column="gpsTrafficFee"/>
+		<result property="createTime" column="createTime" />
+		<result property="updateTime" column="updateTime" />
+		<result property="backFlag" column="backFlag" />
+		<result property="employeeID" column="employeeID" />
+		<result property="employeeName" column="employeeName" />
+		 <!--FINANCE-2995 资产管理订单查询筛选及列表页添加分期时间/放款时间FINANCE-3011资产管理订单查询筛选及列表页添加分期时间/放款时间 -->
+	    <result property="loanDate" column="loanDate" />
+	    <result property="stageDate" column="stageDate" />	    
+	    <result property="leftInstIMonth" column="leftInstIMonth" />
+	    <result property="leftInstIDay" column="leftInstIDay" />
+	</resultMap>
+	<!-- 订单查询ResultMap -->
+	<resultMap id="InfoResultMap"
+		type="com.iqb.consumer.data.layer.bean.order.OrderManageResult"
+		extends="OrderBeanResultMap">
+		<result column="MERCHANTSHORTNAME" property="merchName" />
+		<result column="realName" property="userName" />
+		<result column="PLANSHORTNAME" property="planShortName" />
+		<result column="MERCHANTNO" property="merchCode" />
+		<result column="uploadStatus" property="uploadStatus" />
+		<result column="PROC_CTASKID" property="procTaskId" />
+		<result column="PROC_ORGCODE" property="procOrgCode" />
+		<result column="MARGINRATIO" property="marginRatio" />
+		<result column="bizTypeName" property="bizTypeName" />
+		
+	</resultMap>
+
+	<!-- 替代，语句中的内容,简写 -->
+	<sql id="cols">
+		a.id,a.orderId,a.userId,a.regId,a.merchantNo,a.bizType,
+		a.orderName,a.orderAmt,a.orderItems,a.orderRemark,a.preAmt,a.preAmtStatus,
+		a.status,a.riskStatus,a.riskRetRemark,a.refundFlag,a.margin,a.downPayment,
+		a.serviceFee,a.planId,a.qrcodeId,a.takepayment,a.feeYear,a.feeAmount,
+		a.monthInterest,a.chargeWay,a.procInstId,a.fee,a.sumMoney,a.applyAmt,a.payOwnerId,a.receivedPreAmt, 
+		a.gpsAmt,a.assessPrice,a.wfStatus,a.version,a.createTime,a.updateTime,a.employeeID,a.employeeName,
+		<!-- 添加合同状态 -->
+		a.contractStatus,a.gpsTrafficFee ,a.orderNo,
+		<!--FINANCE-2995 资产管理订单查询筛选及列表页添加分期时间/放款时间FINANCE-3011资产管理订单查询筛选及列表页添加分期时间/放款时间 -->
+		a.loanDate,a.stageDate,A.leftInstIDay,A.leftInstIMonth
+	</sql>
+	
+	<!-- 保存订单信息 -->
+	<insert id="saveOrderInfo" parameterType="com.iqb.consumer.data.layer.bean.order.OrderBean" useGeneratedKeys="true"  keyProperty="id">
+		INSERT INTO inst_orderinfo (orderId, userId, regId, merchantNo, bizType, orderRemark, status, wfStatus, riskStatus,createTime) VALUES 
+		(#{orderId},#{userId},#{regId},#{merchantNo},#{bizType},#{orderRemark},#{status},#{wfStatus},#{riskStatus},#{createTime});
+	</insert>
+	
+	<!-- 保存详情订单 -->
+	<insert id="saveFullOrderInfo" parameterType="com.iqb.consumer.data.layer.bean.order.OrderBean" useGeneratedKeys="true"  keyProperty="id">
+		INSERT INTO inst_orderinfo (orderId, userId, regId, merchantNo, bizType, orderName, orderAmt, orderItems, orderRemark, preAmt, preAmtStatus,
+		 status, wfStatus, riskStatus, riskRetRemark, refundFlag, margin, downPayment, serviceFee, planId, qrCodeId, takePayment, feeYear, feeAmount,
+		  monthInterest, chargeWay, procInstId, fee, sumMoney, applyAmt, gpsTrafficFee, gpsAmt, assessPrice,
+		  version, createTime, updateTime, contractStatus,leftInstIMonth) 
+		  VALUES (#{orderId}, #{userId}, #{regId}, #{merchantNo}, #{bizType}, #{orderName},
+		    #{orderAmt}, #{orderItems}, #{orderRemark}, #{preAmt}, #{preAmtStatus}, #{status}, #{wfStatus}, #{riskStatus}, #{riskRetRemark}, #{refundFlag},
+		     #{margin}, #{downPayment}, #{serviceFee}, #{planId}, #{qrCodeId}, #{takePayment}, #{feeYear}, #{feeAmount}, #{monthInterest}, #{chargeWay}, 
+		     #{procInstId}, #{fee}, #{sumMoney}, #{applyAmt}, #{gpsTrafficFee}, #{gpsAmt}, #{assessPrice}, #{version}, #{createTime}, #{updateTime}, #{contractStatus},
+		     #{orderItems}
+		     );
+	</insert>
+	
+	<!-- 保存流程ID -->
+	<update id="updateProcInstId" parameterType="java.util.Map">
+		UPDATE inst_orderinfo SET procInstId=#{procInstId} WHERE id=#{id}
+	</update>
+	
+	<!-- 订单号修改工作流状态 -->
+	<update id="updateWfStatus" parameterType="java.lang.String">
+		UPDATE
+		<include refid="table" />
+		SET
+		wfStatus=#{wfStatus} WHERE orderId = #{orderId}
+	</update>
+	
+	<!-- 订单号修改工作流状态 -->
+    <update id="updateWfStatus2" parameterType="java.lang.String">
+        UPDATE
+        <include refid="table" />
+        SET
+        wfStatus=#{wfStatus},preAmtStatus=#{preAmtStatus} WHERE orderId = #{orderId}
+    </update>
+
+	<!-- 订单号修改订单状态 -->
+	<update id="updateStatus" parameterType="java.lang.String">
+		UPDATE
+		<include refid="table" />
+		SET
+		riskStatus=#{status} WHERE orderId = #{orderId}
+	</update>
+
+	<!-- 通过订单ID或者NO修改订单状态 -->
+	<update id="updateStatusByIDNO" parameterType="java.util.Map">
+		UPDATE
+		<include refid="table" />
+		SET status=#{status}
+		<where>
+			<if test="orderId !=null and orderId != '' ">orderId = #{orderId}</if>
+		</where>
+	</update>
+
+	<!-- 通过订单ID或者NO修改订单风控状态 -->
+	<update id="updatePreStatusByNO" parameterType="java.util.Map">
+		UPDATE
+		<include refid="table" />
+		SET
+		riskStatus=#{riskStatus},preAmtStatus=#{preAmtStatus}
+		<where>
+			<if test="orderId !=null and orderId != '' ">orderId = #{orderId}</if>
+		</where>
+	</update>
+	
+	<select id="getOrderInfo" parameterType="com.alibaba.fastjson.JSONObject" resultType="com.iqb.consumer.data.layer.bean.order.OrderBean">
+		SELECT 
+            * 
+        FROM 
+            inst_orderinfo 
+        WHERE 
+            orderId = #{orderId}
+	</select>
+	
+	
+	<update id="saveAmtAndItems" parameterType = "String" >
+		update 
+			<include refid="table" /> 
+			<set>
+				<if test="orderAmt != null and orderAmt != ''">
+					orderAmt = #{orderAmt},
+				</if>
+				<if test="orderItems != null and orderItems != ''">
+					orderItems = #{orderItems},
+				</if>
+				<if test="proInfo != null and proInfo != ''">
+					proInfo = #{proInfo},
+				</if>
+			</set>
+			where orderId = #{orderId};
+	</update>
+
+	<!-- 后台修改订单 -->
+	<update id="updateOrderInfo" parameterType="com.iqb.consumer.data.layer.bean.order.OrderBean">
+		update
+		<include refid="table" />
+		a
+		<set>
+			a.version = #{version,jdbcType=INTEGER} + 1,
+			<if test="userId != null and userId != ''">
+				a.userId = #{userId},
+			</if>
+			<if test="merchantNo != null and merchantNo != ''">
+				a.merchantNo = #{merchantNo},
+			</if>
+			<if test="orderName != null and orderName != ''">
+				a.orderName = #{orderName},
+			</if>
+			<if test="orderAmt != null and orderAmt != ''">
+				a.orderAmt = #{orderAmt},
+			</if>
+			<if test="borrowAmt != null and borrowAmt != ''">
+				a.borrowAmt = #{borrowAmt},
+			</if>
+			<if test="orderItems != null and orderItems != ''">
+				a.orderItems = #{orderItems},
+			</if>
+			<if test="preAmt != null and preAmt != ''">
+				a.preAmt = #{preAmt},
+			</if>
+			<if test="orderRemark != null and orderRemark != ''">
+				a.orderRemark = #{orderRemark},
+			</if>
+			<if test="status != null">
+				a.status = #{status},
+			</if>
+			<if test="riskStatus != null">
+				a.riskStatus = #{riskStatus},
+			</if>
+			<if test="regId != null and regId != ''">
+				a.regId = #{regId},
+			</if>
+			<if test="chargeWay != null">
+				a.chargeWay = #{chargeWay},
+			</if>
+			<if test="planId != null and planId != ''">
+				a.planId = #{planId},
+			</if>
+			<if test="qrCodeId != null and qrCodeId != ''">
+				a.qrcodeId = #{qrCodeId},
+			</if>
+			<if test="takePayment != null and takePayment !=''">
+				a.takepayment = #{takePayment},
+			</if>
+			<if test="margin != null and margin != ''">
+				a.margin = #{margin},
+			</if>
+			<if test="downPayment != null and downPayment != ''">
+				a.downPayment = #{downPayment},
+			</if>
+			<if test="serviceFee != null and serviceFee != ''">
+				a.serviceFee = #{serviceFee},
+			</if>
+			<if test="feeYear != null and feeYear != ''">
+				a.feeYear = #{feeYear},
+			</if>
+			<if test="monthInterest != null and monthInterest != ''">
+				a.monthInterest = #{monthInterest},
+			</if>
+			<if test="loanDate != null and loanDate!=''">
+				a.loanDate = #{loanDate},
+			</if>
+			<if test="loanAmt != null and loanAmt !=''">
+				a.loanAmt = #{loanAmt},
+			</if>
+			<if test="feeAmount != null">
+				a.feeAmount = #{feeAmount},
+			</if>
+			<if test="assessPrice !=null and assessPrice != ''">
+				a.assessPrice = #{assessPrice},
+			</if>
+			<if test="gpsAmt !=null and gpsAmt != ''">
+				a.gpsAmt = #{gpsAmt},
+			</if>
+			<if test="gpsTrafficFee !=null and gpsTrafficFee != ''">
+                a.gpsTrafficFee = #{gpsTrafficFee},
+            </if>
+			<if test="applyAmt !=null and applyAmt != ''">
+				a.applyAmt = #{applyAmt},
+			</if>
+			<if test="contractStatus !=null and contractStatus != ''">
+				a.contractStatus = #{contractStatus},
+			</if>
+			<if test="wfStatus != null and wfStatus !=''">
+				a.wfStatus = #{wfStatus},
+			</if>
+			<if test="riskRetRemark != null">
+				a.riskRetRemark = #{riskRetRemark},
+			</if>
+			<if test="loanDate != null and loanDate!=''">
+				a.loanDate = #{loanDate},
+			</if>
+			<if test="loanAmt != null and loanAmt !=''">
+				a.loanAmt = #{loanAmt},
+			</if>
+			<if test="finalRiskAdvice != null and finalRiskAdvice !=''">
+                a.finalRiskAdvice = #{finalRiskAdvice},
+            </if>
+            <if test="assessPrice != null and assessPrice !=''">
+                a.assessPrice = #{assessPrice},
+            </if>
+            <if test="assessSuggest != null and assessSuggest !=''">
+                a.assessSuggest = #{assessSuggest},
+            </if>
+            <if test="procInstId != null and procInstId !=''">
+                a.procInstId = #{procInstId},
+            </if>
+            <if test="stageDate != null and stageDate !=''">
+                stageDate = #{stageDate},
+            </if>
+			a.updateTime = NOW()
+		</set>
+		where a.orderId = #{orderId}
+	</update>
+
+	<select id="selectSelective" parameterType="java.util.Map"
+		resultMap="InfoResultMap">
+		SELECT
+		<include refid="cols" />
+		, b.realName, c.MERCHANTSHORTNAME, d.PLANSHORTNAME,d.PLANFULLNAME, c.MERCHANTNO,
+		e.APPLYTIME
+		FROM
+		<include refid="table" />
+		a
+		LEFT JOIN inst_user b
+		ON a.userId = b.id
+		LEFT JOIN
+		inst_merchantinfo c
+		ON a.merchantNo = c.MERCHANTNO
+		LEFT JOIN inst_plan d
+		ON a.planId = d.id
+		LEFT JOIN (
+		SELECT * FROM(SELECT APPLYTIME, ORDERID FROM cf_requestmoney ORDER BY
+		APPLYTIME DESC) t GROUP BY ORDERID
+		) e
+		ON a.orderId = e.ORDERID
+		WHERE a.status = 1
+		and a.bizType != 2400
+		<if test="merList != null and merList.size() > 0">
+			AND c.MERCHANTNO in
+			<foreach item="item" index="index" collection="merList" open="("
+				separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+		<if test="orderId != null and orderId != ''">
+			AND a.orderId = #{orderId}
+		</if>
+		<if test="regId != null and regId != ''">
+			AND a.regId = #{regId}
+		</if>
+		<if test="employeeName != null and employeeName != ''">
+            AND a.employeeName = #{employeeName}
+        </if>
+		<if test="merchName != null and merchName != ''">
+			AND c.MERCHANTNO = #{merchName}
+		</if>
+		<if test="riskStatus != null and riskStatus != ''">
+			AND a.riskStatus = #{riskStatus}
+		</if>
+		<if test="wfStatus !=null and wfStatus != ''">
+			AND a.wfStatus = #{wfStatus}
+		</if>
+		<if test="bizType !=null and bizType != ''">
+			AND a.bizType = #{bizType}
+		</if>
+		<if test="userName != null and userName != ''">
+			AND b.realName LIKE '%${userName}%'
+		</if>
+		<if test="startTime !=null and startTime != ''">
+			AND a.createTime &gt;= #{startTime}
+		</if>
+		<if test="endTime !=null and endTime != ''">
+			AND a.createTime &lt;= #{endTime}
+		</if>
+		<if test="preAmtStatus !=null and preAmtStatus != ''">
+            AND a.preAmtStatus = #{preAmtStatus}
+        </if>
+        <if test="sbStartTime !=null and sbStartTime != ''">
+            AND DATE_FORMAT(E.applytime,'%Y-%m-%d') &gt;= #{sbStartTime}
+        </if>
+        <if test="sbEndTime !=null and sbEndTime != ''">
+            AND DATE_FORMAT(E.applytime,'%Y-%m-%d') &lt;  #{sbEndTime}
+        </if>
+        <!--FINANCE-2995 资产管理订单查询筛选及列表页添加分期时间/放款时间FINANCE-3011资产管理订单查询筛选及列表页添加分期时间/放款时间 -->
+        <if test="stageStartTime !=null and stageStartTime != ''">
+			AND a.stageDate &gt;= #{stageStartTime}
+		</if>
+		<if test="stageEndTime !=null and stageEndTime != ''">
+			AND a.stageDate &lt;= #{stageEndTime}
+		</if>
+		<if test="loanStartTime !=null and loanStartTime != ''">
+			AND a.loanDate &gt;= #{loanStartTime}
+		</if>
+		<if test="loanEndTime !=null and loanEndTime != ''">
+			AND a.loanDate &lt;= #{loanEndTime}
+		</if>
+        ORDER BY 
+            a.createtime desc
+	</select>
+	
+	<select id="getStageOrderList" parameterType="java.util.Map"
+		resultMap="InfoResultMap">
+		SELECT
+		<include refid="cols" />
+		, b.realName, c.MERCHANTSHORTNAME, d.PLANSHORTNAME,d.PLANFULLNAME, c.MERCHANTNO,
+		e.APPLYTIME
+		FROM
+		<include refid="table" />
+		a
+		LEFT JOIN inst_user b
+		ON a.userId = b.id
+		LEFT JOIN
+		inst_merchantinfo c
+		ON a.merchantNo = c.MERCHANTNO
+		LEFT JOIN inst_plan d
+		ON a.planId = d.id
+		LEFT JOIN (
+		SELECT * FROM(SELECT APPLYTIME, ORDERID FROM cf_requestmoney ORDER BY
+		APPLYTIME DESC) t GROUP BY ORDERID
+		) e
+		ON a.orderId = e.ORDERID
+		WHERE a.status = 1
+		and a.bizType != 2400	
+<!-- FINANCE-2999 订单分期：除单独的车主贷外，其他产品在流程结束后，在列表页显示待分期订单，分期完成后在列表页不显示 -->
+		and a.riskStatus=0
+		and a.wfStatus =9
+		<if test="merList != null and merList.size() > 0">
+			AND c.MERCHANTNO in
+			<foreach item="item" index="index" collection="merList" open="("
+				separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+		<if test="orderId != null and orderId != ''">
+			AND a.orderId = #{orderId}
+		</if>
+		<if test="regId != null and regId != ''">
+			AND a.regId = #{regId}
+		</if>
+		<if test="employeeName != null and employeeName != ''">
+            AND a.employeeName = #{employeeName}
+        </if>
+		<if test="merchName != null and merchName != ''">
+			AND c.MERCHANTNO = #{merchName}
+		</if>
+		<if test="riskStatus != null and riskStatus != ''">
+			AND a.riskStatus = #{riskStatus}
+		</if>
+		<if test="wfStatus !=null and wfStatus != ''">
+			AND a.wfStatus = #{wfStatus}
+		</if>
+		<if test="bizType !=null and bizType != ''">
+			AND a.bizType = #{bizType}
+		</if>
+		<if test="userName != null and userName != ''">
+			AND b.realName LIKE '%${userName}%'
+		</if>
+		<if test="startTime !=null and startTime != ''">
+			AND a.createTime &gt;= #{startTime}
+		</if>
+		<if test="endTime !=null and endTime != ''">
+			AND a.createTime &lt;= #{endTime}
+		</if>
+		<if test="preAmtStatus !=null and preAmtStatus != ''">
+            AND a.preAmtStatus = #{preAmtStatus}
+        </if>
+        <if test="sbStartTime !=null and sbStartTime != ''">
+            AND DATE_FORMAT(E.applytime,'%Y-%m-%d') &gt;= #{sbStartTime}
+        </if>
+        <if test="sbEndTime !=null and sbEndTime != ''">
+            AND DATE_FORMAT(E.applytime,'%Y-%m-%d') &lt;  #{sbEndTime}
+        </if>
+        <!--FINANCE-2995 资产管理订单查询筛选及列表页添加分期时间/放款时间FINANCE-3011资产管理订单查询筛选及列表页添加分期时间/放款时间 -->
+        <if test="stageStartTime !=null and stageStartTime != ''">
+			AND a.stageDate &gt;= #{stageStartTime}
+		</if>
+		<if test="stageEndTime !=null and stageEndTime != ''">
+			AND a.stageDate &lt;= #{stageEndTime}
+		</if>
+		<if test="loanStartTime !=null and loanStartTime != ''">
+			AND a.loanDate &gt;= #{loanStartTime}
+		</if>
+		<if test="loanEndTime !=null and loanEndTime != ''">
+			AND a.loanDate &lt;= #{loanEndTime}
+		</if>
+        ORDER BY 
+            a.createtime desc
+	</select>
+
+	<select id="selectOne" resultMap="InfoResultMap" parameterType="java.util.Map">
+		SELECT
+		<include refid="cols" />
+		, b.realName, c.MERCHANTSHORTNAME, d.PLANSHORTNAME, c.MERCHANTNO
+		FROM
+		<include refid="table" />
+		a
+		LEFT JOIN inst_user b
+		ON a.userId = b.id
+		LEFT JOIN
+		inst_merchantinfo c
+		ON a.merchantNo = c.MERCHANTNO
+		LEFT JOIN inst_plan d
+		ON
+		a.planId = d.id
+		<where>
+			<if test="orderId != null and orderId != '' ">a.orderId = #{orderId}</if>
+		</where>
+	</select>
+
+	<select id="selectPreOrderList" parameterType="java.util.Map"
+		resultMap="InfoResultMap">
+		SELECT
+		<include refid="cols" />
+		, b.realName, c.MERCHANTSHORTNAME, c.MERCHANTNO,
+		(SELECT DICT_NAME from iqb_sys_dict_item WHERE DICT_TYPE_CODE='business_type' and DICT_CODE=A.bizType) as bizTypeName
+		FROM
+		<include refid="table" />
+		a
+		LEFT JOIN
+		inst_user b
+		ON a.userId = b.id
+		LEFT JOIN inst_merchantinfo c
+		ON a.merchantNo = c.MERCHANTNO
+		WHERE a.status
+		= 1
+		AND a.preAmtStatus = 2
+		AND a.riskStatus <![CDATA[!= ]]>11
+		<if test="merList != null and merList.size() > 0">
+			AND c.MERCHANTNO in
+			<foreach item="item" index="index" collection="merList" open="("
+				separator="," close=")">
+				#{item.merchantNo}
+			</foreach>
+		</if>
+		<if test="merchName != null and merchName != ''">
+			AND c.MERCHANTNO = #{merchName}
+		</if>
+		<if test="riskStatus != null and riskStatus != ''">
+			AND a.riskStatus = #{riskStatus}
+		</if>
+		<if test="regId != null and regId != ''">
+			AND a.regId = #{regId}
+		</if>
+		<if test="userName != null and userName != ''">
+			AND b.realName LIKE '%${userName}%'
+		</if>
+		<if test="startTime !=null and startTime != ''">
+			AND a.createTime &gt;= #{startTime}
+		</if>
+		<if test="endTime !=null and endTime != ''">
+			AND a.createTime &lt;= #{endTime}
+		</if>
+		<if test="orderId !=null and orderId != ''">
+            AND a.orderId = #{orderId}
+        </if>
+        <if test="bizType !=null and bizType != ''">
+            AND a.bizType = #{bizType}
+        </if>
+	</select>
+
+	<!-- 新后台修改订单 (修改非基本数据类型的值) -->
+	<update id="newUpdateOrderInfo" parameterType="com.iqb.consumer.data.layer.bean.order.OrderBean">
+		update
+		<include refid="table" />
+		a
+		<set>
+			a.version = #{version,jdbcType=INTEGER} + 1,
+			<if test="merchId != null and merchId != ''">
+				a.merch_id = #{merchId},
+			</if>
+			<if test="orderName != null and orderName != ''">
+				a.order_name = #{orderName},
+			</if>
+			<if test="orderAmt != null and orderAmt != ''">
+				a.order_amt = #{orderAmt},
+			</if>
+			<if test="orderItems != null and status != ''">
+				a.order_items = #{orderItems},
+			</if>
+			<if test="preAmount != null and preAmount != ''">
+				a.pre_amount = #{preAmount},
+			</if>
+			<if test="orderRem != null and orderRem != ''">
+				a.order_rem = #{orderRem},
+			</if>
+			<if test="regId != null and regId != ''">
+				a.regId = #{regId},
+			</if>
+			<if test="planId != null and planId != ''">
+				a.planId = #{planId},
+			</if>
+			<if test="qrCodeId != null and qrCodeId != ''">
+				a.qrcodeId = #{qrCodeId},
+			</if>
+			<if test="margin != null and margin != ''">
+				a.margin = #{margin},
+			</if>
+			<if test="downPayment != null and downPayment != ''">
+				a.downPayment = #{downPayment},
+			</if>
+			<if test="serviceFee != null and serviceFee != ''">
+				a.serviceFee = #{serviceFee},
+			</if>
+			<if test="finalPayment != null and finalPayment != ''">
+				a.finalPayment = #{finalPayment},
+			</if>
+			<if test="feeYear != null and feeYear != ''">
+				a.feeYear = #{feeYear},
+			</if>
+			<if test="monthInterest != null and monthInterest != ''">
+				a.monthInterest = #{monthInterest},
+			</if>
+			<if test="feeAmount != null and feeAmount != ''">
+				a.feeAmount = #{feeAmount},
+			</if>
+			<if test="assessPrice !=null and assessPrice != ''">
+				a.ASSESSPRICE = #{assessPrice},
+			</if>
+			<if test="projectName !=null and projectName != ''">
+				a.projectName = #{PROJECTNAME},
+			</if>
+			<if test="projectNo !=null and projectNo != ''">
+				a.PROJECTNO = #{projectNo},
+			</if>
+			<if test="carSortNo !=null and carSortNo != ''">
+				a.CARSORTNO = #{carSortNo},
+			</if>
+			<if test="guarantee !=null and guarantee != ''">
+				a.GUARANTEE = #{guarantee},
+			</if>
+			<if test="guaranteeName !=null and guaranteeName != ''">
+				a.GUARANTEENAME = #{guaranteeName},
+			</if>
+			a.updateTime = NOW()
+		</set>
+		where a.order_id = #{orderId}
+	</update>
+
+	<select id="getMaxCarSortNo" parameterType="java.util.Map"
+		resultType="int">
+		SELECT
+		IFNULL(MAX(b.CARSORTNO), 0)
+		FROM
+		<include refid="table" />
+		a,
+		inst_orderotherinfo b
+		WHERE
+		a.orderId = b.orderId
+		AND a.merchantNo = #{merchantNo}
+		AND
+		DATE_FORMAT(a.createTime, '%Y%m') = #{prefix};
+	</select>
+
+	<!-- 查询订单其他信息 -->
+	<select id="selectOtherOne" parameterType="String"
+		resultType="com.iqb.consumer.data.layer.bean.order.OrderOtherInfo">
+		SELECT * FROM inst_orderotherinfo WHERE orderId = #{orderId}
+	</select>
+	
+	<!-- 通过订单查询订单信息 -->
+	<select id="selByOrderId" parameterType="java.lang.String" resultMap="OrderBeanResultMap">
+		SELECT * FROM inst_orderinfo WHERE orderId = #{orderId}
+	</select>
+	
+	<!-- 修改实际预付款金额 -->
+	<update id="updatePreInfo" parameterType="java.util.Map">
+		update inst_orderinfo SET version = version+1,receivedPreAmt=#{receivedPreAmt},preAmtStatus = #{preAmtStatus} ,riskStatus = #{riskStatus} ,updateTime=NOW() WHERE orderId = #{orderId}
+	</update>
+
+	<insert id="insertOrderOtherInfo"
+		parameterType="com.iqb.consumer.data.layer.bean.order.OrderOtherInfo">
+		INSERT INTO inst_orderotherinfo
+		(
+		orderId,merchantNo,projectName,projectNo,guarantee,guaranteeName,carSortNo,version,createTime
+		)
+		VALUES
+		(
+		#{orderId},#{merchantNo},#{projectName},#{projectNo},#{guarantee},#{guaranteeName},#{carSortNo},#{version},NOW()
+		)
+	</insert>
+	
+	<select id="getAuthorityOrderList" parameterType="java.util.Map"
+		resultMap="InfoResultMap">
+		SELECT
+		<include refid="cols" />
+		, b.realName, c.MERCHANTSHORTNAME, d.PLANSHORTNAME,
+		e.APPLYTIME,f.uploadStatus,g.PROC_CTASKID, c.ID as PROC_ORGCODE
+		FROM
+		<include refid="table" />
+		a
+		LEFT JOIN inst_user b
+		ON a.userId = b.id
+		LEFT JOIN
+		inst_merchantinfo c
+		ON a.merchantNo = c.MERCHANTNO
+		LEFT JOIN inst_plan d
+		ON a.planId = d.id
+		LEFT JOIN (
+		SELECT * FROM(SELECT APPLYTIME, ORDERID FROM cf_requestmoney ORDER BY
+		APPLYTIME DESC) t GROUP BY ORDERID
+		) e
+		ON a.orderId = e.ORDERID
+		LEFT JOIN inst_authoritycard f ON a.orderId = f.orderId
+		LEFT JOIN iqb_wf_proc_task g ON a.procInstId = g.PROC_INST_ID
+		WHERE a.status = 1 AND (a.riskStatus = 3 OR a.wfstatus = 9) AND a.bizType in ('2001','2002','2100','2200') 
+		<if test="merList != null and merList.size() > 0">
+			AND c.MERCHANTNO in
+			<foreach item="item" index="index" collection="merList" open="("
+				separator="," close=")">
+				#{item.merchantNo}
+			</foreach>
+		</if>
+		<if test="orderId != null and orderId != ''">
+			AND a.orderId = #{orderId}
+		</if>
+		<if test="regId != null and regId != ''">
+			AND a.regId = #{regId}
+		</if>
+		<if test="merchName != null and merchName != ''">
+			AND c.MERCHANTNO = #{merchName}
+		</if>
+		<if test="wfStatus !=null and wfStatus != ''">
+			AND a.wfStatus = #{wfStatus}
+		</if>
+		<if test="uploadStatus !=null and uploadStatus != ''">
+			AND f.uploadStatus = #{uploadStatus}
+		</if>
+		<if test="userName != null and userName != ''">
+			AND b.realName LIKE '%${userName}%'
+		</if>
+		<if test="startTime !=null and startTime != ''">
+			AND e.APPLYTIME &gt;= #{startTime}
+		</if>
+		<if test="endTime !=null and endTime != ''">
+			AND e.APPLYTIME &lt;= #{endTime}
+		</if>
+		<![CDATA[ GROUP BY a.orderId ]]>
+	</select>
+	
+	<insert id="batchInsertJysOrder"  parameterType="java.util.List">
+		INSERT INTO jys_orderinfo (
+			batchNo,orderId,userId,regId,merchantNo,bizType,orderName,orderAmt,orderItems,orderRemark,preAmt,preAmtStatus,status,
+			riskStatus,wfStatus,riskRetRemark,refundFlag,margin,downPayment,serviceFee,planId,qrCodeId,takePayment,feeYear,feeAmount,
+			monthInterest,chargeWay,procInstId,fee,sumMoney,applyAmt,gpsAmt,assessPrice,version,createTime,updateTime,expireDate,creditorId
+		)
+		VALUES
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(#{item.batchNo},#{item.orderId},#{item.userId},#{item.regId},#{item.merchantNo},#{item.bizType},#{item.orderName},#{item.orderAmt},#{item.orderItems},
+			#{item.orderRemark},#{item.preAmt},#{item.preAmtStatus},#{item.status},#{item.riskStatus},#{item.wfStatus},#{item.riskRetRemark},#{item.refundFlag},#{item.margin},
+			#{item.downPayment},#{item.serviceFee},#{item.planId},#{item.qrCodeId},#{item.takePayment},#{item.feeYear},#{item.feeAmount},#{item.monthInterest},
+			#{item.chargeWay},#{item.procInstId},#{item.fee},#{item.sumMoney},#{item.applyAmt},#{item.gpsAmt},#{item.assessPrice},#{item.version},
+			#{item.createTime},#{item.updateTime},#{item.expireDate},#{item.creditorId})
+		</foreach>
+	</insert>
+	
+	<!-- 根据订单id获取机构代码  -->
+	<select id="getOrgCodeByOrderId" resultType="string">
+		SELECT im.ID FROM inst_orderinfo io LEFT JOIN inst_merchantinfo im ON io.merchantNo = im.MERCHANTNO WHERE io.orderId = #{orderId};
+	</select>
+	
+	<!-- 订单号修改工作流状态 -->
+	<update id="updatePledgeWfStatus" parameterType="java.lang.String">
+		UPDATE
+		<include refid="table" />
+		<set>
+		    <if test = "wfStatus != null ">
+                wfStatus = #{wfStatus},
+            </if>
+			<if test = "riskStatus != null and riskStatus != ''">
+				riskStatus = #{riskStatus},
+			</if>
+			<if test = "preAmtStatus != null ">
+				preAmtStatus = #{preAmtStatus},
+			</if>
+			<if test = "specialTime != null and specialTime != ''">
+                specialTime = #{specialTime},
+            </if>
+            <if test = "backFlag != null and backFlag != ''">
+                backFlag = #{backFlag},
+            </if>
+            <if test = "showContract != null and showContract != ''">
+                showContract = #{showContract},
+            </if>
+            <if test = "preAmt != null and preAmt != ''">
+                preAmt = #{preAmt},
+            </if>
+            leftInstIMonth = orderItems,
+            updateTime = now()
+		</set>
+		WHERE orderId = #{orderId}
+	</update>
+	
+	<select id="getIOIEByOid" parameterType="java.lang.String" resultType="com.iqb.consumer.data.layer.bean.credit_product.entity.InstOrderInfoEntity">
+        SELECT 
+            * 
+        FROM 
+            inst_orderinfo 
+        WHERE 
+            orderId = #{orderId}
+    </select>
+    
+    <select id="getCTCPByOid" parameterType="java.lang.String" resultType="com.iqb.consumer.data.layer.bean.admin.request.ChatToChangePlanRequestPojo">
+        SELECT 
+            orderid, regid
+        FROM 
+            inst_orderinfo
+        WHERE 
+            orderid = #{orderId}
+    </select>
+    
+    <insert id="persistIOE" parameterType="com.iqb.consumer.data.layer.bean.admin.entity.InstOperateEntity">
+        INSERT INTO 
+            inst_operate
+	        (
+	           id, orderid, realname, orgcode, target, reason, version, createtime, updatetime
+	        )
+        VALUES
+	        (
+	           #{id}, #{orderId}, #{realName}, #{orgCode}, #{target}, #{reason}, #{version}, #{createTime}, #{updateTime}
+	        )
+    </insert>
+    
+    <select id="getSCBCRequestMessageByOid" parameterType="java.lang.String" resultType="com.iqb.consumer.data.layer.bean.pay.ChatFinanceToRefundRequestMessage">
+        SELECT 
+            a.orderid, a.regid,a.merchantno, a.riskstatus,
+            b.bankcardno, b.bankname ,b.bankcode
+        FROM 
+            inst_orderinfo a
+        LEFT JOIN
+            inst_bankcard b
+        ON
+            a.userid = b.userid
+        WHERE (B.`status`=2 or b.`status`=3)
+        and a.orderid = #{orderId}
+        limit 1 
+    </select>
+    
+    <update id="updateSpecialTimeByOid" parameterType="java.lang.String">
+        UPDATE
+            inst_orderinfo
+        SET
+            specialtime = NOW()
+        WHERE orderId = #{orderId}
+    </update>
+    
+    <!-- 订单号修改工作流状态 -->
+	<update id="updateInstOrderBackFlag" parameterType="java.lang.String">
+		UPDATE
+		<include refid="table" />
+		set backFlag = #{backFlag}
+		WHERE orderId = #{orderId}
+	</update>
+	<!-- 蒲公英行流程回调修改风控信息-->
+	<update id="updateOrderInfoForDandelion" parameterType="com.iqb.consumer.data.layer.bean.order.OrderBean">
+		update
+		<include refid="table" />
+		a
+		<set>
+			a.version = #{version,jdbcType=INTEGER} + 1,
+	
+			<if test="riskRetRemark != null">
+				a.riskRetRemark = #{riskRetRemark},
+			</if>
+			a.updateTime = NOW()
+		</set>
+		where a.orderId = #{orderId}
+	</update>
+	
+	
+	<select id="queryHouseBill" parameterType="com.alibaba.fastjson.JSONObject" resultType="com.iqb.consumer.data.layer.bean.order.pojo.HouseBillQueryPojo">
+        SELECT 
+            a.order_no AS orderno,a.created_time AS createtime,
+            a.real_inst_amt AS realinstamt,a.apply_term AS applyterm,a.receivable_amt AS receivableamt,
+            a.user_name AS username,a.mobile ,a.approval_amt AS approvalAmt,a.business_type businesstype,
+            b.merchantshortname as orgshortname,
+            c.dict_name AS businessname ,
+            d.takePayment, d.planfullName,
+            e.user_name AS channeluser 
+        FROM
+            eatep_house_order a
+        LEFT JOIN
+            inst_merchantinfo b
+        ON
+            a.channel_code = b.MERCHANTNO
+        LEFT JOIN
+            iqb_sys_dict_item c
+        ON
+            a.business_type = c.dict_value
+        AND
+            c.dict_type_code = #{dictTypeCode}
+        LEFT JOIN
+            inst_plan d
+        ON
+            a.plan_id = d.id
+        LEFT JOIN
+            iqb_sys_user_wechat e
+        ON    
+            a.channel_user = e.user_code
+        <where>
+            <if test="orderNo !=null and  orderNo != ''">
+                AND a.order_no = #{orderNo}
+            </if>
+            <if test="merList != null and merList.size() > 0">
+                AND b.merchantNo in
+                <foreach item="item" index="index" collection="merList" open="("
+                    separator="," close=")">
+                    #{item.merchantNo}
+                </foreach>
+            </if>
+            <if test="userName !=null and  userName != ''">
+                AND a.user_name = #{userName}
+            </if>
+            <if test="wfStatus !=null and  wfStatus != ''">
+                AND a.wfstatus = #{wfStatus}
+            </if>
+            <if test="bizType !=null and bizType != ''">
+                AND a.business_type = #{bizType}
+            </if>
+            <if test="startTime !=null and startTime != ''">
+                AND a.created_time &gt;= #{startTime}
+            </if>
+            <if test="endTime !=null and endTime != ''">
+                AND a.created_time &lt; #{endTime}
+            </if>
+            <if test="channelUser !=null and channelUser != ''">
+                AND e.user_name = #{channelUser}
+            </if>
+        </where>
+    </select>
+    
+    <resultMap id="hoeMap" type="com.iqb.consumer.data.layer.bean.order.house.HouseOrderEntity">
+        <id column="ID" property="id"></id>
+        <result column="user_code" property="userCode"></result>
+        <result column="house_id" property="houseId"></result>
+        <result column="order_no" property="orderNo"></result>
+        <result column="order_name" property="orderName"></result>
+        <result column="approval_amt" property="approvalAmt"></result>
+        <result column="approval_term" property="approvalTerm"></result>
+        <result column="plan_id" property="planId"></result>
+        <result column="return_type" property="returnType"></result>
+        <result column="monthly_interest" property="monthlyInterest"></result>
+        <result column="monthly_interest_type" property="monthlyInterestType"></result>
+        <result column="month_items" property="monthItems"></result>
+        <result column="month_items_type" property="monthItemsType"></result>
+        <result column="return_source" property="returnSource"></result>
+        <result column="review" property="review"></result>
+        <result column="expand" property="expand"></result>
+        <result column="expand_interest" property="expandInterest"></result>
+        <result column="expand_term" property="expandTerm"></result>
+        <result column="default_interest" property="defaultInterest"></result>
+        <result column="description" property="description"></result>
+        <result column="created_time" property="createdTime"></result>
+        <result column="update_time" property="updateTime"></result>
+        <result column="black" property="black"></result>
+        <result column="appeal" property="appeal"></result>
+        <result column="bank_credit" property="bankCredit"></result>
+        <result column="major_issue" property="majorIssue"></result>
+        <result column="channel_user" property="channelUser"></result>
+        <result column="channel_code" property="channelCode"></result>
+        <result column="ensure_rate" property="ensureRate"></result>
+        <result column="ensure_amt" property="ensureAmt"></result>
+        <result column="wfstatus" property="wfstatus"></result>
+        <result column="status_desc" property="statusDesc"></result>
+        <result column="approval_desc" property="approvalDesc"></result>
+        <result column="approval_status" property="approvalStatus"></result>
+        <result column="apply_money" property="applyMoney"></result>
+        <result column="apply_term" property="applyTerm"></result>
+        <result column="business_type" property="businessType"></result>
+        <result column="business_subtype" property="businessSubtype"></result>
+        <result column="user_name" property="userName"></result>
+        <result column="id_card" property="idCard"></result>
+        <result column="mobile" property="mobile"></result>
+        <result column="married" property="married"></result>
+        <result column="instdetail" property="instDetail"></result>
+        <result column="transction_no" property="transctionNo"></result>
+        <result column="province" property="province"></result>
+        <result column="city" property="city"></result>
+        <result column="process_id" property="processId"></result>
+        <result column="ledprocess_id" property="ledprocessId"></result>
+        <result column="review_desc" property="reviewDesc"></result>
+        <result column="return_flag" property="returnFlag"></result>
+        <result column="bank_card" property="bankCard"></result>
+        <result column="bank_name" property="bankName"></result>
+        <result column="reserve_mobile" property="reserveMobile"></result>
+        <result column="reserve_desc" property="reserveDesc"></result>
+        <result column="loan_form" property="loanForm"></result>
+        <result column="loan_flag" property="loanFlag"></result>
+        <result column="loan_options" property="loanOptions"></result>
+        <result column="receivable_amt" property="receivableAmt"></result>
+        <result column="receivable_amt" property="receivableAmt"></result>
+        <result column="real_inst_amt" property="realInstAmt"></result>
+        <result column="allot_status" property="allotStatus"></result>
+    </resultMap>
+    
+    <select id="queryHOEByOid" parameterType="java.lang.String" resultMap="hoeMap">
+        SELECT 
+            * 
+        FROM 
+            eatep_house_order
+        WHERE 
+            order_no = #{orderId}
+    </select>
+    
+    <select id="queryMPEByPid" parameterType="java.lang.Long" resultType="com.iqb.consumer.data.layer.bean.order.mplan.InstPlanEntity">
+        SELECT 
+            * 
+        FROM 
+            inst_plan
+        WHERE 
+            id = #{planId}
+    </select>
+    
+    <update id="updateHouseOrderHandler" parameterType="com.iqb.consumer.data.layer.bean.order.house.HouseOrderEntity">
+        UPDATE
+            eatep_house_order
+        <set>
+            <if test="userCode != null">
+                user_code = #{userCode},
+            </if>
+            <if test="houseId != null">  
+                house_id = #{houseId},
+            </if>
+            <if test="orderNo != null">
+                order_no = #{orderNo},
+            </if>
+            <if test="orderName != null">
+                order_name = #{orderName},
+            </if>
+            <if test="approvalAmt != null">
+                approval_amt = #{approvalAmt},
+            </if>
+            <if test="approvalTerm != null">
+                approval_term = #{approvalTerm},
+            </if>
+            <if test="planId != null">
+                plan_id = #{planId},
+            </if>
+            <if test="returnType != null">
+                return_type = #{returnType},
+            </if>
+            <if test="monthlyInterest != null">
+                monthly_interest = #{monthlyInterest},
+            </if>
+            <if test="monthlyInterestType != null">
+                monthly_interest_type = #{monthlyInterestType},
+            </if>
+            <if test="monthItems != null">
+                month_items = #{monthItems},
+            </if>
+            <if test="monthItemsType != null">
+                month_items_type = #{monthItemsType},
+            </if>
+            <if test="returnSource != null">
+                return_source = #{returnSource},
+            </if>
+            <if test="review != null">
+                review = #{review},
+            </if>
+            <if test="expand != null">
+                expand = #{expand},
+            </if>
+            <if test="expandInterest != null">
+                expand_interest = #{expandInterest},
+            </if>
+            <if test="expandTerm != null">
+                expand_term = #{expandTerm},
+            </if>
+            <if test="defaultInterest != null">
+                default_interest = #{defaultInterest},
+            </if>
+            <if test="description != null">
+                description = #{description},
+            </if>
+            <if test="createdTime != null">
+                created_time = #{createdTime},
+            </if>
+            <if test="black != null">
+                black = #{black},
+            </if>
+            <if test="appeal != null">
+                appeal = #{appeal},
+            </if>
+            <if test="bankCredit != null">
+                bank_credit = #{bankCredit},
+            </if>
+            <if test="majorIssue != null">
+                major_issue = #{majorIssue},
+            </if>
+            <if test="channelUser != null">
+                channel_user = #{channelUser},
+            </if>
+            <if test="channelCode != null">
+                channel_code = #{channelCode},
+            </if>
+            <if test="ensureRate != null">
+                ensure_rate = #{ensureRate},
+            </if>
+            <if test="ensureAmt != null">
+                ensure_amt = #{ensureAmt},
+            </if>
+            <if test="wfstatus != null">
+                wfstatus = #{wfstatus},
+            </if>
+            <if test="statusDesc != null">
+                status_desc = #{statusDesc},
+            </if>
+            <if test="approvalDesc != null">
+                approval_desc = #{approvalDesc},
+            </if>
+            <if test="approvalStatus != null">
+                approval_status = #{approvalStatus},
+            </if>
+            <if test="applyMoney != null">
+                apply_money = #{applyMoney},
+            </if>
+            <if test="applyTerm != null">
+                apply_term = #{applyTerm},
+            </if>
+            <if test="businessType != null">
+                business_type = #{businessType},
+            </if>
+            <if test="businessSubtype != null">
+                business_subtype = #{businessSubtype},
+            </if>
+            <if test="userName != null">
+                user_name = #{userName},
+            </if>
+            <if test="idCard != null">
+                id_card = #{idCard},
+            </if>
+            <if test="mobile != null">
+                mobile = #{mobile},
+            </if>
+            <if test="married != null">
+                married = #{married},
+            </if>
+            <if test="instDetail != null">
+                instdetail = #{instDetail},
+            </if>
+            <if test="transctionNo != null">
+                transction_no = #{transctionNo},
+            </if>
+            <if test="province != null">
+                province = #{province},
+            </if>
+            <if test="city != null">
+                city = #{city},
+            </if>
+            <if test="processId != null">
+                process_id = #{processId},
+            </if>
+            <if test="reviewDesc != null">
+                review_desc = #{reviewDesc},
+            </if>
+            <if test="returnFlag != null">
+                return_flag = #{returnFlag},
+            </if>
+            <if test="realInstAmt != null">
+                real_inst_amt = #{realInstAmt},
+            </if>
+            update_time = NOW(),
+        </set>
+        WHERE
+            <choose>
+                <when test="id !=null and  id != ''">
+                    id = #{id}
+                </when>
+                <otherwise>
+                    order_no = #{orderNo}
+                </otherwise>
+            </choose>
+    </update>
+    
+    <select id="getOidsBySongsong" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT
+            a.order_no
+        FROM
+            eatep_house_order a
+        LEFT JOIN
+            iqb_sys_user_wechat b
+        ON
+            a.channel_user = b.user_phone
+        WHERE
+            b.user_name = #{songsong}
+    </select>
+    
+    <select id="querySongSongByOid" parameterType="java.lang.Object" resultMap="hoeMap">
+        SELECT
+            b.user_name AS channel_user, 
+            c.org_short_name  AS channel_code,
+            d.tradeNo AS transction_no
+        FROM
+            eatep_house_order a
+        LEFT JOIN
+            iqb_sys_user_wechat b
+        ON
+            a.channel_user = b.user_phone
+        LEFT JOIN
+            iqb_sys_organization_info c
+        ON
+            a.channel_code = c.org_code
+        LEFT JOIN
+            inst_paymentlog d
+        ON
+            a.order_no = d.orderid
+        <where>
+            <if test="orderId !=null and  orderId != ''">
+                AND a.order_no = #{orderId}
+            </if>
+            <if test="subOrderId !=null and  subOrderId != ''">
+                AND d.suborderid = #{subOrderId}
+            </if>
+            <if test="repayNo !=null">
+                AND d.repayno = #{repayNo}
+            </if>
+        </where>
+    </select>
+    
+    <select id="getChannelInfo" parameterType="java.lang.String" resultType="com.iqb.consumer.data.layer.bean.user.SysUserWechat">
+    	SELECT W.USER_NAME as userName,I.ORG_NAME as channelName from iqb_sys_user_wechat W,iqb_sys_organization_info I,eatep_house_order O 
+    	WHERE W.ORG_NAME = I.ORG_CODE AND O.CHANNEL_USER = W.USER_CODE AND O.ORDER_NO=#{orderId}; 
+    </select>
+    
+    <update id="updateIOIEResetAmt" parameterType="com.iqb.consumer.data.layer.bean.credit_product.entity.InstOrderInfoEntity">
+        UPDATE
+            inst_orderinfo
+        SET
+            downPayment = #{downPayment},
+	        feeAmount = #{feeAmount},
+	        margin = #{margin},
+	        preAmt = #{preAmt},
+	        monthInterest = #{monthInterest},
+	        serviceFee = #{serviceFee},
+	        orderAmt = #{orderAmt}
+        WHERE
+             orderId = #{orderId}
+    </update>
+    
+    <update id="updateIOIE" parameterType="com.iqb.consumer.data.layer.bean.credit_product.entity.InstOrderInfoEntity">
+	    update inst_orderinfo
+	    <set>
+	      <if test="orderId != null">
+	        orderId = #{orderId,jdbcType=VARCHAR},
+	      </if>
+	      <if test="userId != null">
+	        userId = #{userId,jdbcType=TINYINT},
+	      </if>
+	      <if test="regId != null">
+	        regId = #{regId,jdbcType=VARCHAR},
+	      </if>
+	      <if test="merchantNo != null">
+	        merchantNo = #{merchantNo,jdbcType=VARCHAR},
+	      </if>
+	      <if test="bizType != null">
+	        bizType = #{bizType,jdbcType=VARCHAR},
+	      </if>
+	      <if test="orderName != null">
+	        orderName = #{orderName,jdbcType=VARCHAR},
+	      </if>
+	      <if test="orderAmt != null">
+	        orderAmt = #{orderAmt,jdbcType=DECIMAL},
+	      </if>
+	      <if test="orderItems != null">
+	        orderItems = #{orderItems,jdbcType=TINYINT},
+	      </if>
+	      <if test="orderItemsUnit != null">
+	        orderItemsUnit = #{orderItemsUnit,jdbcType=BIT},
+	      </if>
+	      <if test="fee != null">
+	        fee = #{fee,jdbcType=DOUBLE},
+	      </if>
+	      <if test="feeType != null">
+	        feeType = #{feeType,jdbcType=BIT},
+	      </if>
+	      <if test="breachAmt != null">
+	        breachAmt = #{breachAmt,jdbcType=DECIMAL},
+	      </if>
+	      <if test="archivesAmt != null">
+	        archivesAmt = #{archivesAmt,jdbcType=DECIMAL},
+	      </if>
+	      <if test="registAmt != null">
+	        registAmt = #{registAmt,jdbcType=DECIMAL},
+	      </if>
+	      <if test="authenticateAmt != null">
+	        authenticateAmt = #{authenticateAmt,jdbcType=DECIMAL},
+	      </if>
+	      <if test="stopAmt != null">
+	        stopAmt = #{stopAmt,jdbcType=DECIMAL},
+	      </if>
+	      <if test="status != null">
+	        status = #{status,jdbcType=TINYINT},
+	      </if>
+	      <if test="wfStatus != null">
+	        wfStatus = #{wfStatus,jdbcType=TINYINT},
+	      </if>
+	      <if test="riskStatus != null">
+	        riskStatus = #{riskStatus,jdbcType=TINYINT},
+	      </if>
+	      <if test="margin != null">
+	        margin = #{margin,jdbcType=DECIMAL},
+	      </if>
+	      <if test="downPayment != null">
+	        downPayment = #{downPayment,jdbcType=DECIMAL},
+	      </if>
+	      <if test="serviceFee != null">
+	        serviceFee = #{serviceFee,jdbcType=DECIMAL},
+	      </if>
+	      <if test="planId != null">
+	        planId = #{planId,jdbcType=BIGINT},
+	      </if>
+	      <if test="takePayment != null">
+	        takePayment = #{takePayment,jdbcType=INTEGER},
+	      </if>
+	      <if test="feeYear != null">
+	        feeYear = #{feeYear,jdbcType=INTEGER},
+	      </if>
+	      <if test="feeAmount != null">
+	        feeAmount = #{feeAmount,jdbcType=DECIMAL},
+	      </if>
+	      <if test="monthInterest != null">
+	        monthInterest = #{monthInterest,jdbcType=DECIMAL},
+	      </if>
+	      <if test="procInstId != null">
+	        procInstId = #{procInstId,jdbcType=VARCHAR},
+	      </if>
+	      <if test="applyAmt != null">
+	        applyAmt = #{applyAmt,jdbcType=DECIMAL},
+	      </if>
+	      <if test="assessPrice != null">
+	        assessPrice = #{assessPrice,jdbcType=VARCHAR},
+	      </if>
+	      <if test="backFlag != null">
+	        backFlag = #{backFlag,jdbcType=TINYINT},
+	      </if>
+	      <if test="transctionNo != null">
+	        transctionNo = #{transctionNo,jdbcType=VARCHAR},
+	      </if>
+	      <if test="version != null">
+	        version = #{version,jdbcType=VARCHAR},
+	      </if>
+	      <if test="createTime != null">
+	        createTime = #{createTime,jdbcType=TIMESTAMP},
+	      </if>
+	      <if test="updateTime != null">
+	        updateTime = #{updateTime,jdbcType=TIMESTAMP},
+	      </if>
+	      <if test="orderRemark != null">
+	        orderRemark = #{orderRemark,jdbcType=LONGVARCHAR},
+	      </if>
+	      <if test="employeeID != null">
+            employeeID = #{employeeID,jdbcType=VARCHAR},
+          </if>
+          <if test="employeeName != null">
+            employeeName = #{employeeName,jdbcType=VARCHAR},
+          </if>
+	    </set>
+	    where orderid = #{orderId}
+    </update>
+    
+    <!-- 获取放款订单列表信息 -->
+	<select id="getLoanOrderList" parameterType="java.util.Map" resultType="com.iqb.consumer.data.layer.bean.order.InstOrderBean">
+		SELECT
+			A.orderId,
+			B.realName,
+			A.regId,
+			A.orderName,
+			A.orderAmt,
+			A.orderItems,
+			A.createTime,
+			C.planshortname AS planShortName,
+			A.downPayment,
+			A.margin,
+			A.serviceFee,
+			A.monthInterest,
+			A.feeAmount,
+			A.takePayment,
+			A.preAmt,
+			A.riskStatus,
+			A.loanDate
+		FROM
+			inst_orderinfo A
+		LEFT JOIN inst_user B ON A.userid = B.id
+		LEFT JOIN inst_plan C ON A.planId = C.ID
+		WHERE
+			A.riskstatus in (3,7) AND A.`status` <![CDATA[<>]]> 2
+		<!-- <if test="merList != null and merList.size() > 0">
+			AND A.MERCHANTNO in
+			<foreach item="item" index="index" collection="merList" open="("
+				separator="," close=")">
+				#{item.merchantNo}
+			</foreach>
+		</if> -->
+		<if test="merList != null and merList.size() > 0">
+			AND A.MERCHANTNO in
+			<foreach item="item" index="index" collection="merList" open="("
+				separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+		<if test="orderId != null and orderId != ''">
+			AND A.orderId = #{orderId}
+		</if>
+		<if test="regId != null and regId != ''">
+			AND A.regId = #{regId}
+		</if>
+		<if test="realName != null and realName != ''">
+			AND B.realName LIKE '%${realName}%'
+		</if>
+		<if test="startTime !=null and startTime != ''">
+			AND A.stageDate &gt;= #{startTime}
+		</if>
+		<if test="endTime !=null and endTime != ''">
+			AND A.stageDate &lt;= #{endTime}
+		</if>
+        <if test="loanStartTime !=null and loanStartTime != ''">
+            AND DATE_FORMAT(A.loanDate,'%Y-%m-%d') &gt;= #{loanStartTime}
+        </if>
+        <if test="loanEndTime !=null and loanEndTime != ''">
+            AND DATE_FORMAT(A.loanDate,'%Y-%m-%d') &lt;=  #{loanEndTime}
+        </if>
+        ORDER BY 
+            A.createtime desc
+	</select>
+	<select id="getLoanOrderListTotal" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT
+			 SUM(A.orderAmt) as orderAmtTotal,
+		COUNT(A.orderId) as orderAmtCount
+		FROM
+			inst_orderinfo A
+		LEFT JOIN inst_user B ON A.userid = B.id
+		LEFT JOIN inst_plan C ON A.planId = C.ID
+		WHERE
+			A.riskstatus in (3,7) AND A.`status` <![CDATA[<>]]> 2
+		<!-- <if test="merList != null and merList.size() > 0">
+			AND A.MERCHANTNO in
+			<foreach item="item" index="index" collection="merList" open="("
+				separator="," close=")">
+				#{item.merchantNo}
+			</foreach>
+		</if> -->
+		<if test="merList != null and merList.size() > 0">
+			AND A.MERCHANTNO in
+			<foreach item="item" index="index" collection="merList" open="("
+				separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+		<if test="orderId != null and orderId != ''">
+			AND A.orderId = #{orderId}
+		</if>
+		<if test="regId != null and regId != ''">
+			AND A.regId = #{regId}
+		</if>
+		<if test="realName != null and realName != ''">
+			AND B.realName LIKE '%${realName}%'
+		</if>
+		<if test="startTime !=null and startTime != ''">
+			AND A.stageDate &gt;= #{startTime}
+		</if>
+		<if test="endTime !=null and endTime != ''">
+			AND A.stageDate &lt;= #{endTime}
+		</if>
+        <if test="loanStartTime !=null and loanStartTime != ''">
+            AND DATE_FORMAT(A.loanDate,'%Y-%m-%d') &gt;= #{loanStartTime}
+        </if>
+        <if test="loanEndTime !=null and loanEndTime != ''">
+            AND DATE_FORMAT(A.loanDate,'%Y-%m-%d') &lt;=  #{loanEndTime}
+        </if>
+        ORDER BY 
+            A.createtime desc
+	</select>
+	<!-- 根据订单号修改放款日期 -->
+	<update id="updateLoanDateByOrderIds" parameterType="java.util.Map">
+	    update inst_orderinfo
+	    <set>
+	      <if test="loanDate != null and loanDate !=''">
+	        loanDate = #{loanDate},
+	      </if>
+	       <if test="riskStatus != null and riskStatus !=''">
+	        riskStatus = #{riskStatus},
+	      </if>
+	      <if test="stageDate != null and stageDate !=''">
+	        stageDate = #{stageDate},
+	      </if>
+	      <if test="status != null and status !=''">
+            status = #{status},
+          </if>
+	      <if test="lendersSubject != null and lendersSubject !=''">
+            lendersSubject = #{lendersSubject},
+          </if>
+	    </set>
+	    where 
+		<if test="orderIds != null and orderIds.size() > 0">
+			orderId in
+			<foreach item="item" index="index" collection="orderIds" open="("
+				separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+    </update>
+    
+    <insert id="saveOtherAmtEntity" parameterType="com.iqb.consumer.data.layer.bean.order.InstOrderOtherAmtEntity">
+	     INSERT INTO 
+           inst_orderotheramt
+		    <trim prefix="(" suffix=")" suffixOverrides=",">
+		      <if test="orderId != null and orderId != ''">
+		        orderId,
+		      </if>
+		      <if test="online != null">
+		        online,
+		      </if>
+		      <if test="totalCost != null">
+		        totalCost,
+		      </if>
+		      <if test="gpsAmt != null">
+		        gpsAmt,
+		      </if>
+		      <if test="riskAmt != null">
+		        riskAmt,
+		      </if>
+		      <if test="taxAmt != null">
+		        taxAmt,
+		      </if>
+		      <if test="serverAmt != null">
+		        serverAmt,
+		      </if>
+		      <if test="otherAmt != null">
+		        otherAmt,
+		      </if>
+		      <if test="assessMsgAmt != null and assessMsgAmt!=''">
+                assessMsgAmt,
+              </if>
+              <if test="inspectionAmt != null and inspectionAmt!=''">
+                inspectionAmt,
+              </if>
+              <if test="preBusinessTaxAmt != null and preBusinessTaxAmt !=''">
+                preBusinessTaxAmt,
+              </if>
+              <if test="preAmtFlag != null and preAmtFlag!=''">
+                preAmtFlag,
+              </if>
+		    </trim>
+		    <trim prefix="values (" suffix=")" suffixOverrides=",">
+		      <if test="orderId != null">
+		        #{orderId,jdbcType=VARCHAR},
+		      </if>
+		      <if test="online != null">
+		        #{online,jdbcType=BIT},
+		      </if>
+		      <if test="totalCost != null">
+		        #{totalCost,jdbcType=DECIMAL},
+		      </if>
+		      <if test="gpsAmt != null">
+		        #{gpsAmt,jdbcType=DECIMAL},
+		      </if>
+		      <if test="riskAmt != null">
+		        #{riskAmt,jdbcType=DECIMAL},
+		      </if>
+		      <if test="taxAmt != null">
+		        #{taxAmt,jdbcType=DECIMAL},
+		      </if>
+		      <if test="serverAmt != null">
+		        #{serverAmt,jdbcType=DECIMAL},
+		      </if>
+		      <if test="otherAmt != null">
+                    #{otherAmt,jdbcType=DECIMAL},
+              </if>
+               <if test="assessMsgAmt != null and assessMsgAmt!=''">
+                    #{assessMsgAmt,jdbcType=DECIMAL},
+              </if>
+              <if test="inspectionAmt != null and inspectionAmt!=''">
+                    #{inspectionAmt,jdbcType=DECIMAL},
+              </if>
+              <if test="preBusinessTaxAmt != null and preBusinessTaxAmt !=''">
+                    #{preBusinessTaxAmt,jdbcType=DECIMAL},
+              </if>
+              <if test="preAmtFlag != null and preAmtFlag!=''">
+                    #{preAmtFlag},
+              </if>
+		    </trim>
+    </insert>
+    
+    <update id="updateOtherAmtEntity" parameterType="com.iqb.consumer.data.layer.bean.order.InstOrderOtherAmtEntity">
+      UPDATE 
+        inst_orderotheramt
+	    <set>
+	      <if test="online != null">
+	        online = #{online,jdbcType=BIT},
+	      </if>
+	      <if test="totalCost != null">
+	        totalCost = #{totalCost,jdbcType=DECIMAL},
+	      </if>
+	      <if test="gpsAmt != null">
+	        gpsAmt = #{gpsAmt,jdbcType=DECIMAL},
+	      </if>
+	      <if test="riskAmt != null">
+	        riskAmt = #{riskAmt,jdbcType=DECIMAL},
+	      </if>
+	      <if test="taxAmt != null">
+	        taxAmt = #{taxAmt,jdbcType=DECIMAL},
+	      </if>
+	      <if test="serverAmt != null">
+	        serverAmt = #{serverAmt,jdbcType=DECIMAL},
+	      </if>
+	      <if test="otherAmt != null">
+            otherAmt = #{otherAmt},
+          </if>
+          <if test="assessMsgAmt != null">
+            assessMsgAmt = #{assessMsgAmt,jdbcType=DECIMAL},
+          </if>
+          <if test="inspectionAmt != null">
+            inspectionAmt = #{inspectionAmt,jdbcType=DECIMAL},
+          </if>
+          <if test="preBusinessTaxAmt != null">
+            preBusinessTaxAmt = #{preBusinessTaxAmt,jdbcType=DECIMAL},
+          </if>
+          <if test="preAmtFlag != null and preAmtFlag!=''">
+               preAmtFlag =  #{preAmtFlag},
+          </if>
+	    </set>
+      WHERE 
+        orderId = #{orderId,jdbcType=VARCHAR}
+    </update>
+    
+    <select id="getOtherAmtList" parameterType="com.iqb.consumer.data.layer.bean.order.InstOrderOtherAmtEntity" resultType="com.iqb.consumer.data.layer.bean.order.InstOrderOtherAmtEntity">
+        SELECT
+            *
+        FROM
+            inst_orderotheramt
+        <where>
+          <if test="online != null">
+            AND online = #{online,jdbcType=BIT}
+          </if>
+          <if test="totalCost != null">
+            AND totalCost = #{totalCost,jdbcType=DECIMAL}
+          </if>
+          <if test="gpsAmt != null">
+            AND gpsAmt = #{gpsAmt,jdbcType=DECIMAL}
+          </if>
+          <if test="riskAmt != null">
+            AND riskAmt = #{riskAmt,jdbcType=DECIMAL}
+          </if>
+          <if test="taxAmt != null">
+            AND taxAmt = #{taxAmt,jdbcType=DECIMAL}
+          </if>
+          <if test="serverAmt != null">
+            AND serverAmt = #{serverAmt,jdbcType=DECIMAL}
+          </if>
+          <if test="otherAmt != null">
+            AND otherAmt = #{otherAmt,jdbcType=DECIMAL}
+          </if>
+          <if test="orderId != null and orderId != ''">
+            AND orderId = #{orderId,jdbcType=VARCHAR}
+          </if>
+        </where>
+    </select>
+    
+    <select id="getFinishBillAmt" parameterType="String" resultType="java.math.BigDecimal">
+        SELECT
+            received_amt
+        FROM
+            inst_managecar_info
+        WHERE
+            orderId = #{orderId}
+    </select>
+    
+    <update id="updatePreamtByOid" parameterType="java.util.Map">
+        UPDATE
+            inst_orderinfo
+        SET
+            preamt = #{amt}
+        WHERE orderId = #{orderId}
+    </update>
+    
+    <select id="getOtherAmtEntity" parameterType="String" resultType="com.iqb.consumer.data.layer.bean.order.InstOrderOtherAmtEntity">
+        SELECT
+            *
+        FROM
+            inst_orderotheramt
+        WHERE
+            orderId = #{orderId}
+    </select>
+    
+    <insert id="createIOIE" parameterType="com.iqb.consumer.data.layer.bean.credit_product.entity.InstOrderInfoEntity">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    INSERT INTO inst_orderinfo
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="orderId != null and orderId != ''">
+        orderId,
+      </if>
+      <if test="userId != null">
+        userId,
+      </if>
+      <if test="regId != null and regId != ''">
+        regId,
+      </if>
+      <if test="merchantNo != null and merchantNo != ''">
+        merchantNo,
+      </if>
+      <if test="bizType != null and bizType != ''">
+        bizType,
+      </if>
+      <if test="orderName != null and orderName != ''">
+        orderName,
+      </if>
+      <if test="orderAmt != null">
+        orderAmt,
+      </if>
+      <if test="orderItems != null">
+        orderItems,
+      </if>
+      <if test="preAmt != null">
+        preAmt,
+      </if>
+      <if test="receivedPreAmt != null">
+        receivedPreAmt,
+      </if>
+      <if test="preAmtStatus != null">
+        preAmtStatus,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="wfStatus != null">
+        wfStatus,
+      </if>
+      <if test="riskStatus != null">
+        riskStatus,
+      </if>
+      <if test="refundFlag != null">
+        refundFlag,
+      </if>
+      <if test="margin != null">
+        margin,
+      </if>
+      <if test="downPayment != null">
+        downPayment,
+      </if>
+      <if test="serviceFee != null">
+        serviceFee,
+      </if>
+      <if test="planId != null">
+        planId,
+      </if>
+      <if test="qrCodeId != null">
+        qrCodeId,
+      </if>
+      <if test="takePayment != null">
+        takePayment,
+      </if>
+      <if test="feeYear != null">
+        feeYear,
+      </if>
+      <if test="feeAmount != null">
+        feeAmount,
+      </if>
+      <if test="monthInterest != null">
+        monthInterest,
+      </if>
+      <if test="chargeWay != null">
+        chargeWay,
+      </if>
+      <if test="procInstId != null and procInstId != ''">
+        procInstId,
+      </if>
+      <if test="fee != null">
+        fee,
+      </if>
+      <if test="sumMoney != null">
+        sumMoney,
+      </if>
+      <if test="applyAmt != null">
+        applyAmt,
+      </if>
+      <if test="assessPrice != null and assessPrice != ''">
+        assessPrice,
+      </if>
+      <if test="assessSuggest != null and assessSuggest != ''">
+        assessSuggest,
+      </if>
+      <if test="finalRiskAdvice != null and finalRiskAdvice != ''">
+        finalRiskAdvice,
+      </if>
+      <if test="gpsAmt != null">
+        gpsAmt,
+      </if>
+      <if test="gpsTrafficFee != null">
+        gpsTrafficFee,
+      </if>
+      <if test="orderNo != null and orderNo != ''">
+        orderNo,
+      </if>
+      <if test="loanInterval != null and loanInterval != ''">
+        loanInterval,
+      </if>
+      <if test="proInfo != null and proInfo != ''">
+        proInfo,
+      </if>
+      <if test="contractStatus != null">
+        contractStatus,
+      </if>
+      <if test="specialTime != null">
+        specialTime,
+      </if>
+      <if test="carStatus != null">
+        carStatus,
+      </if>
+      <if test="backFlag != null">
+        backFlag,
+      </if>
+      <if test="employeeID != null and employeeID != ''">
+        employeeID,
+      </if>
+      <if test="employeeName != null and employeeName != ''">
+        employeeName,
+      </if>
+      <if test="loanDate != null">
+        loanDate,
+      </if>
+      <if test="loanAmt != null">
+        loanAmt,
+      </if>
+      <if test="stageDate != null">
+        stageDate,
+      </if>
+      <if test="version != null and version != ''">
+        version,
+      </if>
+      <if test="createTime != null">
+        createTime,
+      </if>
+      <if test="updateTime != null">
+        updateTime,
+      </if>
+      <if test="orderRemark != null and orderRemark != ''">
+        orderRemark,
+      </if>
+      <if test="riskRetRemark != null and riskRetRemark != ''">
+        riskRetRemark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="orderId != null and orderId != ''">
+        #{orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="regId != null and regId != ''">
+        #{regId,jdbcType=CHAR},
+      </if>
+      <if test="merchantNo != null and merchantNo != ''">
+        #{merchantNo,jdbcType=VARCHAR},
+      </if>
+      <if test="bizType != null and bizType != ''">
+        #{bizType,jdbcType=VARCHAR},
+      </if>
+      <if test="orderName != null and orderName != ''">
+        #{orderName,jdbcType=VARCHAR},
+      </if>
+      <if test="orderAmt != null">
+        #{orderAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="orderItems != null">
+        #{orderItems,jdbcType=TINYINT},
+      </if>
+      <if test="preAmt != null">
+        #{preAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="receivedPreAmt != null">
+        #{receivedPreAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="preAmtStatus != null">
+        #{preAmtStatus,jdbcType=TINYINT},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="wfStatus != null">
+        #{wfStatus,jdbcType=TINYINT},
+      </if>
+      <if test="riskStatus != null">
+        #{riskStatus,jdbcType=TINYINT},
+      </if>
+      <if test="refundFlag != null">
+        #{refundFlag,jdbcType=TINYINT},
+      </if>
+      <if test="margin != null">
+        #{margin,jdbcType=DECIMAL},
+      </if>
+      <if test="downPayment != null">
+        #{downPayment,jdbcType=DECIMAL},
+      </if>
+      <if test="serviceFee != null">
+        #{serviceFee,jdbcType=DECIMAL},
+      </if>
+      <if test="planId != null">
+        #{planId,jdbcType=BIGINT},
+      </if>
+      <if test="qrCodeId != null">
+        #{qrCodeId,jdbcType=BIGINT},
+      </if>
+      <if test="takePayment != null">
+        #{takePayment,jdbcType=INTEGER},
+      </if>
+      <if test="feeYear != null">
+        #{feeYear,jdbcType=INTEGER},
+      </if>
+      <if test="feeAmount != null">
+        #{feeAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="monthInterest != null">
+        #{monthInterest,jdbcType=DECIMAL},
+      </if>
+      <if test="chargeWay != null">
+        #{chargeWay,jdbcType=INTEGER},
+      </if>
+      <if test="procInstId != null and procInstId != ''">
+        #{procInstId,jdbcType=VARCHAR},
+      </if>
+      <if test="fee != null">
+        #{fee,jdbcType=DOUBLE},
+      </if>
+      <if test="sumMoney != null">
+        #{sumMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="applyAmt != null">
+        #{applyAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="assessPrice != null and assessPrice != ''">
+        #{assessPrice,jdbcType=VARCHAR},
+      </if>
+      <if test="assessSuggest != null and assessSuggest != ''">
+        #{assessSuggest,jdbcType=VARCHAR},
+      </if>
+      <if test="finalRiskAdvice != null and finalRiskAdvice != ''">
+        #{finalRiskAdvice,jdbcType=VARCHAR},
+      </if>
+      <if test="gpsAmt != null">
+        #{gpsAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="gpsTrafficFee != null">
+        #{gpsTrafficFee,jdbcType=DECIMAL},
+      </if>
+      <if test="orderNo != null and orderNo != ''">
+        #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="loanInterval != null and loanInterval != ''">
+        #{loanInterval,jdbcType=VARCHAR},
+      </if>
+      <if test="proInfo != null and proInfo != ''">
+        #{proInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="contractStatus != null">
+        #{contractStatus,jdbcType=TINYINT},
+      </if>
+      <if test="specialTime != null">
+        #{specialTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="carStatus != null">
+        #{carStatus,jdbcType=TINYINT},
+      </if>
+      <if test="backFlag != null">
+        #{backFlag,jdbcType=TINYINT},
+      </if>
+      <if test="employeeID != null and employeeID != ''">
+        #{employeeID,jdbcType=VARCHAR},
+      </if>
+      <if test="employeeName != null and employeeName != ''">
+        #{employeeName,jdbcType=VARCHAR},
+      </if>
+      <if test="loanDate != null">
+        #{loanDate,jdbcType=DATE},
+      </if>
+      <if test="loanAmt != null">
+        #{loanAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="stageDate != null">
+        #{stageDate,jdbcType=DATE},
+      </if>
+      <if test="version != null and version != ''">
+        #{version,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="orderRemark != null and orderRemark != ''">
+        #{orderRemark,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="riskRetRemark != null and riskRetRemark != ''">
+        #{riskRetRemark,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  <!-- 车主贷-订单查询 -->
+  <select id="getCarOwnerOrderInfo" parameterType="com.alibaba.fastjson.JSONObject"
+        resultType="com.iqb.consumer.data.layer.bean.carowner.CarOwnerOrderInfo">
+        SELECT
+            a.orderId,
+		    a.regId,
+		    a.margin,
+		    a.serviceFee,
+		    a.gpsTrafficFee,
+		    a.gpsAmt,
+		    a.monthInterest,
+		    a.preAmt,
+		    a.stageDate,
+		    a.riskStatus,
+		    a.wfStatus,
+		    a.createTime AS orderDate,
+		    a.orderAmt,
+		    <!-- 订单查询借款金额 -->
+		    a.borrowAmt AS amt,
+		    a.orderItems AS orderItem,
+		    b.realname,
+		    c.merchantshortname AS merchName,
+		    d.PLANFULLNAME AS planShortName
+        FROM
+            inst_orderinfo a
+        LEFT JOIN 
+            inst_user b
+        ON 
+            a.userId = b.id
+        LEFT JOIN
+            inst_merchantinfo c
+        ON 
+            a.merchantNo = c.merchantno
+        LEFT JOIN 
+            inst_plan d
+        ON 
+            a.planId = d.id
+        WHERE a.status = 1
+        <if test="merList != null and merList.size() > 0">
+            AND c.merchantno in
+            <foreach item="item" index="index" collection="merList" open="("
+                separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="orderId != null and orderId != ''">
+            AND a.orderId = #{orderId}
+        </if>
+        <if test="regId != null and regId != ''">
+            AND a.regId = #{regId}
+        </if>
+        <if test="riskStatus != null and riskStatus != ''">
+            AND a.riskStatus = #{riskStatus}
+        </if>
+        <if test="wfStatus !=null and wfStatus != ''">
+            AND a.wfStatus = #{wfStatus}
+        </if>
+        <if test="bizType !=null and bizType != ''">
+            AND a.bizType = #{bizType}
+        </if>
+        <if test="userName != null and userName != ''">
+            AND b.realName LIKE '%${userName}%'
+        </if>
+        <if test="startTime !=null and startTime != ''">
+            AND a.createTime &gt;= #{startTime}
+        </if>
+        <if test="endTime !=null and endTime != ''">
+            AND a.createTime &lt;= #{endTime}
+        </if>
+        <if test="loanStartTime !=null and loanStartTime != ''">
+            AND a.loanDate &gt;= #{loanStartTime}
+        </if>
+        <if test="loanEndTime !=null and loanEndTime != ''">
+            AND a.loanDate &lt;= #{loanEndTime}
+        </if>
+        <if test="sbStartTime !=null and sbStartTime != ''">
+            AND DATE_FORMAT(E.applytime,'%Y-%m-%d') &gt;= #{sbStartTime}
+        </if>
+        <if test="sbEndTime !=null and sbEndTime != ''">
+            AND DATE_FORMAT(E.applytime,'%Y-%m-%d') &lt;  #{sbEndTime}
+        </if>
+        ORDER BY 
+            a.createtime desc
+    </select>
+    
+    
+    <select id="getCarOwnerCarInfo" parameterType="com.alibaba.fastjson.JSONObject"
+        resultType="com.iqb.consumer.data.layer.bean.carowner.CarOwnerCarInfo">
+        SELECT
+            a.assessPrice,a.orderAmt, a.orderId, a.regId, a.createTime, a.orderName, 
+            b.carNo, b.plate, b.firstRegDate, 
+            c.mortgageType, c.mortgageCompany, 
+            d.realName, d.idNo, 
+            e.merchantshortname AS merchantName
+        FROM
+            inst_orderinfo a
+        LEFT JOIN
+            inst_authoritycard b
+        ON
+            a.orderid = b.orderid
+        LEFT JOIN
+            inst_mortgageinfo c
+        ON
+            a.orderid = c.orderid
+        LEFT JOIN
+            inst_user d
+        ON
+            a.userid = d.id
+        LEFT JOIN
+            inst_merchantinfo e
+        ON
+            a.merchantno = e.merchantno
+        <where>
+            a.biztype = 2400 
+        AND
+            a.status = 1    
+            <if test="merList != null and merList.size() > 0">
+            AND e.merchantno in
+	            <foreach item="item" index="index" collection="merList" open="("
+	                separator="," close=")">
+	                #{item}
+	            </foreach>
+	        </if>
+	        <if test="orderId != null and orderId != ''">
+	            AND a.orderId = #{orderId}
+	        </if>
+	        <if test="regId != null and regId != ''">
+	            AND a.regId = #{regId}
+	        </if>
+	        <if test="userName != null and userName != ''">
+	            AND d.realName LIKE '${userName}%'
+	        </if>
+	        <if test="plate != null and plate != ''">
+                AND b.plate LIKE '${plate}%'
+            </if>
+            <if test="startTime !=null and startTime != ''">
+	            AND a.createTime &gt;= #{startTime}
+	        </if>
+	        <if test="endTime !=null and endTime != ''"> 
+	            AND a.createTime &lt;= #{endTime}
+	        </if>
+        </where>
+    </select>
+    <!-- 车主贷订单分期 -->
+    <select id="getOrderBreakInfo" parameterType="com.alibaba.fastjson.JSONObject"
+        resultType="com.iqb.consumer.data.layer.bean.carowner.CarOwnerOrderInfo">
+        SELECT
+            a.orderId,
+            a.regId,
+            a.margin,
+            a.serviceFee,
+            a.gpsTrafficFee,
+            a.gpsAmt,
+            a.monthInterest,
+            a.preAmt,
+            a.stageDate,
+            a.riskStatus,
+            a.wfStatus,
+            a.createTime AS orderDate,
+            a.orderAmt,
+            a.applyAmt AS amt,
+            a.orderItems AS orderItem,
+            b.realname, 
+            c.merchantshortname AS merchName, 
+            d.PLANFULLNAME AS planShortName
+
+        FROM
+            inst_orderinfo a
+        LEFT JOIN 
+            inst_user b
+        ON 
+            a.userId = b.id
+        LEFT JOIN
+            inst_merchantinfo c
+        ON 
+            a.merchantNo = c.merchantno
+        LEFT JOIN 
+            inst_plan d
+        ON 
+            a.planId = d.id
+        WHERE a.status = 1
+        and a.riskStatus=7
+        <if test="merList != null and merList.size() > 0">
+            AND c.merchantno in
+            <foreach item="item" index="index" collection="merList" open="("
+                separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="orderId != null and orderId != ''">
+            AND a.orderId = #{orderId}
+        </if>
+        <if test="regId != null and regId != ''">
+            AND a.regId = #{regId}
+        </if>
+        <if test="riskStatus != null and riskStatus != ''">
+            AND a.riskStatus = #{riskStatus}
+        </if>
+        <if test="wfStatus !=null and wfStatus != ''">
+            AND a.wfStatus = #{wfStatus}
+        </if>
+        <if test="bizType !=null and bizType != ''">
+            AND a.bizType = #{bizType}
+        </if>
+        <if test="userName != null and userName != ''">
+            AND b.realName LIKE '%${userName}%'
+        </if>
+        <if test="startTime !=null and startTime != ''">
+            AND a.createTime &gt;= #{startTime}
+        </if>
+        <if test="endTime !=null and endTime != ''">
+            AND a.createTime &lt;= #{endTime}
+        </if>
+        <if test="loanStartTime !=null and loanStartTime != ''">
+            AND a.loanDate &gt;= #{loanStartTime}
+        </if>
+        <if test="loanEndTime !=null and loanEndTime != ''">
+            AND a.loanDate &lt;= #{loanEndTime}
+        </if>
+        <if test="sbStartTime !=null and sbStartTime != ''">
+            AND DATE_FORMAT(E.applytime,'%Y-%m-%d') &gt;= #{sbStartTime}
+        </if>
+        <if test="sbEndTime !=null and sbEndTime != ''">
+            AND DATE_FORMAT(E.applytime,'%Y-%m-%d') &lt;  #{sbEndTime}
+        </if>
+        ORDER BY 
+            a.createtime desc
+    </select>
+    <!-- 批量插入订单信息 -->
+    <insert id="batchInsertOrderInfo"  parameterType="java.util.List">
+       INSERT INTO inst_orderinfo (
+           orderId,userId,regId,merchantNo,bizType,
+           orderAmt,orderItems,orderName,downPayment,margin,
+	       serviceFee,feeAmount,monthInterest,applyAmt,assessPrice,
+	       planId,orderRemark,status,wfStatus,createTime,importFlag,leftInstIMonth
+       ) 
+       VALUES
+       <foreach collection="list" item="item" index="index" separator=",">
+           (
+           #{item.orderId}, #{item.userId}, #{item.regId}, #{item.merchantNo}, #{item.bizType}, 
+           #{item.orderAmt}, #{item.orderItems}, #{item.orderName}, #{item.downPayment}, #{item.margin},
+           #{item.serviceFee}, #{item.feeAmount}, #{item.monthInterest}, #{item.applyAmt}, #{item.assessPrice},
+           #{item.planId}, #{item.orderRemark}, #{item.status}, #{item.wfStatus}, NOW(),#{item.importFlag},#{item.orderItems}
+           )
+       </foreach>
+    </insert>
+    
+    <!-- 订单信息导入分页查询 -->
+    <select id="selectOrderInfoForImport" parameterType="com.alibaba.fastjson.JSONObject" resultType="com.iqb.consumer.data.layer.bean.order.OrderBean">
+		SELECT
+		    A.orderId,
+		    A.orderName,
+		    A.regId,
+		    C.realName,
+		    A.orderAmt,
+		    A.orderItems,
+		    A.preAmt,
+		    A.margin,
+		    A.serviceFee,
+		    A.planId,
+		    A.monthInterest,
+		    A.applyAmt,
+		    A.assessPrice,
+		    B.projectName,
+		    B.projectNo
+		FROM
+		    inst_orderinfo A
+		LEFT JOIN inst_orderotherinfo B ON A.orderId = B.orderId
+		LEFT JOIN inst_user C ON A.regId = C.regId
+		where A.status = 1 and (A.importFlag != null or A.importFlag =1) 
+		<if test="merchantNo != null and merchantNo !=''">
+            AND A.merchantNo = #{merchantNo}
+        </if>
+        <if test="orderId != null and orderId != ''">
+            AND a.orderId = #{orderId}
+        </if>
+        <if test="regId != null and regId != ''">
+            AND a.regId = #{regId}
+        </if>
+        <if test="bizType !=null and bizType != ''">
+            AND a.bizType = #{bizType}
+        </if>
+        <if test="userName != null and userName != ''">
+            AND c.realName LIKE '%${userName}%'
+        </if>
+        <if test="startTime !=null and startTime != ''">
+            AND a.createTime &gt;= #{startTime}
+        </if>
+        <if test="endTime !=null and endTime != ''">
+            AND a.createTime &lt;= #{endTime}
+        </if>
+        <if test="projectProfix != null and projectProfix != ''">
+            AND b.projectName LIKE '${projectProfix}%'
+        </if>
+    </select>
+    <select id="getOrderInfoByListTotal" parameterType="java.util.Map"
+		resultType="java.util.Map">
+		SELECT
+		SUM(a.orderAmt) as orderAmtTotal,
+		COUNT(a.id) as orderAmtCount
+		FROM
+		<include refid="table" />
+		a
+		LEFT JOIN inst_user b
+		ON a.userId = b.id
+		LEFT JOIN
+		inst_merchantinfo c
+		ON a.merchantNo = c.MERCHANTNO
+		LEFT JOIN inst_plan d
+		ON a.planId = d.id
+		LEFT JOIN (
+		SELECT * FROM(SELECT APPLYTIME, ORDERID FROM cf_requestmoney ORDER BY
+		APPLYTIME DESC) t GROUP BY ORDERID
+		) e
+		ON a.orderId = e.ORDERID
+		WHERE a.status = 1
+		and a.bizType != 2400
+		<if test="merList != null and merList.size() > 0">
+			AND c.MERCHANTNO in
+			<foreach item="item" index="index" collection="merList" open="("
+				separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+		<if test="orderId != null and orderId != ''">
+			AND a.orderId = #{orderId}
+		</if>
+		<if test="regId != null and regId != ''">
+			AND a.regId = #{regId}
+		</if>
+		<if test="employeeName != null and employeeName != ''">
+            AND a.employeeName = #{employeeName}
+        </if>
+		<if test="merchName != null and merchName != ''">
+			AND c.MERCHANTNO = #{merchName}
+		</if>
+		<if test="riskStatus != null and riskStatus != ''">
+			AND a.riskStatus = #{riskStatus}
+		</if>
+		<if test="wfStatus !=null and wfStatus != ''">
+			AND a.wfStatus = #{wfStatus}
+		</if>
+		<if test="bizType !=null and bizType != ''">
+			AND a.bizType = #{bizType}
+		</if>
+		<if test="userName != null and userName != ''">
+			AND b.realName LIKE '%${userName}%'
+		</if>
+		<if test="startTime !=null and startTime != ''">
+			AND a.createTime &gt;= #{startTime}
+		</if>
+		<if test="endTime !=null and endTime != ''">
+			AND a.createTime &lt;= #{endTime}
+		</if>
+		<if test="preAmtStatus !=null and preAmtStatus != ''">
+            AND a.preAmtStatus = #{preAmtStatus}
+        </if>
+        <if test="sbStartTime !=null and sbStartTime != ''">
+            AND DATE_FORMAT(E.applytime,'%Y-%m-%d') &gt;= #{sbStartTime}
+        </if>
+        <if test="sbEndTime !=null and sbEndTime != ''">
+            AND DATE_FORMAT(E.applytime,'%Y-%m-%d') &lt;  #{sbEndTime}
+        </if>
+        <!--FINANCE-2995 资产管理订单查询筛选及列表页添加分期时间/放款时间FINANCE-3011资产管理订单查询筛选及列表页添加分期时间/放款时间 -->
+        <if test="stageStartTime !=null and stageStartTime != ''">
+			AND a.stageDate &gt;= #{stageStartTime}
+		</if>
+		<if test="stageEndTime !=null and stageEndTime != ''">
+			AND a.stageDate &lt;= #{stageEndTime}
+		</if>
+		<if test="loanStartTime !=null and loanStartTime != ''">
+			AND a.loanDate &gt;= #{loanStartTime}
+		</if>
+		<if test="loanEndTime !=null and loanEndTime != ''">
+			AND a.loanDate &lt;= #{loanEndTime}
+		</if>
+        ORDER BY 
+            a.createtime desc
+	</select>
+
+	
+	<update id="updateOrderInfo1" parameterType="com.iqb.consumer.data.layer.bean.order.OrderBean">
+		update
+		<include refid="table" />
+		a
+		<set>
+			<if test="userId != null and userId != ''">
+				a.userId = #{userId},
+			</if>
+			<if test="merchantNo != null and merchantNo != ''">
+				a.merchantNo = #{merchantNo},
+			</if>
+			<if test="orderName != null and orderName != ''">
+				a.orderName = #{orderName},
+			</if>
+			<if test="orderAmt != null and orderAmt != ''">
+				a.orderAmt = #{orderAmt},
+			</if>
+			<if test="borrowAmt != null and borrowAmt != ''">
+				a.borrowAmt = #{borrowAmt},
+			</if>
+			<if test="orderItems != null and orderItems != ''">
+				a.orderItems = #{orderItems},
+			</if>
+			<if test="preAmt != null and preAmt != ''">
+				a.preAmt = #{preAmt},
+			</if>
+			<if test="orderRemark != null and orderRemark != ''">
+				a.orderRemark = #{orderRemark},
+			</if>
+			<if test="status != null">
+				a.status = #{status},
+			</if>
+			<if test="riskStatus != null">
+				a.riskStatus = #{riskStatus},
+			</if>
+			<if test="regId != null and regId != ''">
+				a.regId = #{regId},
+			</if>
+			<if test="chargeWay != null">
+				a.chargeWay = #{chargeWay},
+			</if>
+			<if test="planId != null and planId != ''">
+				a.planId = #{planId},
+			</if>
+			<if test="qrCodeId != null and qrCodeId != ''">
+				a.qrcodeId = #{qrCodeId},
+			</if>
+			<if test="takePayment != null and takePayment !=''">
+				a.takepayment = #{takePayment},
+			</if>
+			<if test="margin != null and margin != ''">
+				a.margin = #{margin},
+			</if>
+			<if test="downPayment != null and downPayment != ''">
+				a.downPayment = #{downPayment},
+			</if>
+			<if test="serviceFee != null and serviceFee != ''">
+				a.serviceFee = #{serviceFee},
+			</if>
+			<if test="feeYear != null and feeYear != ''">
+				a.feeYear = #{feeYear},
+			</if>
+			<if test="monthInterest != null and monthInterest != ''">
+				a.monthInterest = #{monthInterest},
+			</if>
+			<if test="feeAmount != null">
+				a.feeAmount = #{feeAmount},
+			</if>
+			<if test="assessPrice !=null and assessPrice != ''">
+				a.assessPrice = #{assessPrice},
+			</if>
+			<if test="gpsAmt !=null and gpsAmt != ''">
+				a.gpsAmt = #{gpsAmt},
+			</if>
+			<if test="gpsTrafficFee !=null and gpsTrafficFee != ''">
+                a.gpsTrafficFee = #{gpsTrafficFee},
+            </if>
+			<if test="applyAmt !=null and applyAmt != ''">
+				a.applyAmt = #{applyAmt},
+			</if>
+			<if test="contractStatus !=null and contractStatus != ''">
+				a.contractStatus = #{contractStatus},
+			</if>
+			<if test="wfStatus != null and wfStatus !=''">
+				a.wfStatus = #{wfStatus},
+			</if>
+			<if test="riskRetRemark != null">
+				a.riskRetRemark = #{riskRetRemark},
+			</if>
+			<if test="loanDate != null and loanDate!=''">
+				a.loanDate = #{loanDate},
+			</if>
+			<if test="loanAmt != null and loanAmt !=''">
+				a.loanAmt = #{loanAmt},
+			</if>
+			<if test="finalRiskAdvice != null and finalRiskAdvice !=''">
+                a.finalRiskAdvice = #{finalRiskAdvice},
+            </if>
+            <if test="assessPrice != null and assessPrice !=''">
+                a.assessPrice = #{assessPrice},
+            </if>
+            <if test="assessSuggest != null and assessSuggest !=''">
+                a.assessSuggest = #{assessSuggest},
+            </if>
+            <if test="procInstId != null and procInstId !=''">
+                a.procInstId = #{procInstId},
+            </if>
+            <if test="stageDate != null and stageDate !=''">
+                stageDate = #{stageDate},
+            </if>
+            <if test="leftInstIMonth != null">
+                leftInstIMonth = #{leftInstIMonth},
+            </if>
+            <if test="leftInstIDay != null">
+                leftInstIDay = #{leftInstIDay},
+            </if>
+			a.updateTime = NOW()
+		</set>
+		where a.orderId = #{orderId}
+	</update>
+	
+	
+
+	<!-- 查询所有订单 -->
+    <select id="selectAllOrderList" resultMap="OrderBeanResultMap">
+       select A.orderId,
+            A.regId,
+            A.orderName,
+            A.orderAmt,
+            A.orderItems,
+            A.createTime,
+            A.downPayment,
+            A.margin,
+            A.serviceFee,
+            A.monthInterest,
+            A.feeAmount,
+            A.takePayment,
+            A.preAmt,
+            A.riskStatus,
+            A.loanDate
+             FROM inst_orderinfo A
+    </select>
+    
+    <!-- 通过订单号修改剩余期数-->
+    <update id="updateOrderItemsByOrderId" parameterType="java.lang.String">
+        UPDATE
+        inst_orderinfo
+        SET leftInstIMonth = orderItems - IFNULL(
+            (
+                SELECT
+                    SUM(APPLYITEMS)
+                FROM
+                    cf_requestmoney
+                WHERE
+                    ORDERID = #{orderId}
+            ),
+            0
+        ),
+         leftInstIDay = 0
+        WHERE
+            orderId = #{orderId}
+    </update>
+    
+    <!-- 根据订单号修改剩余期数-->
+    <update id="updateOrderInfoForLeftMonthByOrderId" parameterType="com.iqb.consumer.data.layer.bean.order.OrderBean">
+        update
+        <include refid="table" />
+        a
+        <set>
+            a.version = #{version,jdbcType=INTEGER} + 1,            
+            <if test="leftInstIMonth != null and leftInstIMonth !=''">
+                leftInstIMonth =leftInstIMonth + #{leftInstIMonth},
+            </if>
+            <if test="leftInstIDay != null and leftInstIDay !=''">
+                leftInstIDay = #{leftInstIDay},
+            </if>
+            a.updateTime = NOW()
+        </set>
+        where a.orderId = #{orderId}
+    </update>
+    <!-- 保存订单信息 -->
+    <insert id="saveOrderInfoForHY" parameterType="com.iqb.consumer.data.layer.bean.order.OrderBean" useGeneratedKeys="true"  keyProperty="id">
+        INSERT INTO inst_orderinfo (orderId, userId, regId, merchantNo, bizType,orderAmt,orderItems, orderRemark, status, wfStatus, riskStatus,orderNo,createTime) VALUES 
+        (#{orderId},#{userId},#{regId},#{merchantNo},#{bizType},#{orderAmt},#{orderItems},#{orderRemark},#{status},#{wfStatus},#{riskStatus},#{orderNo},#{createTime});
+    </insert>
+    <!-- 新增放款查询界面 -->
+    	<select id="getSelectLoanOrderList" parameterType="java.util.Map" resultType="com.iqb.consumer.data.layer.bean.order.InstOrderBean">
+		SELECT
+			A.orderId,
+			B.realName,
+			A.regId,
+			A.orderName,
+			A.createTime,
+			A.bizType,
+			A.orderAmt,
+			A.orderItems,
+			C.PLANFULLNAME AS planShortName,
+			A.preAmt,
+     		A.monthInterest,
+			A.loanDate,
+			A.lendersSubject,
+			D.MERCHANTFULLNAME
+		FROM
+			inst_orderinfo A
+		LEFT JOIN inst_user B ON A.userid = B.id
+		LEFT JOIN inst_plan C ON A.planId = C.ID
+		LEFT JOIN inst_merchantinfo D ON A.merchantNo = D.merchantNo
+		WHERE
+			A.riskstatus in (7,10)  and A.`status` <![CDATA[<>]]> 2
+		<!-- <if test="merList != null and merList.size() > 0">
+			AND A.MERCHANTNO in
+			<foreach item="item" index="index" collection="merList" open="("
+				separator="," close=")">
+				#{item.merchantNo}
+			</foreach>
+		</if> -->
+		<if test="merList != null and merList.size() > 0">
+			AND A.MERCHANTNO in
+			<foreach item="item" index="index" collection="merList" open="("
+				separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+		<if test="orderId != null and orderId != ''">
+			AND A.orderId = #{orderId}
+		</if>
+		<if test="regId != null and regId != ''">
+			AND A.regId = #{regId}
+		</if>
+		<if test="realName != null and realName != ''">
+			AND B.realName LIKE '%${realName}%'
+		</if>
+		<if test="bizType != null and bizType != ''">
+			AND A.bizType = #{bizType}
+		</if>
+		<if test="lendersSubject != null and lendersSubject != ''">
+			AND A.lendersSubject = #{lendersSubject}
+		</if>
+        <if test="loanStartTime !=null and loanStartTime != ''">
+            AND DATE_FORMAT(A.loanDate,'%Y-%m-%d') &gt;= #{loanStartTime}
+        </if>
+        <if test="loanEndTime !=null and loanEndTime != ''">
+            AND DATE_FORMAT(A.loanDate,'%Y-%m-%d') &lt;=  #{loanEndTime}
+        </if>
+        ORDER BY 
+            A.loanDate desc
+	</select>
+	<select id="getSysItem2Excel" parameterType="java.lang.String" resultType="java.lang.String">
+		select DICT_NAME from iqb_sys_dict_item where DICT_TYPE_CODE = #{itemCode} and DICT_VALUE = #{value}
+	</select>
+	<select id="getOrderInfoNew" parameterType="com.alibaba.fastjson.JSONObject" resultType="com.iqb.consumer.data.layer.bean.order.InstOrderBean">
+		SELECT
+			b.MERCHANTFULLNAME,
+			c.realName,
+			a.regId,
+			a.orderId,
+			a.bizType,
+			a.orderAmt,
+			d.PLANFULLNAME,
+			a.margin,
+			a.serviceFee,
+			a.monthInterest,
+			a.feeAmount,
+			a.preAmtStatus,
+			a.orderItems,
+			a.riskStatus
+		FROM
+			inst_orderinfo a
+		LEFT JOIN inst_merchantinfo b ON a.merchantNo = b.MERCHANTNO
+		LEFT JOIN inst_user c ON a.userId = c.id
+		LEFT JOIN inst_plan d ON a.planId = d.id
+		WHERE a.orderId = #{orderId}
+	</select>
+	<!-- 保存订单信息 -->
+	<update id="saveApprovalOpinion" parameterType="com.alibaba.fastjson.JSONObject">
+		update 
+			<include refid="table" /> 
+			set
+			    riskApprovalOpinion = #{riskApprovalOpinion},
+                telApprovalOpinion = #{telApprovalOpinion},
+                updateTime = now()			
+			where orderId = #{orderId};
+	</update>
+	<select id="getApprovalOpinion" parameterType="com.alibaba.fastjson.JSONObject" resultType="java.util.Map">
+		select riskApprovalOpinion,telApprovalOpinion  from inst_orderinfo where orderId = #{orderId};
+	</select>
+	<!-- 根据条件查询以租代购费用明细 -->
+	<select id="selectOrderAmtDetailList" parameterType="com.alibaba.fastjson.JSONObject" resultType="com.iqb.consumer.data.layer.bean.order.OrderAmtDetailBean">
+		        SELECT
+		    A.orderId,
+		    DATE_FORMAT(A.createTime,'%Y-%m-%d %T') as createTime,
+		    A.orderAmt,
+		    A.orderItems,
+		    A.regId,
+		    B.realName,
+		    C.MERCHANTSHORTNAME AS merchantName,
+		    D.PLANFULLNAME,
+		    E.gpsAmt,
+		    E.taxAmt,
+		    E.insAmt,
+		    E.otherAmt,
+		    E.businessTaxAmt,		    
+		    F.gpsAmt AS preGpsAmt,
+		    F.riskAmt AS preRiskAmt,
+		    F.taxAmt AS preTaxAmt,
+		    F.serverAmt,
+		    F.assessMsgAmt,
+		    F.inspectionAmt,
+		    F.otherAmt AS preOtherAmt,
+		    F.preBusinessTaxAmt
+		    
+		FROM
+		    inst_orderinfo A
+		LEFT JOIN inst_user B ON A.userId = B.id
+		LEFT JOIN inst_merchantinfo C ON A.merchantNo = C.MERCHANTNO
+		LEFT JOIN inst_plan D ON A.planId = D.ID
+		LEFT JOIN inst_orderbreakinfo E ON A.orderId = E.orderId
+		LEFT JOIN inst_orderotheramt F ON A.orderId = F.orderId
+		WHERE
+		    (
+		        A.bizType = '2001'
+		        OR A.bizType = '2002'
+		    )
+		AND A.riskStatus in (0,3,7,10)
+		AND A.status <![CDATA[<>]]> 2
+		<if test="merList != null and merList.size() > 0">
+            AND A.MERCHANTNO in
+            <foreach item="item" index="index" collection="merList" open="("
+                separator="," close=")">
+                #{item.merchantNo}
+            </foreach>
+        </if>
+        <if test="orderId != null and orderId != ''">
+            AND A.orderId = #{orderId}
+        </if>
+        <if test="regId != null and regId != ''">
+            AND A.regId = #{regId}
+        </if>
+        <if test="realName != null and realName != ''">
+            AND B.realName LIKE '%${realName}%'
+        </if>
+        <if test="riskStatus != null and riskStatus != ''">
+            AND A.riskStatus = #{riskStatus}
+        </if>
+        <if test="startDate !=null and startDate != ''">
+            AND DATE_FORMAT(A.createTime,'%Y-%m-%d') &gt;= #{startDate}
+        </if>
+        <if test="endDate !=null and endDate != ''">
+            AND DATE_FORMAT(A.createTime,'%Y-%m-%d') &lt;=  #{endDate}
+        </if>
+		ORDER BY
+		    A.createTime DESC
+    </select>
+    <!-- 查询车秒贷金额相关信息 -->
+    <select id="getOrderAmtDetail" parameterType="java.lang.String" resultType="com.iqb.consumer.data.layer.bean.order.OrderAmtDetailBean">
+           SELECT
+			    A.orderId,
+			    A.gpsAmt AS carGpsAmt,
+			    A.riskAmt AS carRiskAmt,
+			    A.preBusinessTaxAmt AS carBusinessTaxAmt,
+			    A.taxAmt AS carTaxAmt,
+			    A.serverAmt AS carserverAmt,
+			    A.otherAmt AS carOtherAmt
+			FROM
+			    inst_orderotheramt A
+			where A.orderId = #{orderId}
+    </select>
+    <!-- 根据手机号获取订单列表 -->
+    <select id="getOrderListByRegId" parameterType="java.lang.String" resultMap="OrderBeanResultMap">
+        SELECT
+		    orderId,
+		    orderName
+		FROM
+		    inst_orderinfo A
+		WHERE
+		    status <![CDATA[<>]]> 2
+		AND riskStatus IN (3, 7)
+		AND regId = #{orderId}
+    </select>
+    
+</mapper>

@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the Apache License, Version 2.0 (the "License"); 
+    you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+    Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS 
+    IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language 
+    governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.cheegu.InstCarPeccancyDao">
+
+    <!-- 根据车架号查询车辆评估报告 -->
+    <select id="selectInstCarPeccancyList" parameterType="java.util.Map" resultType="com.iqb.consumer.data.layer.bean.cheegu.InstCarPeccancyBean">
+          SELECT
+            C.MERCHANTSHORTNAME AS merchantName,
+            A.orderId,
+            D.realName,
+            D.regId,
+            DATE_FORMAT(A.createTime,'%Y-%m-%d %T') as orderTime,
+            A.orderItems,
+            E.plate AS licenseNo,
+            E.carNo AS vin,
+            E.engine AS engineNumber,
+            B.totalDegree,
+            B.totalPeccancyAmt,
+            B.`status`,
+            B.processDate,
+            B.processStatus,
+            DATE_FORMAT(B.sendTime,'%Y-%m-%d %T') as sendTime,
+            F.`status` as carStatus
+        FROM
+            inst_orderinfo A
+        LEFT JOIN inst_car_peccancy B ON A.orderId = B.orderId
+        LEFT JOIN inst_merchantinfo C ON A.merchantNo = C.MERCHANTNO
+        LEFT JOIN inst_user D ON A.userId = D.id
+        LEFT JOIN inst_authoritycard E ON A.orderId = E.orderId 
+        LEFT JOIN inst_managecar_info F on A.orderId = F.orderId
+		<where>
+		       C.PARENTID = '1006' AND A.status <![CDATA[<> ]]>2 
+		       AND (A.riskStatus=3 or A.riskStatus=7)
+               AND (A.bizType=2001 or A.bizType=2002)
+		      <if test="merList != null and merList.size() > 0">
+	                AND C.merchantno in
+	                <foreach item="item" index="index" collection="merList" open="("
+	                    separator="," close=")">
+	                    #{item}
+	                </foreach>
+                </if>
+                <if test="orderId != null and orderId != ''">
+	                AND a.orderid = #{orderId}
+	            </if>
+	            <if test="realName != null and realName != ''">
+	                AND D.realname = #{realName}
+	            </if>
+	            <if test="regId != null and regId != ''">
+	                AND D.regid = #{regId}
+	            </if>
+	            <if test="vin != null and vin != ''">
+                    AND E.carNo = #{vin}
+                </if>
+                <if test="licenseNo != null and licenseNo != ''">
+                    E.plate = #{licenseNo}
+                </if>
+                <if test="engineNumber != null and engineNumber != ''">
+                    AND E.engine = #{engineNumber}
+                </if>
+                <if test="status != null and status != ''">
+                    AND B.status = #{status}
+                </if>
+	            <if test="processStatus != null and processStatus != ''">
+                    AND B.processStatus = #{processStatus}
+                </if>
+                <if test="totalDegree != null and totalDegree!=''">
+                    AND B.totalDegree = #{totalDegree}
+                </if>
+	            <if test="startDate != null and startDate != ''">
+	                AND DATE_FORMAT(A.createtime,'%Y-%m-%d') &gt;= #{startDate}
+	            </if>
+	            <if test="endDate != null and endDate != ''">
+	                AND DATE_FORMAT(A.createtime,'%Y-%m-%d') &lt;= #{endDate}
+	            </if>
+	            <if test="startProcessDate != null and startProcessDate != ''">
+                    AND DATE_FORMAT(B.processDate,'%Y-%m-%d') &gt;= #{startProcessDate}
+                </if>
+                <if test="endProcessDate != null and endProcessDate != ''">
+                    AND DATE_FORMAT(B.processDate,'%Y-%m-%d') &lt;= #{endProcessDate}
+                </if>
+                <if test="carStatus != null and carStatus != '' and carStatus !='70'">
+                    AND F.`status` = #{carStatus}
+                </if>
+                <if test="carStatus != null and carStatus != '' and carStatus =='70'">
+                    AND F.`status` is null
+                </if>
+                 <if test="startSendTime != null and startSendTime != ''">
+                    AND DATE_FORMAT(B.sendTime,'%Y-%m-%d') &gt;= #{startSendTime}
+                </if>
+                <if test="endSendTime != null and endSendTime != ''">
+                    AND DATE_FORMAT(B.sendTime,'%Y-%m-%d') &lt;= #{endSendTime}
+                </if>
+		</where>
+    </select>
+    <!-- 根据订单号 车架号修改违章信息表处理状态 -->
+    <update id="updateInstCarPeccancyStatusByOrderId" parameterType="java.util.Map">
+        UPDATE
+            inst_car_peccancy
+          <set>
+            <if test="processStatus != null and processStatus != ''">
+                processStatus = #{processStatus},
+            </if>
+            <if test="processDate != null and processDate != ''">
+                processDate = #{processDate},
+            </if>
+            <if test="cheeguOrderId != null and cheeguOrderId != ''">
+                cheeguOrderId = #{cheeguOrderId},
+            </if>
+            <if test="status != null and status != ''">
+                status = #{status},
+            </if>
+            <if test="totalDegree != null and totalDegree != ''">
+                totalDegree = #{totalDegree},
+            </if>
+            <if test="totalPeccancyAmt != null and totalPeccancyAmt != ''">
+                totalPeccancyAmt = #{totalPeccancyAmt},
+            </if>
+            updateTime =NOW(),
+            sendTime = NOW()
+        </set>
+          WHERE  orderId = #{orderId} 
+                and vin = #{vin}
+    </update>
+        <!-- 根据订单号车架号查询违章信息 -->
+    <select id="selectInstCarPeccancyInfo" parameterType="java.util.Map" resultType="com.iqb.consumer.data.layer.bean.cheegu.InstCarPeccancyBean">
+        SELECT * from inst_car_peccancy A WHERE A.orderId = #{orderId} and A.vin = #{vin}
+    </select>
+        <!-- 保存资产分配订单信息-->
+    <insert id="insertInstCarPeccancy" parameterType="com.iqb.consumer.data.layer.bean.cheegu.InstCarPeccancyBean" keyProperty="id"
+        useGeneratedKeys="true">        
+        INSERT INTO inst_car_peccancy (
+            orderId,
+            vin,
+            engineNumber,
+            licenseNo,
+            sendTime,
+            version,
+            createTime,
+            updateTime            
+        )
+        VALUES(
+            #{orderId},#{vin},#{engineNumber},#{licenseNo},NOW(),1,NOW(),NOW()
+        )
+    </insert>
+    <!-- 根据订单号查询违章信息列表 -->
+    <select id="selectInstCarPeccancyListByOrderIds" parameterType="java.util.List" resultType="com.iqb.consumer.data.layer.bean.cheegu.InstCarPeccancyBean">
+         SELECT A.* FROM
+            inst_car_peccancy A
+        <where>
+                1=1
+              <if test="list != null and list.size() > 0">
+                    AND A.cheeguOrderId in
+                    <foreach item="item" index="index" collection="list" open="("
+                        separator="," close=")">
+                        #{item.cheeguOrderId}
+                    </foreach>
+                </if>
+                
+        </where>
+    </select>
+    
+</mapper>

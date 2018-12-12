@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iqb.consumer.data.layer.dao.schedule.ScheduleTaskRepository" >
+
+    <select id="getChatIds" resultType="String">
+        SELECT 
+            r.ORDERID 
+        FROM 
+            cf_requestmoney r,inst_orderinfo o 
+        WHERE 
+            r.ORDERID = o.orderId 
+        AND 
+            o.bizType = 2200 
+        AND 
+            r.`STATUS` = 1;
+    </select>
+    
+    <select id="getDetailsByOid" parameterType="String" resultType="com.iqb.consumer.data.layer.bean.credit_product.entity.InstOrderInfoEntity">
+        SELECT 
+            a.createtime, a.regid, a.biztype, a.merchantno, a.orderamt, a.orderitems, 
+            b.planid
+        FROM 
+            inst_orderinfo a
+        LEFT JOIN
+            inst_plan b
+        ON 
+            a.planid = b.id
+        WHERE 
+            a.orderid = #{orderId}
+    </select>
+    
+    
+    <update id="removeChatId" parameterType="com.iqb.consumer.data.layer.bean.schedule.pojo.CfRequestMoneyPojo">
+        UPDATE
+            cf_requestmoney
+        SET
+            deadline = #{deadLine},
+            pushid = #{pushId},
+            loantime = #{loanTime},
+            status = #{status},
+            updatetime = #{updateTime}
+        WHERE 
+            orderid = #{orderId}
+    </update>
+
+    <update id="updateOrderInfo" >
+        UPDATE
+            inst_orderinfo
+        SET
+            riskstatus = 3, updatetime = #{updateTime}
+        WHERE 
+            orderid = #{orderId}
+    </update>
+    
+    <insert id="createISTE" parameterType="com.iqb.consumer.data.layer.bean.schedule.entity.InstScheduleTaskEntity" >
+        INSERT INTO 
+            inst_schedule_task
+            (order_id, url, next_send_time, create_time, 
+            send_num, send_policy, state, json_data)
+        VALUES
+            (#{orderId}, #{url}, #{nextSendTime}, #{createTime}, 
+            #{sendNum}, #{sendPolicy}, #{state}, #{jsonData})
+    </insert>
+    
+    <select id="getMerchantPublicNo" parameterType="String" resultType="Integer">
+        SELECT 
+            publicno
+        FROM 
+            inst_merchantinfo
+        WHERE 
+            merchantno = #{merchantNo}
+    </select>
+</mapper>

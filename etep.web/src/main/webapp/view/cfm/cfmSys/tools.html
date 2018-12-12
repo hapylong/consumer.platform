@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	    <title>工具</title>
+	    <meta charset="UTF-8" />
+	    <meta name="Author" content="" />
+	    <meta name="Keywords" content="" />
+	    <meta name="Description" content="" />
+	    
+	    <!-- 样式库 -->
+	    <link rel="stylesheet" href="../../../js/ztree/css/zTreeStyle/zTreeStyle.css" />
+	    <link rel="stylesheet" href="../../../js/bootstrap/themes/default/bootstrap.css" />
+	    <link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+	    <link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+	    <link rel="stylesheet" href="../../../css/jquery.select2.css" />
+	    <link rel="stylesheet" href="../../../css/jquery.select2-bootstrap.css" />
+	    <link rel="stylesheet" href="../../../css/jquery.datetimepicker.css" /> 
+	    
+	    
+	    <!-- 插件库 -->
+	    <script src="../../../js/common/package.js"></script>
+		<script src="../../../js/common/url.js"></script>
+		<script src="../../../js/common/json2.js"></script>	
+		<script src="../../../js/common/jquery-1.11.3.min.js"></script>		
+		<script src="../../../js/bootstrap/bootstrap.js"></script>
+		<script src="../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+		<script src="../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+		<script src="../../../js/ztree/js/jquery.ztree.all.min.js"></script>
+		<script src="../../../js/common/jquery.select2.js"></script>
+		<script src="../../../js/common/jquery.datetimepicker.js"></script>
+		
+		<!-- 业务库 -->
+		<script src="../../../js/common/base.js"></script>
+		<!-- <script src="../../../js/common/datagrid2.js"></script> -->
+		<script src="../../../js/common/tree.js"></script>
+		<script src="../../../js/common/formatter.js"></script>	    
+	    <script src="../../../js/each/cfm/cfmSys/tools.js"></script>
+	    <script src="../../../js/each/cfm/merch/merch.js"></script>
+		
+		<!-- 页面样式 -->
+		<style type="text/css">
+			body {
+				font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif !important;
+				background:#eee url("../../../img/back.png") repeat;
+			}
+			.container-fluid {
+				padding:5px;
+			}
+			.left-part {
+				height:800px;
+			}
+			.modal-form {
+				margin:8px;
+			}
+		</style>
+	    
+	</head>   
+	<body>
+		<div class="container-fluid">
+			<div class="row">				
+				<div class="col-md-12">
+					<div class="panel panel-info">
+					    <div class="panel-heading">
+							<h4 class="panel-title">查询&解绑</h4>
+					  	</div>
+					  	<div class="panel-body">	
+					  		<form class="form-horizontal">
+							  	<div class="form-group">
+							    	<label class="control-label col-lg-1 col-md-1 col-sm-1">手机号</label>
+							    	<div class="col-lg-2 col-md-2 col-sm-2">
+							    	    <input id="regId" name="regId" type="text" class="form-control input-sm" placeholder="请输入手机号">
+							    	</div>
+							    	<label class="control-label col-lg-1 col-md-1 col-sm-1">银行卡号 </label>
+							    	<div class="col-lg-2 col-md-2 col-sm-2">
+							    	    <input id="bankCard" name="bankCard" type="text" class="form-control input-sm" placeholder="请输入银行卡号">
+								    </div>
+								    <label class="control-label col-lg-1 col-md-1 col-sm-1">支付主体</label>
+							    	<div class="col-lg-2 col-md-2 col-sm-2">
+							    	    <input id="payOwnerId" name="payOwnerId" type="number" class="form-control input-sm" placeholder="请输入支付主体对应的编号">
+								    </div>
+								    <div class="col-lg-3 col-md-3 col-sm-3">
+								    	<button id="btn-query" type="button" class="btn btn-default btn-sm">查询</button>	
+								  	    <button id="btn-unbind" type="button" class="btn btn-default btn-sm">解绑</button>	
+							        </div>
+							  	</div>
+							</form>		  												 	
+					  	</div>
+					</div>
+				</div>
+			</div>		 	
+		</div>
+	</body>
+</html>

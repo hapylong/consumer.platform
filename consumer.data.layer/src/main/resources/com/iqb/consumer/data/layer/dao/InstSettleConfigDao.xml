@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+	Apache License, Version 2.0 (the "License"); you may not use this file except 
+	in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.InstSettleConfigDao">
+	<sql id="table">inst_settle_config</sql>
+	<!-- 配置映射字段 -->
+	<resultMap type="com.iqb.consumer.data.layer.bean.settlementresult.InstSettleConfigBean"
+		id="InstSettleConfigBean">
+		<result property="id" 				column="ID" />
+		<result property="merchantId" 		column="MERCHANTID" />
+		<result property="merchantNo" 		column="MERCHANTNO" />
+		<result property="startDate" 		column="STARTDATE" />
+		<result property="version" 			column="VERSION" />
+		<result property="description" 		column="DESCRIPTION" />
+		<result property="createTime" 		column="CREATETIME" />
+		<result property="updateTime" 		column="UPDATETIME" />
+		<result property="orderDate"        column="orderDate" />
+		<result property="bizTypeName"      column="bizTypeName" />
+	</resultMap>
+
+	<!-- 保存商户代扣配置信息 -->
+	<insert id="saveInstSettleConfig" parameterType="com.iqb.consumer.data.layer.bean.settlementresult.InstSettleConfigBean">
+		INSERT INTO inst_settle_config (
+		  merchantId,
+		  merchantNo,
+		  startDate,
+		  description,
+		  status,
+		  flag,
+		  bizType,
+		  orderDate,
+		  createTime
+		) VALUES
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(
+			 #{item.merchantId}, #{item.merchantNo}, #{item.startDate}, #{item.description},#{item.status}, 
+			 #{item.flag}, #{item.bizType}, #{item.orderDate}, NOW()
+			)
+		</foreach>
+		
+	</insert>
+
+	<!-- 更新商户代扣配置信息  -->
+	<update id="updateInstSettleConfigById" parameterType="java.util.Map">
+		UPDATE 
+			<include refid="table" /> 
+			<set>
+				<if test="merchantId != null and merchantId != ''">
+					merchantId = #{merchantId},
+				</if>
+				<if test="merchantNo != null and merchantNo != ''">
+					merchantNo = #{merchantNo},
+				</if>
+				<if test="status != null and status != ''">
+					status = #{status},
+				</if>
+				<if test="flag != null and flag != ''">
+                    flag = #{flag},
+                </if>
+                <if test="bizType != null and bizType != ''">
+                    bizType = #{bizType},
+                </if>
+                <if test="description != null and description != ''">
+                    description = #{description},
+                </if>
+                startDate = #{startDate},
+                orderDate = #{orderDate},
+				updateTime = now()
+			</set>
+			where ID = #{id};
+	</update>
+	
+	<!-- 根据条件查询结算记录表-->
+	<select id="selectInstSettleConfigResultByParams" resultMap="InstSettleConfigBean" parameterType="java.util.Map">
+		SELECT
+		  A.id,
+		  A.merchantId,
+		  A.merchantNo,
+		  A.startDate,
+		  A.description,
+		  A.updateTime,
+		  A.status,
+		  B.MERCHANTSHORTNAME as merchantName,
+		  A.orderDate,
+          (SELECT DICT_NAME FROM iqb_sys_dict_item WHERE DICT_TYPE_CODE='business_type' and DICT_CODE= A.bizType) as bizTypeName
+		FROM 
+			inst_settle_config A
+			LEFT JOIN inst_merchantinfo B on A.merchantId=B.id
+		WHERE 1=1
+		<if test="merList != null and merList.size() > 0">
+			AND A.MERCHANTNO in
+			<foreach item="item" index="index" collection="merList" open="("
+				separator="," close=")">
+				#{item.merchantNo}
+			</foreach>
+		</if>
+		<if test="startDate != null and startDate != ''">
+			AND DATE_FORMAT(A.startDate,'%Y-%m-%d') &gt;= #{startDate}
+		</if>
+		<if test="endDate != null and endDate != ''">
+			AND DATE_FORMAT(A.startDate,'%Y-%m-%d') &lt;= #{endDate}
+		</if>
+		<if test="status != null and status != ''">
+			and   A.status = #{status}
+		</if>
+		<if test="bizType != null and bizType != ''">
+            and   A.bizType = #{bizType}
+        </if>
+		ORDER BY A.ID
+	</select>
+	<!-- 状态禁用启用 -->
+	 <update id="updateStatus">
+        UPDATE
+            inst_settle_config
+        SET
+            status = #{status},
+            updateTime = now()
+        WHERE
+            id
+        IN (
+        <foreach collection="ids" item="item" index="index"
+            separator=",">
+            #{item}
+        </foreach>
+        )
+    </update>
+    <!-- 根据id查询商户代扣配置 -->
+    <select id="queryById" resultMap="InstSettleConfigBean" parameterType="java.util.Map">
+		SELECT
+		  A.id,
+		  A.merchantId,
+		  A.merchantNo,
+		  A.startDate,
+		  A.description,
+		  A.updateTime,
+		  A.status,
+		  B.MERCHANTSHORTNAME as merchantName,
+		  A.orderDate,
+		  A.flag,
+          (SELECT DICT_NAME FROM iqb_sys_dict_item WHERE DICT_TYPE_CODE='business_type' and DICT_CODE= A.bizType) as bizTypeName,
+          A.bizType
+		FROM 
+			inst_settle_config A
+			LEFT JOIN inst_merchantinfo B on A.merchantId=B.id
+		WHERE 1=1
+		and   A.id = #{id}
+	</select>
+</mapper>

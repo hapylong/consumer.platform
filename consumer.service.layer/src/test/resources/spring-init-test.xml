@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+    <!--统一加载配置文件-->
+    
+    <import resource="db/db_init.xml" />
+    <import resource="redis/spring-data-redis.xml" />  
+    <import resource="redis/spring-data-redis-new.xml" />  
+    <import resource="mongo/spring-jdbc-mongo-dbs.xml" /> 
+    
+    <!-- 配置要扫描的包 -->
+	<context:component-scan base-package="com.iqb.consumer.service.layer"/>
+	<context:component-scan base-package="com.iqb.consumer.data.layer"/>
+	<context:component-scan base-package="com.iqb.etep"/>
+</beans>

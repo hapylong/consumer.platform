@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+    Apache License, Version 2.0 (the "License"); you may not use this file except 
+    in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+    Unless required by applicable law or agreed to in writing, software distributed 
+    under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+    OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+    the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iqb.consumer.data.layer.dao.settlementresult.SettlementResultWithHoldDao">
+    <sql id="table">inst_settlementresult</sql>
+    <!-- 配置映射字段 -->
+    <resultMap type="com.iqb.consumer.data.layer.bean.settlementresult.SettlementResultWithHoldBean"
+        id="settlementResultWithHoldBean">
+        <result property="id"               column="ID" />
+        <result property="orderId"          column="ORDERID" />
+        <result property="merchantNo"       column="MERCHANTNO" />
+        <result property="tradeNo"          column="TRADENO" />
+        <result property="repayNo"          column="REPAYNO" />
+        <result property="openId"           column="OPENID" />
+        <result property="curRepayAmt"      column="CURREPAYAMT" />
+        <result property="tradeType"        column="TREDETYPE" />
+        <result property="status"           column="STATUS"/>
+        <result property="number"           column="NUMBER"/>
+        
+        <result property="describe"         column="describe"/>
+        <result property="lastRepayDate"    column="lastRepayDate"/>
+        <result property="overdueDays"      column="overdueDays"/>
+        <result property="monthInterest"    column="monthInterest"/>
+        <result property="overdueInterest"  column="overdueInterest"/>
+        <result property="billStatus"       column="billStatus"/>
+        <result property="merchantName"     column="merchantName"/>
+        <result property="realName"         column="realName"/>
+        <result property="regId"            column="regId"/>
+        <result property="orderItems"       column="orderItems"/>
+        <result property="version"          column="VERSION" />
+        <result property="createTime"       column="CREATETIME" />
+        <result property="updateTime"       column="UPDATETIME" />
+    </resultMap>
+    
+    <resultMap type="com.iqb.consumer.data.layer.bean.settlementresult.BillWithHoldBean" id="billWithHoldBean">
+        <result property="id"               column="id" />
+        <result property="orderAmount"      column="orderAmount" />
+        <result property="phone"            column="phone" />
+        <result property="businessType"     column="businessType" />
+        <result property="customerName"     column="customerName" />
+        <result property="idNum"            column="idNum" />
+        <result property="bankNo"           column="bankNo" />
+        <result property="bankName"         column="bankName" />
+        <result property="orderId"          column="ORDERID" />
+    </resultMap>
+    <select id="listSettlementResultWithHold" parameterType="java.util.Map" resultMap="settlementResultWithHoldBean">
+        SELECT 
+		d.MERCHANTSHORTNAME as merchantName,
+		A.orderId,
+		E.realName,
+		C.regId,
+		A.repayNo,
+		C.orderItems,
+		A.lastRepayDate,
+		A.monthInterest,
+		A.overdueInterest,
+		A.curRepayAmt,
+		A.overdueDays,
+		CASE WHEN A.billStatus = 0 THEN '逾期'
+		WHEN A.billStatus = 1 THEN '未还款'
+		WHEN A.billStatus = 2 THEN '部分还款'
+		WHEN A.billStatus = 3 THEN '全部还款'
+		END billStatus,
+		A.status,
+		A.describe
+		
+		from inst_settlementresult_withhold A
+		LEFT JOIN inst_orderinfo C on A.orderId = C.orderId
+		LEFT JOIN inst_merchantinfo D on C.merchantNo = D.MERCHANTNO
+		LEFT JOIN inst_user E on C.regId = E.regId
+		where 1=1 
+		and NOT EXISTS(SELECT 1 FROM inst_settlementresult B WHERE b.orderId=A.orderId AND B.id>A.id)
+	           <if test="merList != null and merList.size() > 0">
+	            AND A.MERCHANTNO in
+	            <foreach item="item" index="index" collection="merList" open="("
+	                separator="," close=")">
+	                #{item.merchantNo}
+	            </foreach>
+	        </if>
+	        <if test="orderId !=null and orderId != ''">
+	            AND A.orderId = #{orderId}
+	        </if>
+	        <if test="realName !=null and realName != ''">
+                AND E.realName LIKE '%${realName}%'
+            </if>
+            <if test="regId !=null and regId != ''">
+                AND C.regId = #{regId}
+            </if>
+            <if test="billStatus !=null and billStatus != ''">
+                AND A.billStatus = #{billStatus}
+            </if>
+            <if test="status !=null and status != ''">
+                AND A.status = #{status}
+            </if>
+            <if test="startTime !=null and startTime != ''">
+	            AND DATE_FORMAT(A.lastRepayDate,'%Y-%m-%d') &gt;= #{startTime}
+	        </if>
+	        <if test="endTime !=null and endTime != ''">
+	            AND DATE_FORMAT(A.lastRepayDate,'%Y-%m-%d') &lt;=  #{endTime}
+	        </if>
+    </select>
+    <!-- 后台修改订单 -->
+    <update id="updateSettlementResult" parameterType="java.util.Map">
+        update
+        <include refid="table" />
+        a
+        <set>
+            a.version = #{version,jdbcType=INTEGER} + 1,
+            <if test="status != null and status != ''">
+                a.status = #{status},
+            </if>
+            <if test="number != null and number != ''">
+                a.number = #{number},
+            </if>
+            <if test="tradeType != null and tradeType != ''">
+                a.tradeType = #{tradeType},
+            </if>
+            <if test="tradeNo != null and tradeNo != ''">
+                a.tradeNo = #{tradeNo},
+            </if>
+            <if test="curRepayAmt != null and curRepayAmt != ''">
+                a.curRepayAmt = #{curRepayAmt},
+            </if>
+            a.updateTime = NOW()
+        </set>
+        where a.orderId = #{orderId}
+    </update>
+    
+    <!-- 查询账单代扣信息 -->
+    <select id="selectBillWithHoldInfo" parameterType="java.util.Map" resultMap="billWithHoldBean">
+        SELECT
+            A.id,
+		    A.curRepayAmt as orderAmount,
+		    D.bankMobile AS phone,
+		    B.bizType AS businessType,
+		    C.realName AS customerName,
+		    C.idno AS idNum,
+		    D.bankCardNo AS bankNo,
+		    D.bankName
+		FROM
+		    inst_settlementresult A
+		LEFT JOIN inst_orderinfo B ON A.orderId = B.orderId
+		LEFT JOIN inst_user C ON B.userId = C.id
+		LEFT JOIN (select card.* from (SELECT * FROM inst_bankcard ORDER BY id DESC) card  GROUP BY card.userid) D ON B.userID = D.userId
+	    WHERE 1=1
+	    AND A.orderId = #{orderId}
+		AND A.repayNo= #{repayNo}
+		ORDER BY A.createTime DESC
+		limit 1
+    </select>
+    <!-- 根据id修改还款代扣信息 -->
+    <update id="updateSettlementById" parameterType="java.util.Map">
+        update
+        <include refid="table" />
+        a
+        <set>
+            a.version = #{version,jdbcType=INTEGER} + 1,
+            <if test="status != null and status != ''">
+                a.status = #{status},
+            </if>
+            <if test="number != null and number != ''">
+                a.number = #{number},
+            </if>
+            <if test="tradeType != null and tradeType != ''">
+                a.tradeType = #{tradeType},
+            </if>
+            <if test="tradeNo != null and tradeNo != ''">
+                a.tradeNo = #{tradeNo},
+            </if>
+            <if test="curRepayAmt != null and curRepayAmt != ''">
+                a.curRepayAmt = #{curRepayAmt},
+            </if>
+            <if test="sendTime != null and sendTime != ''">
+                a.sendTime = #{sendTime},
+            </if>
+            <if test="describe != null and describe != ''">
+                a.describe = #{describe},
+            </if>
+            a.number = a.number+1,
+            a.updateTime = NOW()
+        </set>
+        where a.id = #{id}
+    </update>
+    <!-- 更新代扣信息表状态 -->
+    <update id="updateSettleByTradeNo" parameterType="com.iqb.consumer.data.layer.bean.settlementresult.SettlementResultWithHoldBean">
+        UPDATE
+            inst_settlementresult a
+        <set>
+            <if test="billStatus != null and billStatus != ''">
+                a.billStatus = #{billStatus},
+            </if>
+            a.status = #{status},
+            a.updateTime = NOW()
+        </set>
+        where a.tradeno = #{tradeNo}
+    </update>
+    <select id="listSettlementResult" parameterType="java.util.Map" resultMap="settlementResultWithHoldBean">
+        select AA.* from (
+            SELECT 
+        d.MERCHANTSHORTNAME as merchantName,
+        A.orderId,
+        E.realName,
+        C.regId,
+        A.repayNo,
+        C.orderItems,
+        A.lastRepayDate,
+        A.monthInterest,
+        A.overdueInterest,
+        A.curRepayAmt,
+        A.overdueDays,
+        CASE WHEN A.billStatus = 0 THEN '逾期'
+        WHEN A.billStatus = 1 THEN '待还款'
+        WHEN A.billStatus = 2 THEN '部分还款'
+        WHEN A.billStatus = 3 THEN '全部还款'
+        END billStatus,
+        A.status,
+        A.describe
+        
+        from inst_settlementresult A
+        LEFT JOIN inst_orderinfo C on A.orderId = C.orderId
+        LEFT JOIN inst_merchantinfo D on C.merchantNo = D.MERCHANTNO
+        LEFT JOIN inst_user E on C.regId = E.regId
+        LEFT JOIN inst_managecar_info f ON A.orderId = f.orderId 
+        where A.status <![CDATA[<>]]>3         
+        AND  (F.status<![CDATA[<>]]>30 or F.status is null)
+               <if test="merList != null and merList.size() > 0">
+                AND A.MERCHANTNO in
+                <foreach item="item" index="index" collection="merList" open="("
+                    separator="," close=")">
+                    #{item.merchantNo}
+                </foreach>
+            </if>
+            <if test="orderId !=null and orderId != ''">
+                AND A.orderId = #{orderId}
+            </if>
+            <if test="realName !=null and realName != ''">
+                AND E.realName LIKE '%${realName}%'
+            </if>
+            <if test="regId !=null and regId != ''">
+                AND C.regId = #{regId}
+            </if>
+            <if test="billStatus !=null and billStatus != ''">
+                AND A.billStatus = #{billStatus}
+            </if>
+            <if test="status !=null and status != ''">
+                AND A.status = #{status}
+            </if>
+            <if test="startTime !=null and startTime != ''">
+                AND DATE_FORMAT(A.lastRepayDate,'%Y-%m-%d') &gt;= #{startTime}
+            </if>
+            <if test="endTime !=null and endTime != ''">
+                AND DATE_FORMAT(A.lastRepayDate,'%Y-%m-%d') &lt;=  #{endTime}
+            </if>
+            ORDER BY A.createTime DESC
+        ) AA GROUP BY AA.orderid,AA.repayNo
+    </select>
+</mapper>

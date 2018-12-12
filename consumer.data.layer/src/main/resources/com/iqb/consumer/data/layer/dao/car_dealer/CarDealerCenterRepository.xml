@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+	Apache License, Version 2.0 (the "License"); you may not use this file except 
+	in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.car_dealer.CarDealerCenterRepository">
+	
+	<select id="getCustomerChannal" resultType="com.iqb.consumer.data.layer.bean.car_dealer.pojo.CgetInfoResponsePojo">
+		SELECT 
+		  custchannelsname AS id, custchannels AS name
+		FROM
+		  inst_dealermanage
+	</select>
+	
+	<select id="getCarDealer" resultType="com.iqb.consumer.data.layer.bean.car_dealer.pojo.CgetInfoResponsePojo">
+        SELECT 
+          sourceCarName AS id, custchannels AS name
+        FROM
+          inst_dealermanage
+    </select>
+	<!-- , remark -->
+	<select id="cgetCarDealerList" parameterType="Map"  resultType="com.iqb.consumer.data.layer.bean.car_dealer.entity.InstDealerManagerEntity">
+        SELECT 
+            id, orderid, custChannelsName, SourceCar, SourceCarName, address, contactMethod
+        FROM
+          inst_dealermanage
+        <where>
+            <if test="sourceCarName != null and sourceCarName != ''">
+                and sourcecarname = #{sourceCarName}
+            </if>
+            <if test="contactMethod != null and contactMethod != ''">
+                and contactmethod = #{contactMethod}
+            </if>
+            <if test="status != null and status != ''">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+	
+	<insert id="persistSubletInfo" parameterType="com.iqb.consumer.data.layer.bean.dandelion.entity.InstCreditInfoEntity">
+        INSERT INTO
+          inst_creditinfo
+            (
+              orderId,designCode,designName,guarantorNum,
+              creditType,borrowTogether,borrTogetherName,
+              creditInfo,version,createTime,updateTime
+             )
+        VALUES
+            (
+              #{orderId},#{designCode},#{designName},#{guarantorNum},
+              #{creditType},#{borrowTogether},#{borrTogetherName},
+              #{creditInfo},#{version},#{createTime},#{updateTime}
+             )
+    </insert>
+    
+    <update id="updateSubletInfo" parameterType="com.iqb.consumer.data.layer.bean.dandelion.entity.InstCreditInfoEntity">
+        UPDATE
+            inst_creditinfo
+        SET
+            designcode = #{designCode} , updatetime = NOW(), designname = #{designName}
+        WHERE 
+            orderid = #{orderId}
+    </update>
+    
+    <select id="getInstCreditInfoEntityByOid" parameterType="String" resultType="com.iqb.consumer.data.layer.bean.dandelion.entity.InstCreditInfoEntity">
+        SELECT 
+          a.*, b.remark, b.projectname
+        FROM
+          inst_creditinfo a
+        LEFT JOIN
+          inst_orderotherinfo b
+        ON
+          a.orderid = b.orderid
+        WHERE
+          a.orderid = #{orderId}
+    </select>
+    
+    <update id="updateToAddGuaranteeNo" parameterType="com.iqb.consumer.data.layer.bean.dandelion.entity.InstCreditInfoEntity">
+        UPDATE
+            inst_creditinfo
+        SET
+            guarantornum = #{guarantorNum} , updatetime = NOW()
+        WHERE 
+            id = #{id}
+    </update>
+    
+    <update id="updateBorrowInfo" parameterType="com.iqb.consumer.data.layer.bean.dandelion.entity.InstCreditInfoEntity">
+        UPDATE
+            inst_creditinfo
+        SET
+            credittype = #{creditType}, amtadvice = #{amtAdvice}, remark = #{remark}, updatetime = NOW()
+        WHERE 
+            orderid = #{orderId}
+    </update>
+    
+    <update id="updatePersionInfo" parameterType="com.iqb.consumer.data.layer.bean.dandelion.entity.InstCreditInfoEntity">
+        UPDATE
+            inst_creditinfo
+        SET
+            borrtogethername = #{borrTogetherName} ,creditinfo = #{creditInfo} ,
+            borrowtogether = #{borrowTogether} , updatetime = NOW()
+        WHERE 
+            orderid = #{orderId}
+    </update>
+    
+    <update id="updateDandelionEntityByOid" parameterType="com.iqb.consumer.data.layer.bean.credit_product.entity.InstOrderInfoEntity">
+        UPDATE
+            inst_orderinfo
+        SET
+            orderAmt = #{orderAmt},  planId = #{planId},  bizType = #{bizType},  
+            preAmt = #{preAmt},  
+            applyAmt = #{applyAmt},  assessPrice = #{assessPrice},  
+            monthInterest = #{monthInterest},  margin = #{margin},  
+            downPayment = #{downPayment},  serviceFee = #{serviceFee},  
+            feeAmount = #{feeAmount},  takePayment = #{takePayment}, orderItems = #{orderItems},  
+            feeYear = #{feeYear},  fee = #{fee},  updateTime = #{updateTime}
+        WHERE 
+            orderid = #{orderId}
+    </update>
+    
+    <select id="getPBByOid" parameterType="String" resultType="com.iqb.consumer.data.layer.bean.plan.PlanBean">
+        SELECT
+		    *
+		FROM
+		    inst_plan
+		WHERE
+		    id = (
+		        SELECT
+		            planid
+		        FROM
+		            inst_orderinfo
+		        WHERE
+		            orderid = #{orderId}
+		    )
+    </select>
+    
+</mapper>

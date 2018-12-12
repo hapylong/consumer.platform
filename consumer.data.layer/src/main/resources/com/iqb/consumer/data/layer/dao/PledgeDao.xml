@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+	Apache License, Version 2.0 (the "License"); you may not use this file except 
+	in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.PledgeDao">
+
+	<select id="getPledgeInfo" resultType="map">
+		SELECT 
+		  mi.MERCHANTSHORTNAME AS merchName,
+		  mi.MERCHANTNO AS merchantNo,
+		  u.realName,
+		  u.regId,
+		  oi.orderName,
+		  oi.bizType,
+		  oi.orderId,
+		  oi.planId,
+		  oi.preAmt,
+		  oi.takepayment,
+		  oi.chargeWay,
+		  oi.preAmtStatus,
+		  oi.orderAmt,
+		  oi.orderItems,
+		  p.PLANFULLNAME AS planFullName,
+		  oi.assessPrice,
+		  oi.downPayment,
+		  oi.margin,
+		  oi.serviceFee,
+		  oi.feeAmount,
+		  oi.monthInterest,
+		  oi.gpsAmt,
+		  oi.riskStatus,
+		  oi.riskRetRemark,
+		  oi.loanInterval,
+		  oi.applyAmt,
+		  ooi.guarantee,
+		  ooi.guaranteeName,
+		  ooi.gpsRemark,
+		  ooi.receiveAmt,
+		  ooi.remark,
+		  ipi.plate,
+		  ipi.carType,
+		  ipi.engine,
+		  ipi.registAdd,
+		  ipi.registDate,
+		  ipi.mileage,
+		  ipi.rfid,
+		  ipi.isLoan,
+		  ipi.selectRZ,
+		  ipi.remark as ipiRemark
+		FROM
+		  inst_orderinfo oi 
+		  LEFT JOIN inst_user u 
+		    ON oi.userId = u.id 
+		  LEFT JOIN inst_merchantinfo mi 
+		    ON oi.merchantNo = mi.MERCHANTNO 
+		  LEFT JOIN inst_plan p 
+		    ON oi.planId = p.ID 
+		  LEFT JOIN inst_orderotherinfo ooi 
+		    ON oi.orderId = ooi.orderId 
+		  LEFT JOIN inst_pledgeinfo ipi 
+		    ON oi.orderId = ipi.orderId 
+		  WHERE oi.orderId = #{orderId}
+	</select>
+	
+	<!-- 保存车辆入库信息  -->
+	<update id="saveVehicleStorageInfo">
+		update
+		inst_pledgeinfo 
+		<set>
+			version = #{version,jdbcType=INTEGER} + 1,
+			<if test="rfid != null and rfid != ''">
+				rfid = #{rfid},
+			</if>
+			<if test="remark != null and remark != ''">
+				remark = #{remark},
+			</if>
+			<if test="selectRZ != null and selectRZ != ''">
+				selectRZ = #{selectRZ},
+			</if>
+		</set>
+		where orderId = #{orderId}
+	</update>
+	
+	<update id="savePledgeInfo">
+		update
+		inst_pledgeinfo 
+		<set>
+			isLoan = #{isLoan}
+		</set>
+		where orderId = #{orderId}
+	</update>
+	
+	<select id="cgetCarInfo" parameterType="java.util.Map" resultType="com.iqb.consumer.data.layer.bean.Pledge.pojo.ConditionsGetCarInfoResponsePojo">
+        SELECT 
+            a.id, a.carbrand, a.cardetail, a.cartype, a.plate, a.carno, 
+            a.engine, a.registdate, a.registadd, a.assessprice, a.applyamt, a.status,
+            b.merchantshortname AS merchantno 
+        FROM
+          inst_pledgeinfo a
+        LEFT JOIN
+          inst_merchantinfo b
+        ON
+          a.merchantno = b.merchantno
+        WHERE
+        1 = 1
+        <if test="merList != null and merList.size() > 0">
+            AND a.merchantno in
+            <foreach item="item" index="index" collection="merList" open="("
+                separator="," close=")">
+                #{item.merchantNo}
+            </foreach>
+        </if>
+        <if test="carNo !=null and carNo != ''">
+            AND a.carno = #{carNo}
+        </if>
+        <if test="carType != null and carType != ''">
+            AND a.cartype = #{carType}
+        </if>
+        <if test="status != null and status != ''">
+            AND a.status = #{status}
+        </if>
+    </select>
+    
+    <insert id="persistCarInfo" parameterType="com.iqb.consumer.data.layer.bean.Pledge.PledgeInfoBean">
+        INSERT INTO
+          inst_pledgeinfo
+            (
+              id, orderid, merchantno, carbrand, cardetail, 
+              plate, cartype, engine, registadd, registdate, 
+              carno, mileage, status, assessprice, applyamt, 
+              version, createtime, updatetime, rfid, selectrz, 
+              remark, isloan, purpose
+             )
+        VALUES
+            (
+              #{id}, #{orderId}, #{merchantNo}, #{carBrand}, #{carDetail}, 
+              #{plate}, #{carType}, #{engine}, #{registAdd}, #{registDate}, 
+              #{carNo}, #{mileage}, #{status}, #{assessPrice}, #{applyAmt}, 
+              #{version}, #{createTime}, #{updateTime}, #{rfid}, #{selectRZ}, 
+              #{remark}, #{isLoan}, #{purpose}
+             )
+    </insert>
+    
+    <update id="updateCarInfo" parameterType="com.iqb.consumer.data.layer.bean.Pledge.PledgeInfoBean">
+        UPDATE
+        inst_pledgeinfo 
+        <set>
+            merchantNo = #{merchantNo},  carBrand = #{carBrand},  carDetail = #{carDetail},  
+            carType = #{carType},  plate = #{plate},  carNo = #{carNo},  engine = #{engine},  
+            registDate = #{registDate},  registAdd = #{registAdd},  assessPrice = #{assessPrice},  
+            applyAmt = #{applyAmt},  mileage = #{mileage},  remark = #{remark}
+        </set>
+        where id = #{id}
+    </update>
+    
+    <update id="updateAmt" parameterType="com.iqb.consumer.data.layer.bean.Pledge.pojo.UpdateAmtRequestPojo">
+        UPDATE
+        inst_pledgeinfo 
+        <set>
+            assessPrice = #{assessPrice},  
+            applyAmt = #{applyAmt}
+        </set>
+        where id = #{id}
+    </update>
+    <!-- 更新质押车状态 -->
+     <update id="updatePledgeStatus" parameterType="com.iqb.consumer.data.layer.bean.Pledge.PledgeInfoBean">
+        UPDATE
+        inst_pledgeinfo 
+        <set>
+            status = #{status}
+        </set>
+        where orderId = #{orderId}
+    </update>
+</mapper>

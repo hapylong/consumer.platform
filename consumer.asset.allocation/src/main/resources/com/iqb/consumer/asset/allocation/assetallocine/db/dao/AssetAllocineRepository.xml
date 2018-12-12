@@ -1,0 +1,766 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iqb.consumer.asset.allocation.assetallocine.db.dao.AssetAllocineRepository" >
+
+    <resultMap id="asset_allocine_pojo" type="com.iqb.consumer.asset.allocation.assetallocine.pojo.AssetAllocinePojo">
+        <id column="ID" property="id"></id>
+        <result column="borderid" property="bOrderId"></result>
+        <result column="orderid" property="orderId"></result>
+        <result column="orderitems" property="orderItems"></result>
+        <result column="borderamt" property="bOrderAmt"></result>
+        <result column="recordnum" property="recordNum"></result>
+        <result column="fee" property="fee"></result>
+        <result column="expiredate" property="expireDate"></result>
+        <result column="raiseinstitutions" property="raiseInstitutions"></result>
+        <result column="guaranteeinstitution" property="guaranteeInstitution"></result>
+        
+        <result column="proname" property="proName"></result>
+        <result column="bakorgan" property="bakOrgan"></result>
+        <result column="url" property="url"></result>
+        <result column="prodetail" property="proDetail"></result>
+        <result column="trancondition" property="tranCondition"></result>
+        <result column="safeway" property="safeWay"></result>
+        <result column="bizType" property="bizType"></result>
+        <result column="breakId" property="breakId"/>
+        <result column="proBeginDate"   property="proBeginDate"/>
+        <result column="jysOrderId"     property="jysOrderId"/> 
+        <result column="channel"        property="channel"/> 
+               
+    </resultMap>
+    <sql id="asset_allocine_sql">
+        a.id, a.borderid, a.orderid, a.orderitems, a.borderamt, a.recordnum,
+        b.fee, b.expiredate, b.ordername as proname, b.bakorgan, b.url, b.prodetail, b.trancondition, b.safeway,
+        c.raiseInstitutions, c.guaranteeInstitution,b.bizType
+    </sql>
+    <select id="getDivisionAssetsDetails" parameterType="com.iqb.consumer.asset.allocation.assetallocine.request.DivisionAssetsDetailsRequestMessage" resultMap="asset_allocine_pojo">
+        SELECT
+             a.id, a.borderid, b.orderId, a.orderitems, a.borderamt, a.recordnum,
+        b.fee, b.expiredate, b.ordername as proname, b.bakorgan, b.url, b.prodetail, b.trancondition, b.safeway,
+        c.raiseInstitutions, c.guaranteeInstitution,b.bizType
+        FROM
+            jys_breakorderinfo a 
+        LEFT JOIN  jys_orderinfo b  ON  a.jysOrderId = b.id and a.jysorderid=b.id
+        LEFT JOIN jys_packinfo c ON  a.orderid = c.orderid and  c.jysorderid=b.id
+        <where>
+            <if test="orderId != null and orderId != ''">
+                b.orderid = #{orderId, jdbcType=VARCHAR}
+            </if>
+            <if test="raiseInstitutions != null and raiseInstitutions != ''">
+                AND c.raiseInstitutions = #{raiseInstitutions, jdbcType=VARCHAR}
+            </if>
+            <if test="guaranteeInstitution != null and guaranteeInstitution != ''">
+                AND c.guaranteeInstitution = #{guaranteeInstitution, jdbcType=VARCHAR}
+            </if>
+            <if test="expireDate != null">
+                AND b.expiredate = #{expireDate ,jdbcType=DATE}
+            </if>
+            <if test="bOrderAmtBegin != null">
+                AND a.borderamt &gt;= #{bOrderAmtBegin, jdbcType=DECIMAL}
+            </if>
+            <if test="bOrderAmtEnd != null">
+                AND a.borderamt &lt; #{bOrderAmtEnd, jdbcType=DECIMAL}
+            </if>
+            <!--FINANCE-2972交易所资产打包/资产拆分/资产分配页面中筛选条件增加业务类型 -->
+            <if test="bizType != null and bizType != ''">
+                AND b.bizType = #{bizType, jdbcType=VARCHAR}
+            </if>
+            
+                AND a.status = 1
+        </where>
+    </select>
+    
+    <select id="getDivisionAssetsDetailsById" parameterType="long" resultMap="asset_allocine_pojo">
+        SELECT
+                a.id, a.borderid, b.orderid, a.orderitems, a.borderamt, a.recordnum,
+	        b.fee, b.expiredate, b.ordername as proname, b.bakorgan, b.url, b.prodetail, b.trancondition, b.safeway,
+	        c.raiseInstitutions, c.guaranteeInstitution,b.bizType,b.id jysOrderId
+        FROM
+            jys_breakorderinfo a 
+        LEFT JOIN  jys_orderinfo b  ON  a.jysOrderId = b.id
+        LEFT JOIN  jys_packinfo c   ON  a.orderid = c.orderid and a.jysOrderId = c.jysOrderId
+        WHERE
+            a.id = #{id}
+            limit 1
+    </select>
+    
+    <insert id="persistAssetAllocationEntity" parameterType="com.iqb.consumer.asset.allocation.assetallocine.db.entity.AssetAllocationEntity" >
+        INSERT INTO 
+            JYS_ASSETALLOCATION
+            (BORDERID, ORDERID, CHANNEL, PRONAME, PROBEGINDATE, BAKORGAN, URL, 
+            PRODETAIL,TRANCONDITION, SAFEWAY, VERSION, CREATETIME, UPDATETIME,BREAKID,DELETEFLAG,jysOrderId)
+        VALUES
+            (#{bOrderId}, #{orderId}, #{channel}, #{proName}, #{proBeginDate}, 
+            #{bakOrgan}, #{url}, #{proDetail}, #{tranCondition}, #{safeWay}, 
+            #{version}, #{createTime}, #{updateTime},#{id},#{deleteFlag},#{jysOrderId})
+    </insert>
+    
+    
+    <resultMap id="asset_division_pojo" type="com.iqb.consumer.asset.allocation.assetallocine.pojo.AssetDivisionPojo">
+        <result column="orderid" property="orderId"></result>
+        <result column="begininterestdate" property="beginInterestDate"></result>
+        <result column="raiseinstitutions" property="raiseInstitutions"></result>
+        <result column="guaranteeinstitution" property="guaranteeInstitution"></result>
+        <result column="remark" property="remark"></result>
+        
+        <result column="id" property="id"></result>
+        <result column="orderamt" property="orderAmt"></result>
+        <result column="expiredate" property="expireDate"></result>
+        <result column="fee" property="fee"></result>
+        <result column="orderitems" property="orderItems"></result>
+        <result column="bizType" property="bizType"></result>
+        <result column="packageId" property="packageId"/>
+    </resultMap>
+    
+    <sql id="asset_division_sql">
+        a.orderid, a.begininterestdate, a.raiseinstitutions, a.guaranteeinstitution, a.remark,
+        b.id, b.orderamt, b.expiredate, b.fee, b.orderitems,b.bizType
+    </sql>
+    <select id="getDivisionAssetsPrepare" parameterType="com.iqb.consumer.asset.allocation.assetallocine.request.DivisionAssetsDetailsRequestMessage" resultMap="asset_division_pojo">
+        SELECT
+            b.orderId, a.begininterestdate, a.raiseinstitutions, a.guaranteeinstitution, a.remark,
+        b.id, b.orderamt, b.expiredate, b.fee, b.orderitems,b.bizType
+        FROM
+            jys_packinfo a 
+        LEFT JOIN 
+            jys_orderinfo b  ON  a.orderid = b.orderid and a.jysOrderid=B.id
+        <where>
+            <if test="orderId != null and orderId != ''">
+                b.orderid = #{orderId, jdbcType=VARCHAR}
+            </if>
+            <if test="raiseInstitutions != null and raiseInstitutions != ''">
+                AND a.raiseInstitutions = #{raiseInstitutions, jdbcType=VARCHAR}
+            </if>
+            <if test="guaranteeInstitution != null and guaranteeInstitution != ''">
+                AND a.guaranteeInstitution = #{guaranteeInstitution, jdbcType=VARCHAR}
+            </if>
+            <if test="expireDate != null">
+                AND b.expiredate = #{expireDate, jdbcType=DATE}
+            </if>
+            <if test="bOrderAmtBegin != null">
+                AND b.orderAmt &gt;= #{bOrderAmtBegin, jdbcType=DECIMAL}
+            </if>
+            <if test="bOrderAmtEnd != null">
+                AND b.orderAmt &lt; #{bOrderAmtEnd, jdbcType=DECIMAL}
+            </if>
+            <!--FINANCE-2972交易所资产打包/资产拆分/资产分配页面中筛选条件增加业务类型 -->
+            <if test="bizType != null and bizType != ''">
+                AND b.bizType = #{bizType, jdbcType=VARCHAR}
+            </if>
+                AND b.status = 4
+        </where>
+    </select>
+    
+    <insert id="persistChildAssets"  parameterType="java.util.List">
+        INSERT INTO JYS_BREAKORDERINFO (
+            borderid, orderid, orderitems, borderamt, 
+            recordnum, delistingmechanism, breaktype, status, 
+            remark, version, createtime, updatetime, breakPackNum,jysOrderId
+        )
+        VALUES
+        <foreach collection="list" item="item" index="index"
+            separator=",">
+            (#{item.bOrderId}, #{item.orderId}, #{item.orderItems}, 
+             #{item.bOrderAmt}, #{item.recordNum}, #{item.delistingMechanism},
+             #{item.breakType}, #{item.status}, #{item.remark}, #{item.version}, 
+             #{item.createTime}, #{item.updateTime}, #{item.breakPackNum},#{item.jysOrderId})
+        </foreach>
+    </insert>
+    
+    <select id="findOrderInfoNeedBreakById" parameterType="long" resultType="com.iqb.consumer.asset.allocation.assetallocine.db.entity.OrderInfoEntity">
+        SELECT
+            id, status, orderamt
+        FROM
+            jys_orderinfo
+        WHERE
+            id = #{id}
+        AND 
+            status = 4
+    </select>
+    
+    <update id="updateOrderInfoBreakSuccess" parameterType="com.iqb.consumer.asset.allocation.assetallocine.db.entity.OrderInfoEntity">
+        UPDATE
+            jys_orderinfo
+          <set>
+			<if test="status != null and status != ''">
+				status = #{status},
+			</if>
+			<if test="proName != null and proName != ''">
+				proName = #{proName},
+				orderName = #{proName},
+			</if>
+			<if test="bakOrgan != null and bakOrgan != ''">
+				bakOrgan = #{bakOrgan},
+			</if>
+			<if test="url != null and url != ''">
+				url = #{url},
+			</if>
+			<if test="proDetail != null and proDetail != ''">
+				proDetail = #{proDetail},
+			</if>
+			<if test="tranCondition != null and tranCondition != ''">
+				tranCondition = #{tranCondition},
+			</if>
+			<if test="safeWay != null and safeWay != ''">
+				safeWay = #{safeWay},
+			</if>
+			updatetime = now()
+		</set>
+        WHERE 
+            id = #{id}
+    </update>
+    
+    <select id="getDivisionAssetsPrepareById" parameterType="long" resultMap="asset_division_pojo">
+        SELECT
+             b.orderid, a.begininterestdate, a.raiseinstitutions, a.guaranteeinstitution, a.remark,
+            b.id, b.orderamt, b.expiredate, b.fee, b.orderitems,b.bizType,A.id as packageId
+        FROM
+            jys_packinfo a 
+        LEFT JOIN  jys_orderinfo b  ON  a.orderid = b.orderid and a.jysorderid = b.id
+        WHERE
+            b.id = #{id}
+            limit 1
+    </select>
+    
+    <resultMap id="RAR_pojo" type="com.iqb.consumer.asset.allocation.assetallocine.request.RARRequestMessage">
+        <id column="id" property="projectId"></id>
+        <result column="borderid" property="projectCode"></result>
+        <result column="borderamt" property="applyamt"></result>
+        <result column="recordnum" property="exchRecordNbr"></result>
+        <result column="breakpacknum" property="packNum"></result>
+
+        <result column="proname" property="projectName"></result>
+        <result column="bakorgan" property="registerAgency"></result>
+        <result column="trancondition" property="transConditions"></result>
+        <result column="prodetail" property="proOverview"></result>
+        <result column="safeway" property="guaranteeWay"></result>
+        <result column="url" property="listingAddr"></result>
+        
+        <result column="guaranteeinstitution" property="guarantee"></result>
+        <result column="guaranteename" property="guaranteeName"></result>
+        <result column="raiseinstitutions" property="raiseObj"></result>
+        
+        <result column="biztype" property="projectType"></result>
+        <result column="expiredate" property="deadlinePre"></result>
+        <result column="orderamt" property="raiseTotalAmount"></result>
+        <result column="orderid" property="packageId"></result>
+        
+        <result column="realname" property="loanName"></result>
+        <result column="idno" property="loanIdcard"></result>
+        <result column="jysOrderId" property="jysOrderId"></result>
+        
+    </resultMap>
+    <sql id="create_RAR_sql">
+        a.id, a.borderid, a.borderamt, a.recordnum, a.breakpacknum,a.jysOrderId,
+        b.proname, b.bakorgan, b.trancondition, b.prodetail, b.safeway, b.url,
+        c.guaranteeinstitution, c.guaranteename, c.raiseinstitutions,
+        d.biztype, d.expiredate, d.orderamt, d.orderid,
+        e.realname, e.idno
+    </sql>
+    
+    <select id="createRAR" parameterType="string" resultMap="RAR_pojo">
+       SELECT 
+            <include refid="create_RAR_sql" />
+        FROM 
+            jys_breakorderinfo a 
+        LEFT JOIN 
+            jys_assetallocation b 
+        ON 
+            a.borderid = b.borderid
+        LEFT JOIN 
+            jys_packinfo c
+        ON 
+            a.orderid = c.orderid
+        LEFT JOIN 
+            jys_orderinfo d
+        ON 
+            a.jysOrderId = d.id
+        LEFT JOIN 
+            jys_user e
+        ON 
+            d.userId = e.id
+        WHERE
+            a.id = #{id,jdbcType=VARCHAR}
+        AND
+            a.status = 1
+            limit 1
+    </select>
+    
+     <update id="updateChildState" parameterType="com.iqb.consumer.asset.allocation.assetallocine.db.entity.BreakOrderInfoEntity">
+        UPDATE 
+            jys_breakorderinfo
+        SET 
+            status = #{status}, updatetime = #{updateTime}
+        WHERE 
+            id = #{id}
+    </update>
+    
+    <delete id="deleteAssetAllocationEntity" parameterType="string">
+        DELETE FROM
+            jys_assetallocation
+        WHERE 
+            borderid = #{bid, jdbcType=VARCHAR}
+    </delete>
+    <select id="cgetAssetBreakDetails" parameterType="Map" resultType="com.iqb.consumer.asset.allocation.assetallocine.pojo.AssetBreakDetailsInfoResponsePojo">
+        select AA.* from (
+            SELECT 
+            a.orderid ,a.regid ,a.margin ,a.expiredate ,a.orderitems ,a.planid ,a.createtime ,
+            a.ordername AS proName, a.orderAmt, a.upperTime AS paymentdate, a.riskstatus,
+            b.realName, b.idNo,b.bankname ,b.bankcardno,
+            c.borderid ,c.recordnum ,c.delistingmechanism ,
+            d.channel ,a.url ,d.bakorgan ,
+            e.planshortname ,e.feeratio ,e.recharge ,
+            f.raiseinstitutions ,f.guaranteeinstitution,
+            g.merchantshortname  AS merchantno,
+            h.dict_name AS biztype,
+            t.PROJECTNAME AS projectName1
+        FROM    
+            jys_orderinfo a
+        LEFT JOIN   
+            jys_user b
+        ON
+            a.userId = b.id
+        LEFT JOIN
+            (SELECT * FROM jys_breakorderinfo ORDER BY id DESC) c
+        ON
+            c.jysorderid = a.id
+        LEFT JOIN 
+            (select * from  jys_assetallocation ORDER BY id DESC) d
+        ON 
+            a.orderid = d.orderid
+        LEFT JOIN 
+            inst_plan e
+        ON 
+            a.planid = e.id
+        LEFT JOIN
+            (select * from jys_packinfo ORDER BY id DESC) f
+        ON
+            a.id = f.jysorderid
+        LEFT JOIN 
+            inst_merchantinfo g 
+        ON 
+            a.merchantno = g.merchantno
+        LEFT JOIN 
+            (
+                SELECT 
+                    dict_type_code,dict_name,dict_code,dict_value,cascade_code,remark,is_enable
+                FROM 
+                    iqb_sys_dict_item 
+                WHERE 
+                    is_enable = 1 
+                AND
+                    dict_type_code='bizType2OpenId' 
+             ) h 
+        ON 
+            a.biztype = h.dict_code
+             LEFT JOIN inst_orderotherinfo t on a.orderId = t.orderId
+        <where>
+            <if test="orderId != null and orderId != ''">
+                AND a.orderid = #{orderId}
+            </if>
+            <if test="upperTime != null and upperTime != ''">
+                AND a.upperTime = #{upperTime}
+            </if>
+            <if test="merList != null and merList.size() > 0">
+                AND g.merchantno in
+                <foreach item="item" index="index" collection="merList" open="("
+                    separator="," close=")">
+                    #{item.merchantNo}
+                </foreach>
+            </if>
+            <if test="raiseInstitutions != null and raiseInstitutions != ''">
+                AND f.raiseinstitutions = #{raiseInstitutions}
+            </if>
+            <if test="guaranteeInstitution != null and guaranteeInstitution != ''">
+                AND f.guaranteeinstitution = #{guaranteeInstitution}
+            </if>
+            <if test="bakOrgan != null and bakOrgan != ''">
+                AND d.bakorgan = #{bakOrgan}
+            </if>
+            <if test="realName != null and realName != ''">
+                AND b.realname = #{realName}
+            </if>
+        </where>
+            ORDER BY C.createTime DESC
+        ) AA
+        GROUP BY AA.orderid
+    </select>
+    
+    <select id="cgetAssetBreakDetailsList" parameterType="Map" resultType="com.iqb.consumer.asset.allocation.assetallocine.pojo.AssetBreakDetailsInfoResponsePojo">
+         select AA.* from (
+            SELECT 
+            a.orderid ,a.regid ,a.margin ,a.expiredate ,a.orderitems ,a.planid ,a.createtime ,
+            a.ordername AS proName, a.orderAmt, a.upperTime AS paymentdate, a.riskstatus,
+            b.realName, b.idNo,b.bankname ,b.bankcardno,
+            c.borderid ,c.recordnum ,c.delistingmechanism ,
+            d.channel ,a.url ,a.bakorgan ,
+            e.planshortname ,e.feeratio ,e.recharge ,
+            f.raiseinstitutions ,f.guaranteeinstitution,
+            g.merchantshortname  AS merchantno,
+            h.dict_name AS biztype,
+            t.PROJECTNAME AS projectName1
+        FROM    
+            jys_orderinfo a
+        LEFT JOIN   
+            jys_user b
+        ON
+            a.userId = b.id
+        LEFT JOIN
+            (SELECT * FROM jys_breakorderinfo ORDER BY id DESC) c
+        ON
+            c.jysOrderid = a.id
+        LEFT JOIN 
+            (select * from  jys_assetallocation ORDER BY id DESC) d
+        ON 
+            a.orderid = d.orderid
+        LEFT JOIN 
+            inst_plan e
+        ON 
+            a.planid = e.id
+        LEFT JOIN
+            (select * from jys_packinfo ORDER BY id DESC) f
+        ON
+            a.id = f.jysOrderid
+        LEFT JOIN 
+            inst_merchantinfo g 
+        ON 
+            a.merchantno = g.merchantno
+        LEFT JOIN 
+            (
+                SELECT 
+                    dict_type_code,dict_name,dict_code,dict_value,cascade_code,remark,is_enable
+                FROM 
+                    iqb_sys_dict_item 
+                WHERE 
+                    is_enable = 1 
+                AND
+                    dict_type_code='bizType2OpenId' 
+             ) h 
+        ON 
+            a.biztype = h.dict_code
+        LEFT JOIN inst_orderotherinfo t on a.orderId = t.orderId
+        <where>
+            <if test="orderId != null and orderId != ''">
+                AND a.orderid = #{orderId}
+            </if>
+            <if test="upperTime != null and upperTime != ''">
+                AND a.upperTime = #{upperTime}
+            </if>
+            <if test="merList != null and merList.size() > 0">
+                AND g.merchantno in
+                <foreach item="item" index="index" collection="merList" open="("
+                    separator="," close=")">
+                    #{item.merchantNo}
+                </foreach>
+            </if>
+            <if test="raiseInstitutions != null and raiseInstitutions != ''">
+                AND f.raiseinstitutions = #{raiseInstitutions}
+            </if>
+            <if test="guaranteeInstitution != null and guaranteeInstitution != ''">
+                AND f.guaranteeinstitution = #{guaranteeInstitution}
+            </if>
+            <if test="bakOrgan != null and bakOrgan != ''">
+                AND d.bakorgan = #{bakOrgan}
+            </if>
+            <if test="realName != null and realName != ''">
+                AND b.realname = #{realName}
+            </if>
+        </where>
+            ORDER BY C.createTime DESC
+        ) AA
+        GROUP BY AA.orderid
+    </select>
+    
+    <select id="cgetAssetBreakDetailsAmtTotal" parameterType="Map" resultType="BigDecimal">
+        SELECT 
+            SUM(A.orderamt) 
+        FROM (
+	        SELECT
+	            a.orderamt
+	        FROM    
+	            jys_orderinfo a
+	        LEFT JOIN   
+	            jys_user b
+	        ON
+	            a.userId = b.id
+	        LEFT JOIN
+	            (SELECT * FROM jys_breakorderinfo ORDER BY id DESC) c
+	        ON
+	            c.jysorderid = a.id
+	        LEFT JOIN 
+	            (select * from  jys_assetallocation ORDER BY id DESC) d
+	        ON 
+	            a.id = d.jysorderid
+	        LEFT JOIN 
+	            inst_plan e
+	        ON 
+	            a.planid = e.id
+	        LEFT JOIN
+	            (select * from jys_packinfo ORDER BY id DESC) f
+	        ON
+	            a.id = f.jysorderid
+	        LEFT JOIN 
+	            inst_merchantinfo g 
+	        ON 
+	            a.merchantno = g.merchantno
+	        LEFT JOIN
+	            (select dict_name,dict_value from iqb_sys_dict_item where dict_type_code = 'bizType2OpenId') h
+	        ON
+	            a.biztype = h.dict_value
+	        <where>
+	            <if test="orderId != null and orderId != ''">
+	                AND a.orderid = #{orderId}
+	            </if>
+	            <if test="upperTime != null and upperTime != ''">
+	                AND a.upperTime = #{upperTime}
+	            </if>
+	            <if test="merList != null and merList.size() > 0">
+	                AND g.merchantno in
+	                <foreach item="item" index="index" collection="merList" open="("
+	                    separator="," close=")">
+	                    #{item.merchantNo}
+	                </foreach>
+	            </if>
+	            <if test="raiseInstitutions != null and raiseInstitutions != ''">
+	                AND f.raiseinstitutions = #{raiseInstitutions}
+	            </if>
+	            <if test="guaranteeInstitution != null and guaranteeInstitution != ''">
+	                AND f.guaranteeinstitution = #{guaranteeInstitution}
+	            </if>
+	            <if test="bakOrgan != null and bakOrgan != ''">
+	                AND d.bakorgan = #{bakOrgan}
+	            </if>
+	            <if test="realName != null and realName != ''">
+	                AND b.realname = #{realName}
+	            </if>
+	        </where>
+	        GROUP BY a.orderid
+	        ) A
+    </select>
+    
+    <select id="cgetOrderBreakDetails" parameterType="Map" resultType="com.iqb.consumer.asset.allocation.assetallocine.pojo.OrderBreakDetailsInfoResponsePojo">
+        SELECT
+            a.orderid, a.ordername, a.createtime, a.orderamt, a.orderitems, a.downpayment, a.margin, a.riskstatus,
+            a.servicefee, a.monthinterest, a.feeamount, a.takepayment, a.preamt, a.chargeway,
+            b.realname, b.regid, 
+            c.planfullname,
+            d.merchantshortname,
+            (
+                SELECT
+                    e.createtime
+                FROM
+                    jys_assetallocation e
+                WHERE
+                    e.orderid = a.orderid
+                ORDER BY
+                    e.createtime DESC
+                LIMIT 1
+            ) AS sbtime
+        FROM
+            jys_orderinfo a,
+            jys_user b,
+            inst_merchantinfo d,
+            inst_plan c
+        <where>
+                a.userid = b.id
+            AND a.merchantno = d.merchantno
+            AND a.planid = c.ID
+            AND a.riskstatus in(3,9)
+            <if test="merList != null and merList.size() > 0">
+                AND a.merchantno in
+                <foreach item="item" index="index" collection="merList" open="("
+                    separator="," close=")">
+                    #{item.merchantNo}
+                </foreach>
+            </if>
+            <if test="orderId != null and orderId != ''">
+                AND a.orderid = #{orderId}
+            </if>
+            <if test="regId != null and regId != ''">
+                AND b.regid = #{regId}
+            </if>
+            <if test="realName != null and realName != ''">
+                AND b.realname = #{realName}
+            </if>
+            <if test="startTime != null and startTime != ''">
+                AND a.createtime &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND a.createtime &lt;= #{endTime}
+            </if>
+        </where>
+    </select>
+    
+    <select id="getBOIEByStatusAndOid" parameterType="Map" resultType="com.iqb.consumer.asset.allocation.assetallocine.db.entity.BreakOrderInfoEntity">
+        SELECT
+            borderid, orderid
+        FROM
+            jys_breakorderinfo
+        WHERE
+            orderid = #{orderId}
+        AND
+            status != #{status}
+    </select>
+    
+    <update id="markFinshRARPushByRS9" parameterType="String">
+        UPDATE 
+            jys_orderinfo
+        SET 
+            riskstatus = 9, updatetime = NOW()
+        WHERE 
+            orderid = #{orderId}
+    </update>
+    <!-- 交易所资产分配列表 -->
+    <select id="assetAllocationList" parameterType="com.iqb.consumer.asset.allocation.assetallocine.request.DivisionAssetsDetailsRequestMessage" resultMap="asset_allocine_pojo">
+        SELECT
+		    A.id,
+		    A.borderid,
+		    B.orderId,
+		    C.raiseInstitutions,
+		    D.borderamt,
+		    B.orderItems,
+		    B.fee,
+		    C.guaranteeInstitution,
+		    B.expireDate,
+		    B.bizType,
+		    D.recordNum,
+		    A.breakId,
+		    A.channel,
+		    A.proBeginDate
+		FROM
+		    jys_assetallocation A
+		LEFT JOIN (
+		    SELECT
+		        *
+		    FROM
+		        jys_orderinfo
+		    GROUP BY
+		        orderId
+		) B ON A.orderId = B.orderId
+		LEFT JOIN (select * from jys_packinfo GROUP BY orderId) C ON C.orderId = B.orderid 
+        LEFT JOIN (SELECT * from jys_breakorderinfo GROUP BY orderId) D ON D.orderId = B.orderid 
+        <where>
+            A.deleteFlag is null
+            <if test="orderId != null and orderId != ''">
+                AND b.orderid = #{orderId, jdbcType=VARCHAR}
+            </if>
+            <if test="raiseInstitutions != null and raiseInstitutions != ''">
+                AND c.raiseInstitutions = #{raiseInstitutions, jdbcType=VARCHAR}
+            </if>
+            <if test="guaranteeInstitution != null and guaranteeInstitution != ''">
+                AND c.guaranteeInstitution = #{guaranteeInstitution, jdbcType=VARCHAR}
+            </if>
+            <if test="expireDate != null and expireDate!=''">
+                AND b.expiredate = #{expireDate ,jdbcType=DATE}
+            </if>
+            <if test="bOrderAmtBegin != null and bOrderAmtBegin!=''">
+                AND d.borderamt &gt;= #{bOrderAmtBegin, jdbcType=DECIMAL}
+            </if>
+            <if test="bOrderAmtEnd != null and bOrderAmtEnd!=''">
+                AND d.borderamt &lt; #{bOrderAmtEnd, jdbcType=DECIMAL}
+            </if>
+            <if test="proBeginDateBegin != null and proBeginDateBegin!=''">
+                AND A.proBeginDate &gt;= #{proBeginDateBegin, jdbcType=VARCHAR}
+            </if>
+            <if test="proBeginDateEnd != null and proBeginDateEnd!=''">
+                AND A.proBeginDate &lt; #{proBeginDateEnd, jdbcType=VARCHAR}
+            </if>
+            <if test="bizType != null and bizType != ''">
+                AND b.bizType = #{bizType, jdbcType=VARCHAR}
+            </if> 
+            <if test="channel != null and channel!=''">
+                AND A.channel = #{channel}
+            </if>            
+        </where>
+        UNION
+        SELECT DISTINCT 
+            A.id,
+            A.borderid,
+            B.orderId,
+            C.raiseInstitutions,
+            D.borderamt,
+            B.orderItems,
+            B.fee,
+            C.guaranteeInstitution,
+            B.expireDate,
+            B.bizType,
+            D.recordNum,
+            A.breakId,
+            A.channel,
+            A.proBeginDate
+        FROM
+            jys_assetallocation A
+        LEFT JOIN jys_orderinfo B ON A.jysOrderId = B.id
+        LEFT JOIN jys_packinfo C ON C.jysOrderId = B.id 
+        LEFT JOIN jys_breakorderinfo D ON D.jysOrderId = B.id 
+        <where>
+            A.deleteFlag = 0
+            <if test="orderId != null and orderId != ''">
+                AND b.orderid = #{orderId, jdbcType=VARCHAR}
+            </if>
+            <if test="raiseInstitutions != null and raiseInstitutions != ''">
+                AND c.raiseInstitutions = #{raiseInstitutions, jdbcType=VARCHAR}
+            </if>
+            <if test="guaranteeInstitution != null and guaranteeInstitution != ''">
+                AND c.guaranteeInstitution = #{guaranteeInstitution, jdbcType=VARCHAR}
+            </if>
+            <if test="expireDate != null and expireDate!=''">
+                AND b.expiredate = #{expireDate ,jdbcType=DATE}
+            </if>
+            <if test="bOrderAmtBegin != null and bOrderAmtBegin!=''">
+                AND d.borderamt &gt;= #{bOrderAmtBegin, jdbcType=DECIMAL}
+            </if>
+            <if test="bOrderAmtEnd != null and bOrderAmtEnd!=''">
+                AND d.borderamt &lt; #{bOrderAmtEnd, jdbcType=DECIMAL}
+            </if>
+            <if test="proBeginDateBegin != null and proBeginDateBegin!=''">
+                AND A.proBeginDate &gt;= #{proBeginDateBegin, jdbcType=VARCHAR}
+            </if>
+            <if test="proBeginDateEnd != null and proBeginDateEnd!=''">
+                AND A.proBeginDate &lt; #{proBeginDateEnd, jdbcType=VARCHAR}
+            </if>
+            <if test="bizType != null and bizType != ''">
+                AND b.bizType = #{bizType, jdbcType=VARCHAR}
+            </if>   
+            <if test="channel != null and channel!=''">
+                AND A.channel = #{channel}
+            </if>           
+        </where>
+    </select>
+    <!-- 更新交易所资产分配删除标识 -->
+    <update id="updateAssetAllocationById" parameterType="String">
+        UPDATE 
+            jys_assetallocation
+        SET 
+            deleteFlag = 1, updatetime = NOW()
+        WHERE 
+            id = #{id}
+    </update>
+    <!-- 更新资产打包状态 -->
+    <update id="updateBreakOrderInfoStatusByBorderId" parameterType="String">
+        UPDATE 
+            jys_breakorderinfo
+        SET 
+            status = 1, updatetime = NOW()
+        WHERE 
+            id = #{breakId}
+    </update>
+    <!--更新交易所订单信息状态-->
+    <update id="updateOrderinfoStatusById" parameterType="String">
+        UPDATE 
+            jys_orderinfo
+        SET 
+            status = 5, updatetime = NOW()
+        WHERE 
+            id = #{id}
+    </update>
+    <!--  -->
+    <select id="getBreakInfoById" parameterType="string" resultMap="RAR_pojo">
+       SELECT 
+            *
+        FROM 
+            jys_breakorderinfo a 
+        
+        WHERE
+            a.id = #{id,jdbcType=VARCHAR}
+    </select>
+</mapper>

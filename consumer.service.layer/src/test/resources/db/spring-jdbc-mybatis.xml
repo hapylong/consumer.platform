@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+    
+    <!-- 引入数据源配置 -->
+    <import resource="spring-jdbc-mysql-dbs.xml" />
+    <import resource="spring-activiti.xml" />
+    
+    <bean id="common_platform_subDbContextHolder" class="com.iqb.etep.common.db.SubDbContextHolder">   
+        <property name="SINGLE_DB_MAX_NUM" value="${common.platform.db.max.num}" />
+        <property name="MASTER_DB_NUM" value="${common.platform.master.num}" />
+        <property name="SLAVE_DB_NUM" value="${common.platform.slave.num}" />
+        <property name="MASTER_DB_DBSTR" value="${common.platform.master.dbstr}" />
+        <property name="SLAVE_DB_DBSTR" value="${common.platform.slave.dbstr}" />   
+    </bean>
+    
+    <bean id="common_platform_dataSource" class="com.iqb.etep.common.db.SubDbDataSource">
+        <property name="targetDataSources">
+            <map key-type="java.lang.String">
+                <entry key="common_platform_iqb_master001" value-ref="common_platform_iqb_master001"/>
+                <entry key="common_platform_iqb_master001_slave001" value-ref="common_platform_iqb_master001_slave001"/>
+                <entry key="common_platform_iqb_master001_slave002" value-ref="common_platform_iqb_master001_slave002"/>
+            </map>
+        </property>
+         <property name="defaultTargetDataSource" ref="common_platform_iqb_master001" />
+        <property name="subDbContextHolder" ref="common_platform_subDbContextHolder"/>
+    </bean>
+
+     <bean id="common_platform_sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+	      <property name="dataSource" ref="common_platform_dataSource" />
+	      <!-- 配置Mybatis的插件plugin-->
+	      <property name="plugins">
+		    <array>
+		      <bean class="com.github.pagehelper.PageHelper">
+		        <property name="properties">
+		          <value>
+		            dialect=mysql
+		          </value>
+		        </property>
+		      </bean>
+		    </array>
+		  </property>
+     </bean>
+	
+	<!-- transaction manager, use JtaTransactionManager for global tx -->
+    <bean id="common_platform_transactionManager4ms" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="common_platform_dataSource" />
+    </bean>
+<!--     <tx:annotation-driven transaction-manager="transactionManagerMyBatis" proxy-target-class="true"/> -->
+
+	<bean class="tk.mybatis.spring.mapper.MapperScannerConfigurer">
+	    <property name="basePackage" value="com.iqb.etep.*,com.iqb.consumer.data.layer.*"/>
+	    <property name="sqlSessionFactoryBeanName" value="common_platform_sqlSessionFactory"/>
+	    <property name="properties">
+	        <value>
+	            mappers=tk.mybatis.mapper.common.Mapper
+	        </value>
+	    </property>
+	</bean>
+
+
+<!-- 	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer"> -->
+<!-- 	  <property name="basePackage" value="com.iqb.*" /> -->
+<!-- 	  <property name="sqlSessionFactoryBeanName" value="common_platform_sqlSessionFactory"/> -->
+<!-- 	</bean> -->
+	 
+    <tx:annotation-driven transaction-manager="common_platform_transactionManager4ms" proxy-target-class="true"/>
+</beans>

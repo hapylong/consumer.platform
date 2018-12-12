@@ -1,0 +1,1824 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>读脉</title>
+		<meta charset="UTF-8" />
+		<meta name="Author" content="" />
+		<meta name="Keywords" content="" />
+		<meta name="Description" content="" />
+
+		<!-- 基础CSS库 -->
+		<link rel="stylesheet" href="../../js/bootstrap/themes/default/bootstrap.css" />
+		<link rel="stylesheet" href="../../css/font-awesome/css/font-awesome.min.css" />
+		<link rel="stylesheet" href="../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+		<link rel="stylesheet" href="../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+		<link rel="stylesheet" href="../../css/jquery.select2.css" />
+		<link rel="stylesheet" href="../../css/jquery.select2-bootstrap.css" />
+		<link rel="stylesheet" href="../../js/viewer/viewer.css" />
+
+		<!-- 业务CSS库 -->
+		<link rel="stylesheet" href="../../css/common/base.css"/>
+		<link rel="stylesheet" href="../../css/common/scrollbar.css" />
+
+		<!-- 基础JS库 -->
+		<script src="../../js/common/package.js"></script>
+		<script src="../../js/common/url.js"></script>
+		<script src="../../js/common/json2.js"></script>
+		<script src="../../js/common/jquery-1.11.3.min.js"></script>
+		<script src="../../js/common/jquery.form.js"></script>
+		<script src="../../js/bootstrap/bootstrap.js"></script>
+		<script src="../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+		<script src="../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+		<script src="../../js/common/jquery.select2.js"></script>
+		<script src="../../js/viewer/viewer.js"></script>
+
+		<!-- 业务JS库 -->
+		<script src="../../js/common/base.js"></script>
+		<script src="../../js/common/datagrid2.js"></script>
+		<script src="../../js/common/formatter.js"></script>
+		<script src="../../js/common/wflow.js"></script>
+		<script src="../../js/each/houseLoan/riskApprovalView.js"></script>
+
+		<!-- 页面样式 -->
+		<style type="text/css">
+			.container-fluid {
+				padding-top: 4px;
+			}
+			.text-right {
+				text-align: right;
+			}
+			.text-muted {
+				font-weight: bold;
+			}
+			.text-stress {
+				font-weight: bold;
+			}
+			.list-group-blank {
+				background-color: #f5f5f5;
+			}
+			th {
+				text-align: center;
+			}
+			td {
+				text-align: center;
+			}
+			.modal-form {
+				margin: 15px 0;
+			}
+			.float-left {
+				float: left;
+				margin-right: 8px;
+			}
+			.special-panel {
+				border-top-left-radius: 0 !important;
+			}
+			.nav-tabs {
+				border-bottom: 1px solid #fff;				
+			}
+			.alert {
+				padding: 10px;
+				margin-bottom: 2px;
+			}
+			h5 {
+				float: left;
+				width: 80%;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				-o-text-overflow: ellipsis;
+				-webkit-text-overflow: ellipsis;
+				-moz-text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+			h6 {
+				float: right;
+				width: 10%;
+			}
+			a :hover {
+				cursor: pointer;
+			}
+			.margin{
+			    margin-top:10px; 
+			}
+			.noSublet{
+			    display:none;
+			    list-style:none;
+			}
+			.btn-menu{
+			    margin:10px 10px;
+			}
+			.pictureTitle{
+			    display:inline-block;
+			    margin:20px 20px 20px 20px;
+			}
+			.riskReport{
+			    display:block;
+			    line-height:40px;
+			}
+		</style>
+	</head>
+	<body>
+	<div class="container-fluid">
+	
+		<ul id="tab" class="nav nav-tabs" role="tablist">
+		  	<li role="presentation" class="active"><a href="#order-tab" role="tab" data-toggle="tab">基本信息</a></li>
+		  	<li role="presentation"><a href="#program-tab" role="tab" data-toggle="tab">外访信息</a></li>
+		  	<li role="presentation"><a href="#project-tab" role="tab" data-toggle="tab">项目信息</a></li>
+		  	<li role="presentation"><a href="#risk-tab" role="tab" data-toggle="tab">风控信息</a></li>
+		</ul>
+	
+		<div class="tab-content">
+			<div role="tabpanel" class="tab-pane fade in active" id="order-tab">
+				<div class="panel panel-default">
+					<!-- <div class="panel-heading">
+						<button id="btn-approve" type="button"	class="btn btn-primary btn-sm">
+							<span class="glyphicon glyphicon-user"></span> 审核
+						</button>
+						<button id="btn-unassign" type="button" class="btn btn-primary btn-sm">
+							<span class="glyphicon glyphicon-share-alt"></span> 取消签收
+						</button>
+					</div> -->
+					<ul class="list-group">
+				    	<li class="list-group-item list-group-blank">基本信息</li>
+				    	<li class="list-group-item" style="border-bottom: 1px solid #fff;">
+							<div class="row">		
+								<div class="col-md-1 text-right"><span class="text-stress">机构名称</span></div>
+								<div class="col-md-2"><span id="merchName" class="text-muted"></span></div>
+								<div class="col-md-1 text-right"><span class="text-stress">姓名</span></div>
+								<div class="col-md-2"><span id="realName" class="text-muted"></span></div>
+								<div class="col-md-1 text-right"><span class="text-stress">手机号</span></div>
+								<div class="col-md-2"><span id="regId" class="text-muted"></span></div>
+								<div class="col-md-1 text-right"><span class="text-stress">订单号</span></div>
+								<div class="col-md-2"><span id="orderId" class="text-muted"></span></span></div>
+							</div>
+						</li>
+						<li class="list-group-item" style="border-top: none;">
+							<div class="row">			
+								<div class="col-md-1 text-right"><span class="text-stress">产品类型</span></div>
+								<div class="col-md-2"><span id="bizType" class="text-muted"></span></div>
+								<div class="col-md-1 text-right"><span class="text-stress">业务类型</span></div>
+								<div class="col-md-2"><span id="groupName" class="text-muted"></span></div>
+								<div class="col-md-1 text-right"><span class="text-stress">身份证号</span></div>
+								<div class="col-md-2"><span id="idCard" class="text-muted"></span></div>						
+								<div class="col-md-1 text-right"><span class="text-stress">常驻地址</span></div>
+								<div class="col-md-2"><span id="address" class="text-muted"></span></div>
+							</div>
+						</li>
+						<li class="list-group-item" style="border-top: none;">
+							<div class="row">
+								<div class="col-md-1 text-right"><span class="text-stress">公司名称</span></div>
+								<div class="col-md-2"><span id="firmName" class="text-muted"></span></div>				
+								<div class="col-md-1 text-right"><span class="text-stress">公司地址</span></div>
+								<div class="col-md-2"><span id="firmAddress" class="text-muted"></span></div>
+							    <div class="col-md-1 text-right"><span class="text-stress">公司电话</span></div>
+								<div class="col-md-2"><span id="firmPhone" class="text-muted"></span></div>				
+								
+							</div>
+						</li>
+						<li class="list-group-item" style="border-top: none;">
+							<div class="row">				
+								<div class="col-md-1 text-right"><span class="text-stress">网查征信账号</span></div>
+								<div class="col-md-2"><span id="creditNumber" class="text-muted"></span></div>
+								<div class="col-md-1 text-right"><span class="text-stress">网查征信密码</span></div>
+								<div class="col-md-2"><span id="creditPass" class="text-muted"></span></div>
+								<div class="col-md-1 text-right"><span class="text-stress">与网查征信验证码</span></div>
+								<div class="col-md-2"><span id="creditCode" class="text-muted"></span></div>
+							</div>
+						</li>
+						<li class="list-group-item list-group-blank">补充基本信息</li>
+						<li class="list-group-item">
+							<div class="row">
+							    <div class="col-md-1 text-right"><span class="text-stress required">银行卡</span></div>
+								<div class="col-md-2"><span id="bankCard" class="text-muted"></span></div>
+							    <div class="col-md-1 text-right"><span class="text-stress required">申请金额</span></div>
+								<div class="col-md-2"><span id="orderAmt" class="text-muted"></span></div>
+								<div class="col-md-1 text-right"><span class="text-stress required">期限</span></div>
+								<div class="col-md-2"><span id="orderItems" class="text-muted"></span></div>
+							</div>
+						</li>
+						<li class="list-group-item" style="border-top: none;">
+							<div class="row">
+							    <div class="col-md-1 text-right"><span class="text-stress required">同事姓名1</span></div>
+								<div class="col-md-2"><span id="workmateOne" class="text-muted"></span></div>
+								<div class="col-md-1 text-right"><span class="text-stress required">手机号1</span></div>
+								<div class="col-md-2"><span id="workmateOneTel" class="text-muted"></span></div>		
+								<div class="col-md-1 text-right"><span class="text-stress">同事姓名2</span></div>
+								<div class="col-md-2"><span id="workmateTwo" class="text-muted"></span></div>
+								<div class="col-md-1 text-right"><span class="text-stress">手机号2</span></div>
+								<div class="col-md-2"><span id="workmateTwoTel" class="text-muted"></span></div>	
+							</div>
+						</li>
+						<li class="list-group-item" style="border-top: none;">
+							<div class="row">				
+								<div class="col-md-1 text-right"><span class="text-stress required">与借款人关系1</span></div>
+								<div class="col-md-2"><span id="relationOne" class="text-muted"></span></div>
+								<div class="col-md-1 text-right"><span class="text-stress required">姓名1</span></div>
+								<div class="col-md-2"><span id="reNameOne" class="text-muted"></span></div>
+								<div class="col-md-1 text-right"><span class="text-stress required">性别1</span></div>
+								<div class="col-md-2"><span id="sexOne" class="text-muted"></span></div>
+								<div class="col-md-1 text-right"><span class="text-stress required">手机号1</span></div>
+								<div class="col-md-2"><span id="mobileOne" class="text-muted"></span></div>
+							</div>
+						</li>
+						<li class="list-group-item" style="border-top: none;">
+							<div class="row">				
+								<div class="col-md-1 text-right"><span class="text-stress">与借款人关系2</span></div>
+								<div class="col-md-2"><span id="relationTwo" class="text-muted"></span></div>
+								<div class="col-md-1 text-right"><span class="text-stress">姓名2</span></div>
+								<div class="col-md-2"><span id="reNameTwo" class="text-muted"></span></div>
+								<div class="col-md-1 text-right"><span class="text-stress">性别2</span></div>
+								<div class="col-md-2"><span id="sexTwo" class="text-muted"></span></div>
+								<div class="col-md-1 text-right"><span class="text-stress">手机号2</span></div>
+								<div class="col-md-2"><span id="mobileTwo" class="text-muted"></span></div>
+							</div>
+						</li>
+						<li class="list-group-item" style="border-top: none;">
+							<div class="row">				
+								<div class="col-md-1 text-right"><span class="text-stress">与借款人关系3</span></div>
+								<div class="col-md-2"><span id="relationThree" class="text-muted"></span></div>
+								<div class="col-md-1 text-right"><span class="text-stress">姓名3</span></div>
+								<div class="col-md-2"><span id="reNameThree" class="text-muted"></span></div>
+								<div class="col-md-1 text-right"><span class="text-stress">性别3</span></div>
+								<div class="col-md-2"><span id="sexThree" class="text-muted"></span></div>
+								<div class="col-md-1 text-right"><span class="text-stress">手机号3</span></div>
+								<div class="col-md-2"><span id="mobileThree" class="text-muted"></span></div>
+							</div>
+						</li>
+						<li class="list-group-item">
+						    <div class="row">				
+								<div class="col-md-1 text-right"><span class="text-stress">订单状态</span></div>
+								<div class="col-md-2"><span id="orderStatus" class="text-muted"></span></div>
+							</div>
+						</li>
+						<!-- <li class="list-group-item" style="border-top: none;">
+							<div class="row">				
+								<div class="col-md-1 text-right"><span class="text-stress">是否历史订单</span></div>
+								<div class="col-md-2"><span id="orderFlag" class="text-muted"></span></div>
+								<div class="col-md-1 text-right"><span class="text-stress">开始日期</span></div>
+								<div class="col-md-2"><span id="startTime" class="text-muted"></span></div>
+								<div class="col-md-1 text-right"><span class="text-stress">结束日期</span></div>
+								<div class="col-md-2"><span id="endTime" class="text-muted"></span></div>
+							</div>
+						</li> -->
+					</ul>
+					<table id="viewerOne" class="table table-bordered">
+					    <tbody>
+				    		<tr class="old-tr">	
+						    	<td style="vertical-align: middle;width:50%"><span class="text-stress">社保</span></td>						    	
+						    	<td id="td-1" style="vertical-align: middle;"></td>
+				    		</tr>
+				    		<tr class="old-tr">
+						    	<td style="vertical-align: middle;width:50%"><span class="text-stress">公积金</span></td>						    	
+						    	<td id="td-2" style="vertical-align: middle;"></td>
+				    		</tr>
+				    		<tr class="old-tr">
+						    	<td style="vertical-align: middle;width:50%"><span class="text-stress">征信</span></td>						    	
+						    	<td id="td-3" style="vertical-align: middle;"></td>
+				    		</tr>
+				    		<tr class="old-tr">
+						    	<td style="vertical-align: middle;width:50%"><span class="text-stress">企业信息查询</span></td>						    	
+						    	<td id="td-4" style="vertical-align: middle;"></td>
+				    		</tr>
+				    		<tr class="old-tr">
+						    	<td style="vertical-align: middle;width:50%"><span class="text-stress">第三方数据查询</span></td>						    	
+						    	<td id="td-101" style="vertical-align: middle;"></td>
+				    		</tr>
+				    		<tr class="old-tr">
+						    	<td style="vertical-align: middle;width:50%"><span class="text-stress">其它</span></td>						    	
+						    	<td id="td-102" style="vertical-align: middle;"></td>
+				    		</tr>
+					    </tbody>
+					</table>
+					<table id="datagrid" class="table table-hover">
+						<thead>
+							<tr class="warning">
+								<th field="ck" hidden="true"></th>
+								<th field="rn" align="text-center" class="text-center">序号</th>
+								<th field="id" idField="true" hidden="true">ID</th>
+								<th field="procCtaskname" align="text-center" class="text-center">任务名称</th>
+								<th field="procTaskAssignee" align="text-center" class="text-center">处理人</th>
+								<th field="procLicensor" align="text-center" class="text-center">委托人</th>
+								<th field="procTaskCommittime" align="text-center" class="text-center">任务到达时间</th>
+								<th field="procTaskEndtime" align="text-center" class="text-center">任务受理时间</th>
+								<th field="procTaskEndtime" align="text-center" class="text-center">任务完成时间</th>
+								<th field="procTaskApprStatus" align="text-center" class="text-center">审批结论</th>
+								<th field="procTaskApprOpinion" align="text-center" class="text-center" formatter="Formatter.opinion(val)">审批意见</th>
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
+				</div>
+			</div>
+			<div role="tabpanel" class="tab-pane fade" id="program-tab" style='background:#fff'>
+				<div class="panel panel-default">
+					<div class="panel-heading" style='background:#fff'>
+				    	<!-- 新增字段 -->	
+						<!-- <select id="creditType" class="form-control input-sm" style='width:200px;display:inline-block;'>
+		                   <option value='1'>单签类</option>
+		                   <option value='2'>担保类</option>
+		                   <option value='3'>双签类</option>
+		                   <option value='4'>互保类</option>
+		                   <option value='5'>主借人互换类</option>
+						</select> -->
+						<span class="text-stress" id='creditType'></span>
+						<!-- <button id="btn-addBondsman" type="button" class="btn btn-primary btn-sm" style='display:inline-block'>
+						   <span class="glyphicon"></span> 增加担保人信息
+						</button> -->
+						<br/><br/>
+						<table class="table table-bordered" id='bondsTable'>
+						    <tbody>
+						    	<tr>		
+						    		<td><span class="text-stress">担保人类型</span></td>				    		
+							    	<td><span class="text-stress">姓名</span></td>
+							    	<td><span class="text-stress">身份证号</span></td>
+							    	<td><span class="text-stress">手机号</span></td>
+							    	<td><span class="text-stress">银行卡</span></td>
+							    	<td><span class="text-stress">当前所在公司名称</span></td>
+							    	<td><span class="text-stress">公司地址</span></td>
+							    	<td><span class="text-stress">公司电话</span></td>
+					    		</tr>
+					    	</tbody>
+					    </table>
+						<button id="btn-borrowerInfo" href='borrowerInfo' type="button" class="btn btn-primary btn-sm forInfo" style='display:inline-block'>
+						   <span class="glyphicon"></span> 借款人信息
+						</button>
+						<button id="btn-signedInfo" href='signedInfo' type="button" class="btn btn-primary btn-sm forInfo" style='display:inline-block'>
+						   <span class="glyphicon"></span> 共签人信息
+						</button>
+						<button id="btn-bondsmanInfo1" href='bondsmanInfo-1' type="button" class="btn btn-primary btn-sm forInfo" style='display:inline-block'>
+						   <span class="glyphicon"></span> 担保人信息1
+						</button>
+						<button id="btn-bondsmanInfo2" href='bondsmanInfo-2' type="button" class="btn btn-primary btn-sm forInfo bondsmanInfoBtn bondsmanInfo-2" style='display:inline-block'>
+						   <span class="glyphicon"></span> 担保人信息2
+						</button>
+						<button id="btn-bondsmanInfo3" href='bondsmanInfo-3' type="button" class="btn btn-primary btn-sm forInfo bondsmanInfoBtn bondsmanInfo-3" style='display:inline-block'>
+						   <span class="glyphicon"></span> 担保人信息3
+						</button>
+						<button id="btn-bondsmanInfo4" href='bondsmanInfo-4' type="button" class="btn btn-primary btn-sm forInfo bondsmanInfoBtn bondsmanInfo-4" style='display:inline-block'>
+						   <span class="glyphicon"></span> 担保人信息4
+						</button>
+						<button id="btn-bondsmanInfo5" href='bondsmanInfo-5' type="button" class="btn btn-primary btn-sm forInfo bondsmanInfoBtn bondsmanInfo-5" style='display:inline-block'>
+						   <span class="glyphicon"></span> 担保人信息5
+						</button>
+				  	</div>
+				  	<div class='borrowerInfo infos'>
+					  	<span class="text-muted pictureTitle">借款人信息</span>
+					  	<!-- <div class="btn-group">
+						  	<button id="btn-uploadBorrowerInfo" type="button" class="btn btn-primary btn-sm dropdown-toggle btn-menu" data-toggle="dropdown">
+						  		<span class="fa fa-folder-open-o"></span> 借款人信息 <span class="caret"></span>							    	
+						  	</button>
+						  	<ul class="dropdown-menu" role="menu">	
+						  		<li><span class="text-stress" style="margin-left: 8px;">房屋信息</span></li>							  		
+						    	<li><a id="btn-uploadType1-1" href="#">小区大门</a></li>						    	
+						    	<li><a id="btn-uploadType1-2" href="#">单元楼号</a></li>
+						    	<li><a id="btn-uploadType1-3" href="#">门牌号</a></li>
+						    	<li><a id="btn-uploadType1-4" href="#">楼层号</a></li>
+						    	<li><a id="btn-uploadType1-5" href="#">卫生间</a></li>
+						    	<li><a id="btn-uploadType1-6" href="#">客厅</a></li>
+						    	<li><a id="btn-uploadType1-7" href="#">卧室</a></li>
+						    	<li><a id="btn-uploadType1-8" href="#">厨房</a></li>
+						    	<li><a id="btn-uploadType1-9" href="#">生活照</a></li>
+						    	<li><a id="btn-uploadType1-10" href="#">GPS定位图</a></li>
+						    	
+						    	<li><span class="text-stress" style="margin-left: 8px;">公司信息</span></li>							  		
+						    	<li class="old-li"><a id="btn-uploadType1-11" href="#">楼宇外观</a></li>
+						    	<li class="old-li"><a id="btn-uploadType1-12" href="#">楼层号</a></li>
+						    	<li class="old-li"><a id="btn-uploadType1-13" href="#">门牌号 </a></li>
+						    	<li class="old-li"><a id="btn-uploadType1-14" href="#">前台</a></li>
+						    	<li class="old-li"><a id="btn-uploadType1-15" href="#">办公环境 </a></li>
+						    	<li class="old-li"><a id="btn-uploadType1-16" href="#">GPS定位图</a></li>
+						    	
+						    	<li><span class="text-stress" style="margin-left: 8px;">个人信息</span></li>							  		
+						    	<li class="old-li"><a id="btn-uploadType1-17" href="#">身份证</a></li>
+						    	<li class="old-li"><a id="btn-uploadType1-18" href="#">户口本</a></li>
+						    	<li class="old-li"><a id="btn-uploadType1-19" href="#">水电小票 </a></li>
+						    	<li class="old-li"><a id="btn-uploadType1-20" href="#">结婚证</a></li>
+						    	<li class="old-li"><a id="btn-uploadType1-21" href="#">银行卡 </a></li>
+						    	<li class="old-li"><a id="btn-uploadType1-22" href="#">房产证</a></li>
+						    	<li class="old-li"><a id="btn-uploadType1-23" href="#">购房合同</a></li>
+						    	<li class="old-li"><a id="btn-uploadType1-24" href="#">按揭合同</a></li>
+						    	<li class="old-li"><a id="btn-uploadType1-25" href="#">工作证明</a></li>
+						    	<li class="old-li"><a id="btn-uploadType1-26" href="#">工资卡</a></li>
+						    	<li class="old-li"><a id="btn-uploadType1-27" href="#">银行流水</a></li>
+						    	<li class="old-li"><a id="btn-uploadType1-28" href="#">行驶证</a></li>
+						    	<li class="old-li"><a id="btn-uploadType1-29" href="#">登记证</a></li>
+						    	
+						    	<li><span class="text-stress" style="margin-left: 8px;">企业信息</span></li>							  		
+						    	<li class="old-li"><a id="btn-uploadType1-30" href="#">营业执照</a></li>
+						    	<li class="old-li"><a id="btn-uploadType1-31" href="#">租赁合同</a></li>
+						  	</ul>
+						</div> -->
+						<table id="viewerTwo" class="table table-bordered">
+						    <tbody>
+						    	<tr>		
+						    		<td style="width: 15%; vertical-align: middle;" rowspan="10"><span class="text-stress">房屋信息</span></td>				    		
+							    	<td style="width: 15%; vertical-align: middle;"><span class="text-stress">小区大门</span></td>						    	
+							    	<td id="td-11" style="width: 70%; vertical-align: middle;"><div></div></td>
+					    		</tr>
+					    		<tr>	
+							    	<td style="vertical-align: middle;"><span class="text-stress">单元楼号</span></td>						    	
+							    	<td id="td-12" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>	
+							    	<td style="vertical-align: middle;"><span class="text-stress">门牌号</span></td>						    	
+							    	<td id="td-13" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>	
+							    	<td style="vertical-align: middle;"><span class="text-stress">楼层号</span></td>						    	
+							    	<td id="td-14" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">卫生间</span></td>						    	
+							    	<td id="td-15" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">客厅</span></td>						    	
+							    	<td id="td-16" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">卧室</span></td>						    	
+							    	<td id="td-17" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">厨房</span></td>						    	
+							    	<td id="td-18" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">生活照</span></td>						    	
+							    	<td id="td-19" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">GPS定位图</span></td>						    	
+							    	<td id="td-110" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="old-tr">		
+						    		<td style="vertical-align: middle;" rowspan="6"><span class="text-stress">公司信息</span></td>				    		
+							    	<td style="vertical-align: middle;"><span class="text-stress">楼宇外观</span></td>						    	
+							    	<td id="td-111" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="old-tr">		
+							    	<td style="vertical-align: middle;"><span class="text-stress">楼层号</span></td>						    	
+							    	<td id="td-112" style="vertical-align: middle;"></td>
+					    		</tr>				    		
+					    		<tr class="old-tr">		
+							    	<td style="vertical-align: middle;"><span class="text-stress">门牌号</span></td>						    	
+							    	<td id="td-113" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="old-tr">		
+							    	<td style="vertical-align: middle;"><span class="text-stress">前台</span></td>						    	
+							    	<td id="td-114" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="old-tr">		
+							    	<td style="vertical-align: middle;"><span class="text-stress">办公环境</span></td>						    	
+							    	<td id="td-115" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="old-tr">	
+							    	<td style="vertical-align: middle;"><span class="text-stress">GPS定位图</span></td>						    	
+							    	<td id="td-116" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+					    			<td style="vertical-align: middle;" rowspan="13"><span class="text-stress">个人信息</span></td>				    		
+							    	<td style="vertical-align: middle;"><span class="text-stress">身份证</span></td>						    	
+							    	<td id="td-117" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">户口本</span></td>						    	
+							    	<td id="td-118" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">水电小票</span></td>						    	
+							    	<td id="td-119" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">结婚证</span></td>						    	
+							    	<td id="td-120" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">银行卡</span></td>						    	
+							    	<td id="td-121" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">房产证</span></td>						    	
+							    	<td id="td-122" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">购房合同</span></td>						    	
+							    	<td id="td-123" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">按揭合同</span></td>						    	
+							    	<td id="td-124" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">工作证明</span></td>						    	
+							    	<td id="td-125" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">工资卡</span></td>						    	
+							    	<td id="td-126" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">银行流水</span></td>						    	
+							    	<td id="td-127" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">行驶证</span></td>						    	
+							    	<td id="td-128" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">登记证</span></td>						    	
+							    	<td id="td-129" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+					    			<td style="vertical-align: middle;" rowspan="2"><span class="text-stress">企业信息</span></td>				    		
+							    	<td style="vertical-align: middle;"><span class="text-stress">营业执照</span></td>						    	
+							    	<td id="td-130" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">租赁合同</span></td>						    	
+							    	<td id="td-131" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+					    			<td style="vertical-align: middle;" rowspan="1"><span class="text-stress">其它</span></td>				    		
+							    	<td style="vertical-align: middle;"><span class="text-stress">其它</span></td>						    	
+							    	<td id="td-132" style="vertical-align: middle;"></td>
+					    		</tr>
+						    </tbody>
+						</table>
+				  	</div>
+				  	<div class='signedInfo infos'>
+				  	   <span class="text-muted pictureTitle">共签人信息</span>
+				  	   <!-- <div class="btn-group">
+						  	<button id="btn-uploadSignedInfo" type="button" class="btn btn-primary btn-sm dropdown-toggle btn-menu" data-toggle="dropdown">
+						  		<span class="fa fa-folder-open-o"></span> 共签人信息 <span class="caret"></span>							    	
+						  	</button>
+						  	<ul class="dropdown-menu" role="menu">	
+						  		<li><span class="text-stress" style="margin-left: 8px;">房屋信息</span></li>							  		
+						    	<li><a id="btn-uploadType2-1" href="#">小区大门</a></li>						    	
+						    	<li><a id="btn-uploadType2-2" href="#">单元楼号</a></li>
+						    	<li><a id="btn-uploadType2-3" href="#">门牌号</a></li>
+						    	<li><a id="btn-uploadType2-4" href="#">楼层号</a></li>
+						    	<li><a id="btn-uploadType2-5" href="#">卫生间</a></li>
+						    	<li><a id="btn-uploadType2-6" href="#">客厅</a></li>
+						    	<li><a id="btn-uploadType2-7" href="#">卧室</a></li>
+						    	<li><a id="btn-uploadType2-8" href="#">厨房</a></li>
+						    	<li><a id="btn-uploadType2-9" href="#">生活照</a></li>
+						    	<li><a id="btn-uploadType2-10" href="#">GPS定位图</a></li>
+						    	
+						    	<li><span class="text-stress" style="margin-left: 8px;">公司信息</span></li>							  		
+						    	<li class="old-li"><a id="btn-uploadType2-11" href="#">楼宇外观</a></li>
+						    	<li class="old-li"><a id="btn-uploadType2-12" href="#">楼层号</a></li>
+						    	<li class="old-li"><a id="btn-uploadType2-13" href="#">门牌号 </a></li>
+						    	<li class="old-li"><a id="btn-uploadType2-14" href="#">前台</a></li>
+						    	<li class="old-li"><a id="btn-uploadType2-15" href="#">办公环境 </a></li>
+						    	<li class="old-li"><a id="btn-uploadType2-16" href="#">GPS定位图</a></li>
+						    	
+						    	<li><span class="text-stress" style="margin-left: 8px;">个人信息</span></li>							  		
+						    	<li class="old-li"><a id="btn-uploadType2-17" href="#">身份证</a></li>
+						    	<li class="old-li"><a id="btn-uploadType2-18" href="#">户口本</a></li>
+						    	<li class="old-li"><a id="btn-uploadType2-19" href="#">水电小票 </a></li>
+						    	<li class="old-li"><a id="btn-uploadType2-20" href="#">结婚证</a></li>
+						    	<li class="old-li"><a id="btn-uploadType2-21" href="#">银行卡 </a></li>
+						    	<li class="old-li"><a id="btn-uploadType2-22" href="#">房产证</a></li>
+						    	<li class="old-li"><a id="btn-uploadType2-23" href="#">购房合同</a></li>
+						    	<li class="old-li"><a id="btn-uploadType2-24" href="#">按揭合同</a></li>
+						    	<li class="old-li"><a id="btn-uploadType2-25" href="#">工作证明</a></li>
+						    	<li class="old-li"><a id="btn-uploadType2-26" href="#">工资卡</a></li>
+						    	<li class="old-li"><a id="btn-uploadType2-27" href="#">银行流水</a></li>
+						    	<li class="old-li"><a id="btn-uploadType2-28" href="#">行驶证</a></li>
+						    	<li class="old-li"><a id="btn-uploadType2-29" href="#">登记证</a></li>
+						    	
+						    	<li><span class="text-stress" style="margin-left: 8px;">企业信息</span></li>							  		
+						    	<li class="old-li"><a id="btn-uploadType2-30" href="#">营业执照</a></li>
+						    	<li class="old-li"><a id="btn-uploadType2-31" href="#">租赁合同</a></li>
+						  	</ul>
+						</div> -->
+						<table id="viewerThree" class="table table-bordered">
+						    <tbody>
+						    	<tr>		
+						    		<td style="width: 15%; vertical-align: middle;" rowspan="10"><span class="text-stress">房屋信息</span></td>				    		
+							    	<td style="width: 15%; vertical-align: middle;"><span class="text-stress">小区大门</span></td>						    	
+							    	<td id="td-21" style="width: 70%; vertical-align: middle;"><div></div></td>
+					    		</tr>
+					    		<tr>	
+							    	<td style="vertical-align: middle;"><span class="text-stress">单元楼号</span></td>						    	
+							    	<td id="td-22" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>	
+							    	<td style="vertical-align: middle;"><span class="text-stress">门牌号</span></td>						    	
+							    	<td id="td-23" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>	
+							    	<td style="vertical-align: middle;"><span class="text-stress">楼层号</span></td>						    	
+							    	<td id="td-24" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">卫生间</span></td>						    	
+							    	<td id="td-25" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">客厅</span></td>						    	
+							    	<td id="td-26" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">卧室</span></td>						    	
+							    	<td id="td-27" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">厨房</span></td>						    	
+							    	<td id="td-28" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">生活照</span></td>						    	
+							    	<td id="td-29" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">GPS定位图</span></td>						    	
+							    	<td id="td-210" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="old-tr">		
+						    		<td style="vertical-align: middle;" rowspan="6"><span class="text-stress">公司信息</span></td>				    		
+							    	<td style="vertical-align: middle;"><span class="text-stress">楼宇外观</span></td>						    	
+							    	<td id="td-211" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="old-tr">		
+							    	<td style="vertical-align: middle;"><span class="text-stress">楼层号</span></td>						    	
+							    	<td id="td-212" style="vertical-align: middle;"></td>
+					    		</tr>				    		
+					    		<tr class="old-tr">		
+							    	<td style="vertical-align: middle;"><span class="text-stress">门牌号</span></td>						    	
+							    	<td id="td-213" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="old-tr">		
+							    	<td style="vertical-align: middle;"><span class="text-stress">前台</span></td>						    	
+							    	<td id="td-214" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="old-tr">		
+							    	<td style="vertical-align: middle;"><span class="text-stress">办公环境</span></td>						    	
+							    	<td id="td-215" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="old-tr">	
+							    	<td style="vertical-align: middle;"><span class="text-stress">GPS定位图</span></td>						    	
+							    	<td id="td-216" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+					    			<td style="vertical-align: middle;" rowspan="16"><span class="text-stress">个人信息</span></td>				    		
+							    	<td style="vertical-align: middle;"><span class="text-stress">身份证</span></td>						    	
+							    	<td id="td-217" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">户口本</span></td>						    	
+							    	<td id="td-218" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">水电小票</span></td>						    	
+							    	<td id="td-219" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">结婚证</span></td>						    	
+							    	<td id="td-220" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">银行卡</span></td>						    	
+							    	<td id="td-221" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">房产证</span></td>						    	
+							    	<td id="td-222" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">购房合同</span></td>						    	
+							    	<td id="td-223" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">按揭合同</span></td>						    	
+							    	<td id="td-224" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">工作证明</span></td>						    	
+							    	<td id="td-225" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">工资卡</span></td>						    	
+							    	<td id="td-226" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">银行流水</span></td>						    	
+							    	<td id="td-227" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">行驶证</span></td>						    	
+							    	<td id="td-228" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">登记证</span></td>						    	
+							    	<td id="td-229" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+                                    <td style="vertical-align: middle;"><span class="text-stress">公积金</span></td>                               
+                                    <td id="td-251" style="vertical-align: middle;"></td>
+                                </tr>
+                                <tr class="new-tr">
+                                    <td style="vertical-align: middle;"><span class="text-stress">社保</span></td>                               
+                                    <td id="td-252" style="vertical-align: middle;"></td>
+                                </tr>
+                                <tr class="new-tr">
+                                    <td style="vertical-align: middle;"><span class="text-stress">征信</span></td>                               
+                                    <td id="td-253" style="vertical-align: middle;"></td>
+                                </tr>
+					    		<tr class="new-tr">
+					    			<td style="vertical-align: middle;" rowspan="2"><span class="text-stress">企业信息</span></td>				    		
+							    	<td style="vertical-align: middle;"><span class="text-stress">营业执照</span></td>						    	
+							    	<td id="td-230" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">租赁合同</span></td>						    	
+							    	<td id="td-231" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+					    			<td style="vertical-align: middle;" rowspan="1"><span class="text-stress">其它</span></td>				    		
+							    	<td style="vertical-align: middle;"><span class="text-stress">其它</span></td>						    	
+							    	<td id="td-232" style="vertical-align: middle;"></td>
+					    		</tr>
+						    </tbody>
+						</table>
+				  	</div>
+				  	<div class='bondsmanInfo bondsmanInfo-1 infos'>
+				  	   <span class="text-muted pictureTitle">担保人信息1</span>
+				  	   <!-- <div class="btn-group">
+						  	<button id="btn-uploadBondsmanInfo-1" type="button" class="btn btn-primary btn-sm dropdown-toggle btn-menu" data-toggle="dropdown">
+						  		<span class="fa fa-folder-open-o"></span> 担保人信息1 <span class="caret"></span>							    	
+						  	</button>
+						  	<ul class="dropdown-menu" role="menu">	
+						  		<li><span class="text-stress" style="margin-left: 8px;">房屋信息</span></li>							  		
+						    	<li><a id="btn-uploadType3-1" href="#">小区大门</a></li>						    	
+						    	<li><a id="btn-uploadType3-2" href="#">单元楼号</a></li>
+						    	<li><a id="btn-uploadType3-3" href="#">门牌号</a></li>
+						    	<li><a id="btn-uploadType3-4" href="#">楼层号</a></li>
+						    	<li><a id="btn-uploadType3-5" href="#">卫生间</a></li>
+						    	<li><a id="btn-uploadType3-6" href="#">客厅</a></li>
+						    	<li><a id="btn-uploadType3-7" href="#">卧室</a></li>
+						    	<li><a id="btn-uploadType3-8" href="#">厨房</a></li>
+						    	<li><a id="btn-uploadType3-9" href="#">生活照</a></li>
+						    	<li><a id="btn-uploadType3-10" href="#">GPS定位图</a></li>
+						    	
+						    	<li><span class="text-stress" style="margin-left: 8px;">公司信息</span></li>							  		
+						    	<li class="old-li"><a id="btn-uploadType3-11" href="#">楼宇外观</a></li>
+						    	<li class="old-li"><a id="btn-uploadType3-12" href="#">楼层号</a></li>
+						    	<li class="old-li"><a id="btn-uploadType3-13" href="#">门牌号 </a></li>
+						    	<li class="old-li"><a id="btn-uploadType3-14" href="#">前台</a></li>
+						    	<li class="old-li"><a id="btn-uploadType3-15" href="#">办公环境 </a></li>
+						    	<li class="old-li"><a id="btn-uploadType3-16" href="#">GPS定位图</a></li>
+						    	
+						    	<li><span class="text-stress" style="margin-left: 8px;">个人信息</span></li>							  		
+						    	<li class="old-li"><a id="btn-uploadType3-17" href="#">身份证</a></li>
+						    	<li class="old-li"><a id="btn-uploadType3-18" href="#">户口本</a></li>
+						    	<li class="old-li"><a id="btn-uploadType3-19" href="#">水电小票 </a></li>
+						    	<li class="old-li"><a id="btn-uploadType3-20" href="#">结婚证</a></li>
+						    	<li class="old-li"><a id="btn-uploadType3-21" href="#">银行卡 </a></li>
+						    	<li class="old-li"><a id="btn-uploadType3-22" href="#">房产证</a></li>
+						    	<li class="old-li"><a id="btn-uploadType3-23" href="#">购房合同</a></li>
+						    	<li class="old-li"><a id="btn-uploadType3-24" href="#">按揭合同</a></li>
+						    	<li class="old-li"><a id="btn-uploadType3-25" href="#">工作证明</a></li>
+						    	<li class="old-li"><a id="btn-uploadType3-26" href="#">工资卡</a></li>
+						    	<li class="old-li"><a id="btn-uploadType3-27" href="#">银行流水</a></li>
+						    	<li class="old-li"><a id="btn-uploadType3-28" href="#">行驶证</a></li>
+						    	<li class="old-li"><a id="btn-uploadType3-29" href="#">登记证</a></li>
+						    	
+						    	<li><span class="text-stress" style="margin-left: 8px;">企业信息</span></li>							  		
+						    	<li class="old-li"><a id="btn-uploadType3-30" href="#">营业执照</a></li>
+						    	<li class="old-li"><a id="btn-uploadType3-31" href="#">租赁合同</a></li>
+						  	</ul>
+						</div> -->
+						<table id="viewerFour" class="table table-bordered">
+						    <tbody>
+						    	<tr>		
+						    		<td style="width: 15%; vertical-align: middle;" rowspan="10"><span class="text-stress">房屋信息</span></td>				    		
+							    	<td style="width: 15%; vertical-align: middle;"><span class="text-stress">小区大门</span></td>						    	
+							    	<td id="td-31" style="width: 70%; vertical-align: middle;"><div></div></td>
+					    		</tr>
+					    		<tr>	
+							    	<td style="vertical-align: middle;"><span class="text-stress">单元楼号</span></td>						    	
+							    	<td id="td-32" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>	
+							    	<td style="vertical-align: middle;"><span class="text-stress">门牌号</span></td>						    	
+							    	<td id="td-33" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>	
+							    	<td style="vertical-align: middle;"><span class="text-stress">楼层号</span></td>						    	
+							    	<td id="td-34" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">卫生间</span></td>						    	
+							    	<td id="td-35" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">客厅</span></td>						    	
+							    	<td id="td-36" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">卧室</span></td>						    	
+							    	<td id="td-37" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">厨房</span></td>						    	
+							    	<td id="td-38" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">生活照</span></td>						    	
+							    	<td id="td-39" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">GPS定位图</span></td>						    	
+							    	<td id="td-310" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="old-tr">		
+						    		<td style="vertical-align: middle;" rowspan="6"><span class="text-stress">公司信息</span></td>				    		
+							    	<td style="vertical-align: middle;"><span class="text-stress">楼宇外观</span></td>						    	
+							    	<td id="td-311" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="old-tr">		
+							    	<td style="vertical-align: middle;"><span class="text-stress">楼层号</span></td>						    	
+							    	<td id="td-312" style="vertical-align: middle;"></td>
+					    		</tr>				    		
+					    		<tr class="old-tr">		
+							    	<td style="vertical-align: middle;"><span class="text-stress">门牌号</span></td>						    	
+							    	<td id="td-313" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="old-tr">		
+							    	<td style="vertical-align: middle;"><span class="text-stress">前台</span></td>						    	
+							    	<td id="td-314" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="old-tr">		
+							    	<td style="vertical-align: middle;"><span class="text-stress">办公环境</span></td>						    	
+							    	<td id="td-315" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="old-tr">	
+							    	<td style="vertical-align: middle;"><span class="text-stress">GPS定位图</span></td>						    	
+							    	<td id="td-316" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+					    			<td style="vertical-align: middle;" rowspan="16"><span class="text-stress">个人信息</span></td>				    		
+							    	<td style="vertical-align: middle;"><span class="text-stress">身份证</span></td>						    	
+							    	<td id="td-317" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">户口本</span></td>						    	
+							    	<td id="td-318" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">水电小票</span></td>						    	
+							    	<td id="td-319" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">结婚证</span></td>						    	
+							    	<td id="td-320" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">银行卡</span></td>						    	
+							    	<td id="td-321" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">房产证</span></td>						    	
+							    	<td id="td-322" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">购房合同</span></td>						    	
+							    	<td id="td-323" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">按揭合同</span></td>						    	
+							    	<td id="td-324" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">工作证明</span></td>						    	
+							    	<td id="td-325" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">工资卡</span></td>						    	
+							    	<td id="td-326" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">银行流水</span></td>						    	
+							    	<td id="td-327" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">行驶证</span></td>						    	
+							    	<td id="td-328" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">登记证</span></td>						    	
+							    	<td id="td-329" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+                                    <td style="vertical-align: middle;"><span class="text-stress">公积金</span></td>                               
+                                    <td id="td-351" style="vertical-align: middle;"></td>
+                                </tr>
+                                <tr class="new-tr">
+                                    <td style="vertical-align: middle;"><span class="text-stress">社保</span></td>                               
+                                    <td id="td-352" style="vertical-align: middle;"></td>
+                                </tr>
+                                <tr class="new-tr">
+                                    <td style="vertical-align: middle;"><span class="text-stress">征信</span></td>                               
+                                    <td id="td-353" style="vertical-align: middle;"></td>
+                                </tr>
+					    		<tr class="new-tr">
+					    			<td style="vertical-align: middle;" rowspan="2"><span class="text-stress">企业信息</span></td>				    		
+							    	<td style="vertical-align: middle;"><span class="text-stress">营业执照</span></td>						    	
+							    	<td id="td-330" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">租赁合同</span></td>						    	
+							    	<td id="td-331" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+					    			<td style="vertical-align: middle;" rowspan="1"><span class="text-stress">其它</span></td>				    		
+							    	<td style="vertical-align: middle;"><span class="text-stress">其它</span></td>						    	
+							    	<td id="td-332" style="vertical-align: middle;"></td>
+					    		</tr>
+						    </tbody>
+						</table>
+				  	</div>
+				  	<div class='bondsmanInfo bondsmanInfo-2 infos'>
+				  	   <span class="text-muted pictureTitle">担保人信息2</span>
+				  	   <!-- <div class="btn-group">
+						  	<button id="btn-uploadBondsmanInfo-2" type="button" class="btn btn-primary btn-sm dropdown-toggle btn-menu" data-toggle="dropdown">
+						  		<span class="fa fa-folder-open-o"></span> 担保人信息2 <span class="caret"></span>							    	
+						  	</button>
+						  	<ul class="dropdown-menu" role="menu">	
+						  		<li><span class="text-stress" style="margin-left: 8px;">房屋信息</span></li>							  		
+						    	<li><a id="btn-uploadType4-1" href="#">小区大门</a></li>						    	
+						    	<li><a id="btn-uploadType4-2" href="#">单元楼号</a></li>
+						    	<li><a id="btn-uploadType4-3" href="#">门牌号</a></li>
+						    	<li><a id="btn-uploadType4-4" href="#">楼层号</a></li>
+						    	<li><a id="btn-uploadType4-5" href="#">卫生间</a></li>
+						    	<li><a id="btn-uploadType4-6" href="#">客厅</a></li>
+						    	<li><a id="btn-uploadType4-7" href="#">卧室</a></li>
+						    	<li><a id="btn-uploadType4-8" href="#">厨房</a></li>
+						    	<li><a id="btn-uploadType4-9" href="#">生活照</a></li>
+						    	<li><a id="btn-uploadType4-10" href="#">GPS定位图</a></li>
+						    	
+						    	<li><span class="text-stress" style="margin-left: 8px;">公司信息</span></li>							  		
+						    	<li class="old-li"><a id="btn-uploadType4-11" href="#">楼宇外观</a></li>
+						    	<li class="old-li"><a id="btn-uploadType4-12" href="#">楼层号</a></li>
+						    	<li class="old-li"><a id="btn-uploadType4-13" href="#">门牌号 </a></li>
+						    	<li class="old-li"><a id="btn-uploadType4-14" href="#">前台</a></li>
+						    	<li class="old-li"><a id="btn-uploadType4-15" href="#">办公环境 </a></li>
+						    	<li class="old-li"><a id="btn-uploadType4-16" href="#">GPS定位图</a></li>
+						    	
+						    	<li><span class="text-stress" style="margin-left: 8px;">个人信息</span></li>							  		
+						    	<li class="old-li"><a id="btn-uploadType4-17" href="#">身份证</a></li>
+						    	<li class="old-li"><a id="btn-uploadType4-18" href="#">户口本</a></li>
+						    	<li class="old-li"><a id="btn-uploadType4-19" href="#">水电小票 </a></li>
+						    	<li class="old-li"><a id="btn-uploadType4-20" href="#">结婚证</a></li>
+						    	<li class="old-li"><a id="btn-uploadType4-21" href="#">银行卡 </a></li>
+						    	<li class="old-li"><a id="btn-uploadType4-22" href="#">房产证</a></li>
+						    	<li class="old-li"><a id="btn-uploadType4-23" href="#">购房合同</a></li>
+						    	<li class="old-li"><a id="btn-uploadType4-24" href="#">按揭合同</a></li>
+						    	<li class="old-li"><a id="btn-uploadType4-25" href="#">工作证明</a></li>
+						    	<li class="old-li"><a id="btn-uploadType4-26" href="#">工资卡</a></li>
+						    	<li class="old-li"><a id="btn-uploadType4-27" href="#">银行流水</a></li>
+						    	<li class="old-li"><a id="btn-uploadType4-28" href="#">行驶证</a></li>
+						    	<li class="old-li"><a id="btn-uploadType4-29" href="#">登记证</a></li>
+						    	
+						    	<li><span class="text-stress" style="margin-left: 8px;">企业信息</span></li>							  		
+						    	<li class="old-li"><a id="btn-uploadType4-30" href="#">营业执照</a></li>
+						    	<li class="old-li"><a id="btn-uploadType4-31" href="#">租赁合同</a></li>
+						  	</ul>
+						</div> -->
+						<table id="viewerFive" class="table table-bordered">
+						    <tbody>
+						    	<tr>		
+						    		<td style="width: 15%; vertical-align: middle;" rowspan="10"><span class="text-stress">房屋信息</span></td>				    		
+							    	<td style="width: 15%; vertical-align: middle;"><span class="text-stress">小区大门</span></td>						    	
+							    	<td id="td-41" style="width: 70%; vertical-align: middle;"><div></div></td>
+					    		</tr>
+					    		<tr>	
+							    	<td style="vertical-align: middle;"><span class="text-stress">单元楼号</span></td>						    	
+							    	<td id="td-42" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>	
+							    	<td style="vertical-align: middle;"><span class="text-stress">门牌号</span></td>						    	
+							    	<td id="td-43" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>	
+							    	<td style="vertical-align: middle;"><span class="text-stress">楼层号</span></td>						    	
+							    	<td id="td-44" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">卫生间</span></td>						    	
+							    	<td id="td-45" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">客厅</span></td>						    	
+							    	<td id="td-46" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">卧室</span></td>						    	
+							    	<td id="td-47" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">厨房</span></td>						    	
+							    	<td id="td-48" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">生活照</span></td>						    	
+							    	<td id="td-49" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">GPS定位图</span></td>						    	
+							    	<td id="td-410" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="old-tr">		
+						    		<td style="vertical-align: middle;" rowspan="6"><span class="text-stress">公司信息</span></td>				    		
+							    	<td style="vertical-align: middle;"><span class="text-stress">楼宇外观</span></td>						    	
+							    	<td id="td-411" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="old-tr">		
+							    	<td style="vertical-align: middle;"><span class="text-stress">楼层号</span></td>						    	
+							    	<td id="td-412" style="vertical-align: middle;"></td>
+					    		</tr>				    		
+					    		<tr class="old-tr">		
+							    	<td style="vertical-align: middle;"><span class="text-stress">门牌号</span></td>						    	
+							    	<td id="td-413" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="old-tr">		
+							    	<td style="vertical-align: middle;"><span class="text-stress">前台</span></td>						    	
+							    	<td id="td-414" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="old-tr">		
+							    	<td style="vertical-align: middle;"><span class="text-stress">办公环境</span></td>						    	
+							    	<td id="td-415" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="old-tr">	
+							    	<td style="vertical-align: middle;"><span class="text-stress">GPS定位图</span></td>						    	
+							    	<td id="td-416" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+					    			<td style="vertical-align: middle;" rowspan="16"><span class="text-stress">个人信息</span></td>				    		
+							    	<td style="vertical-align: middle;"><span class="text-stress">身份证</span></td>						    	
+							    	<td id="td-417" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">户口本</span></td>						    	
+							    	<td id="td-418" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">水电小票</span></td>						    	
+							    	<td id="td-419" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">结婚证</span></td>						    	
+							    	<td id="td-420" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">银行卡</span></td>						    	
+							    	<td id="td-421" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">房产证</span></td>						    	
+							    	<td id="td-422" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">购房合同</span></td>						    	
+							    	<td id="td-423" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">按揭合同</span></td>						    	
+							    	<td id="td-424" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">工作证明</span></td>						    	
+							    	<td id="td-425" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">工资卡</span></td>						    	
+							    	<td id="td-426" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">银行流水</span></td>						    	
+							    	<td id="td-427" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">行驶证</span></td>						    	
+							    	<td id="td-428" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">登记证</span></td>						    	
+							    	<td id="td-429" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+                                    <td style="vertical-align: middle;"><span class="text-stress">公积金</span></td>                               
+                                    <td id="td-451" style="vertical-align: middle;"></td>
+                                </tr>
+                                <tr class="new-tr">
+                                    <td style="vertical-align: middle;"><span class="text-stress">社保</span></td>                               
+                                    <td id="td-452" style="vertical-align: middle;"></td>
+                                </tr>
+                                <tr class="new-tr">
+                                    <td style="vertical-align: middle;"><span class="text-stress">征信</span></td>                               
+                                    <td id="td-453" style="vertical-align: middle;"></td>
+                                </tr>
+					    		<tr class="new-tr">
+					    			<td style="vertical-align: middle;" rowspan="2"><span class="text-stress">企业信息</span></td>				    		
+							    	<td style="vertical-align: middle;"><span class="text-stress">营业执照</span></td>						    	
+							    	<td id="td-430" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">租赁合同</span></td>						    	
+							    	<td id="td-431" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+					    			<td style="vertical-align: middle;" rowspan="1"><span class="text-stress">其它</span></td>				    		
+							    	<td style="vertical-align: middle;"><span class="text-stress">其它</span></td>						    	
+							    	<td id="td-432" style="vertical-align: middle;"></td>
+					    		</tr>
+						    </tbody>
+						</table>
+				  	</div>
+				  	<div class='bondsmanInfo bondsmanInfo-3 infos'>
+				  	   <!-- <div class="btn-group">
+						  	<button id="btn-uploadBondsmanInfo-3" type="button" class="btn btn-primary btn-sm dropdown-toggle btn-menu" data-toggle="dropdown">
+						  		<span class="fa fa-folder-open-o"></span> 担保人信息3 <span class="caret"></span>							    	
+						  	</button>
+						  	<ul class="dropdown-menu" role="menu">	
+						  		<li><span class="text-stress" style="margin-left: 8px;">房屋信息</span></li>							  		
+						    	<li><a id="btn-uploadType5-1" href="#">小区大门</a></li>						    	
+						    	<li><a id="btn-uploadType5-2" href="#">单元楼号</a></li>
+						    	<li><a id="btn-uploadType5-3" href="#">门牌号</a></li>
+						    	<li><a id="btn-uploadType5-4" href="#">楼层号</a></li>
+						    	<li><a id="btn-uploadType5-5" href="#">卫生间</a></li>
+						    	<li><a id="btn-uploadType5-6" href="#">客厅</a></li>
+						    	<li><a id="btn-uploadType5-7" href="#">卧室</a></li>
+						    	<li><a id="btn-uploadType5-8" href="#">厨房</a></li>
+						    	<li><a id="btn-uploadType5-9" href="#">生活照</a></li>
+						    	<li><a id="btn-uploadType5-10" href="#">GPS定位图</a></li>
+						    	
+						    	<li><span class="text-stress" style="margin-left: 8px;">公司信息</span></li>							  		
+						    	<li class="old-li"><a id="btn-uploadType5-11" href="#">楼宇外观</a></li>
+						    	<li class="old-li"><a id="btn-uploadType5-12" href="#">楼层号</a></li>
+						    	<li class="old-li"><a id="btn-uploadType5-13" href="#">门牌号 </a></li>
+						    	<li class="old-li"><a id="btn-uploadType5-14" href="#">前台</a></li>
+						    	<li class="old-li"><a id="btn-uploadType5-15" href="#">办公环境 </a></li>
+						    	<li class="old-li"><a id="btn-uploadType5-16" href="#">GPS定位图</a></li>
+						    	
+						    	<li><span class="text-stress" style="margin-left: 8px;">个人信息</span></li>							  		
+						    	<li class="old-li"><a id="btn-uploadType5-17" href="#">身份证</a></li>
+						    	<li class="old-li"><a id="btn-uploadType5-18" href="#">户口本</a></li>
+						    	<li class="old-li"><a id="btn-uploadType5-19" href="#">水电小票 </a></li>
+						    	<li class="old-li"><a id="btn-uploadType5-20" href="#">结婚证</a></li>
+						    	<li class="old-li"><a id="btn-uploadType5-21" href="#">银行卡 </a></li>
+						    	<li class="old-li"><a id="btn-uploadType5-22" href="#">房产证</a></li>
+						    	<li class="old-li"><a id="btn-uploadType5-23" href="#">购房合同</a></li>
+						    	<li class="old-li"><a id="btn-uploadType5-24" href="#">按揭合同</a></li>
+						    	<li class="old-li"><a id="btn-uploadType5-25" href="#">工作证明</a></li>
+						    	<li class="old-li"><a id="btn-uploadType5-26" href="#">工资卡</a></li>
+						    	<li class="old-li"><a id="btn-uploadType5-27" href="#">银行流水</a></li>
+						    	<li class="old-li"><a id="btn-uploadType5-28" href="#">行驶证</a></li>
+						    	<li class="old-li"><a id="btn-uploadType5-29" href="#">登记证</a></li>
+						    	
+						    	<li><span class="text-stress" style="margin-left: 8px;">企业信息</span></li>							  		
+						    	<li class="old-li"><a id="btn-uploadType5-30" href="#">营业执照</a></li>
+						    	<li class="old-li"><a id="btn-uploadType5-31" href="#">租赁合同</a></li>
+						  	</ul>
+						</div> -->
+						<span class="text-muted pictureTitle">担保人信息3</span>
+						<table id="viewerSix" class="table table-bordered">
+						    <tbody>
+						    	<tr>		
+						    		<td style="width: 15%; vertical-align: middle;" rowspan="10"><span class="text-stress">房屋信息</span></td>				    		
+							    	<td style="width: 15%; vertical-align: middle;"><span class="text-stress">小区大门</span></td>						    	
+							    	<td id="td-51" style="width: 70%; vertical-align: middle;"><div></div></td>
+					    		</tr>
+					    		<tr>	
+							    	<td style="vertical-align: middle;"><span class="text-stress">单元楼号</span></td>						    	
+							    	<td id="td-52" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>	
+							    	<td style="vertical-align: middle;"><span class="text-stress">门牌号</span></td>						    	
+							    	<td id="td-53" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>	
+							    	<td style="vertical-align: middle;"><span class="text-stress">楼层号</span></td>						    	
+							    	<td id="td-54" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">卫生间</span></td>						    	
+							    	<td id="td-55" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">客厅</span></td>						    	
+							    	<td id="td-56" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">卧室</span></td>						    	
+							    	<td id="td-57" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">厨房</span></td>						    	
+							    	<td id="td-58" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">生活照</span></td>						    	
+							    	<td id="td-59" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">GPS定位图</span></td>						    	
+							    	<td id="td-510" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="old-tr">		
+						    		<td style="vertical-align: middle;" rowspan="6"><span class="text-stress">公司信息</span></td>				    		
+							    	<td style="vertical-align: middle;"><span class="text-stress">楼宇外观</span></td>						    	
+							    	<td id="td-511" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="old-tr">		
+							    	<td style="vertical-align: middle;"><span class="text-stress">楼层号</span></td>						    	
+							    	<td id="td-512" style="vertical-align: middle;"></td>
+					    		</tr>				    		
+					    		<tr class="old-tr">		
+							    	<td style="vertical-align: middle;"><span class="text-stress">门牌号</span></td>						    	
+							    	<td id="td-513" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="old-tr">		
+							    	<td style="vertical-align: middle;"><span class="text-stress">前台</span></td>						    	
+							    	<td id="td-514" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="old-tr">		
+							    	<td style="vertical-align: middle;"><span class="text-stress">办公环境</span></td>						    	
+							    	<td id="td-515" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="old-tr">	
+							    	<td style="vertical-align: middle;"><span class="text-stress">GPS定位图</span></td>						    	
+							    	<td id="td-516" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+					    			<td style="vertical-align: middle;" rowspan="16"><span class="text-stress">个人信息</span></td>				    		
+							    	<td style="vertical-align: middle;"><span class="text-stress">身份证</span></td>						    	
+							    	<td id="td-517" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">户口本</span></td>						    	
+							    	<td id="td-518" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">水电小票</span></td>						    	
+							    	<td id="td-519" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">结婚证</span></td>						    	
+							    	<td id="td-520" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">银行卡</span></td>						    	
+							    	<td id="td-521" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">房产证</span></td>						    	
+							    	<td id="td-522" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">购房合同</span></td>						    	
+							    	<td id="td-523" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">按揭合同</span></td>						    	
+							    	<td id="td-524" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">工作证明</span></td>						    	
+							    	<td id="td-525" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">工资卡</span></td>						    	
+							    	<td id="td-526" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">银行流水</span></td>						    	
+							    	<td id="td-527" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">行驶证</span></td>						    	
+							    	<td id="td-528" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">登记证</span></td>						    	
+							    	<td id="td-529" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+                                    <td style="vertical-align: middle;"><span class="text-stress">公积金</span></td>                               
+                                    <td id="td-551" style="vertical-align: middle;"></td>
+                                </tr>
+                                <tr class="new-tr">
+                                    <td style="vertical-align: middle;"><span class="text-stress">社保</span></td>                               
+                                    <td id="td-552" style="vertical-align: middle;"></td>
+                                </tr>
+                                <tr class="new-tr">
+                                    <td style="vertical-align: middle;"><span class="text-stress">征信</span></td>                               
+                                    <td id="td-553" style="vertical-align: middle;"></td>
+                                </tr>
+					    		<tr class="new-tr">
+					    			<td style="vertical-align: middle;" rowspan="2"><span class="text-stress">企业信息</span></td>				    		
+							    	<td style="vertical-align: middle;"><span class="text-stress">营业执照</span></td>						    	
+							    	<td id="td-530" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">租赁合同</span></td>						    	
+							    	<td id="td-531" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+					    			<td style="vertical-align: middle;" rowspan="1"><span class="text-stress">其它</span></td>				    		
+							    	<td style="vertical-align: middle;"><span class="text-stress">其它</span></td>						    	
+							    	<td id="td-532" style="vertical-align: middle;"></td>
+					    		</tr>
+						    </tbody>
+						</table>
+				  	</div>
+				  	<div class='bondsmanInfo bondsmanInfo-4 infos'>
+				  	   <span class="text-muted pictureTitle">担保人信息4</span>
+				  	   <!-- <div class="btn-group">
+						  	<button id="btn-uploadBondsmanInfo-4" type="button" class="btn btn-primary btn-sm dropdown-toggle btn-menu" data-toggle="dropdown">
+						  		<span class="fa fa-folder-open-o"></span> 担保人信息4 <span class="caret"></span>							    	
+						  	</button>
+						  	<ul class="dropdown-menu" role="menu">	
+						  		<li><span class="text-stress" style="margin-left: 8px;">房屋信息</span></li>							  		
+						    	<li><a id="btn-uploadType6-1" href="#">小区大门</a></li>						    	
+						    	<li><a id="btn-uploadType6-2" href="#">单元楼号</a></li>
+						    	<li><a id="btn-uploadType6-3" href="#">门牌号</a></li>
+						    	<li><a id="btn-uploadType6-4" href="#">楼层号</a></li>
+						    	<li><a id="btn-uploadType6-5" href="#">卫生间</a></li>
+						    	<li><a id="btn-uploadType6-6" href="#">客厅</a></li>
+						    	<li><a id="btn-uploadType6-7" href="#">卧室</a></li>
+						    	<li><a id="btn-uploadType6-8" href="#">厨房</a></li>
+						    	<li><a id="btn-uploadType6-9" href="#">生活照</a></li>
+						    	<li><a id="btn-uploadType6-10" href="#">GPS定位图</a></li>
+						    	
+						    	<li><span class="text-stress" style="margin-left: 8px;">公司信息</span></li>							  		
+						    	<li class="old-li"><a id="btn-uploadType6-11" href="#">楼宇外观</a></li>
+						    	<li class="old-li"><a id="btn-uploadType6-12" href="#">楼层号</a></li>
+						    	<li class="old-li"><a id="btn-uploadType6-13" href="#">门牌号 </a></li>
+						    	<li class="old-li"><a id="btn-uploadType6-14" href="#">前台</a></li>
+						    	<li class="old-li"><a id="btn-uploadType6-15" href="#">办公环境 </a></li>
+						    	<li class="old-li"><a id="btn-uploadType6-16" href="#">GPS定位图</a></li>
+						    	
+						    	<li><span class="text-stress" style="margin-left: 8px;">个人信息</span></li>							  		
+						    	<li class="old-li"><a id="btn-uploadType6-17" href="#">身份证</a></li>
+						    	<li class="old-li"><a id="btn-uploadType6-18" href="#">户口本</a></li>
+						    	<li class="old-li"><a id="btn-uploadType6-19" href="#">水电小票 </a></li>
+						    	<li class="old-li"><a id="btn-uploadType6-20" href="#">结婚证</a></li>
+						    	<li class="old-li"><a id="btn-uploadType6-21" href="#">银行卡 </a></li>
+						    	<li class="old-li"><a id="btn-uploadType6-22" href="#">房产证</a></li>
+						    	<li class="old-li"><a id="btn-uploadType6-23" href="#">购房合同</a></li>
+						    	<li class="old-li"><a id="btn-uploadType6-24" href="#">按揭合同</a></li>
+						    	<li class="old-li"><a id="btn-uploadType6-25" href="#">工作证明</a></li>
+						    	<li class="old-li"><a id="btn-uploadType6-26" href="#">工资卡</a></li>
+						    	<li class="old-li"><a id="btn-uploadType6-27" href="#">银行流水</a></li>
+						    	<li class="old-li"><a id="btn-uploadType6-28" href="#">行驶证</a></li>
+						    	<li class="old-li"><a id="btn-uploadType6-29" href="#">登记证</a></li>
+						    	
+						    	<li><span class="text-stress" style="margin-left: 8px;">企业信息</span></li>							  		
+						    	<li class="old-li"><a id="btn-uploadType6-30" href="#">营业执照</a></li>
+						    	<li class="old-li"><a id="btn-uploadType6-31" href="#">租赁合同</a></li>
+						  	</ul>
+						</div> -->
+						<table id="viewerSeven" class="table table-bordered">
+						    <tbody>
+						    	<tr>		
+						    		<td style="width: 15%; vertical-align: middle;" rowspan="10"><span class="text-stress">房屋信息</span></td>				    		
+							    	<td style="width: 15%; vertical-align: middle;"><span class="text-stress">小区大门</span></td>						    	
+							    	<td id="td-61" style="width: 70%; vertical-align: middle;"><div></div></td>
+					    		</tr>
+					    		<tr>	
+							    	<td style="vertical-align: middle;"><span class="text-stress">单元楼号</span></td>						    	
+							    	<td id="td-62" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>	
+							    	<td style="vertical-align: middle;"><span class="text-stress">门牌号</span></td>						    	
+							    	<td id="td-63" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>	
+							    	<td style="vertical-align: middle;"><span class="text-stress">楼层号</span></td>						    	
+							    	<td id="td-64" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">卫生间</span></td>						    	
+							    	<td id="td-65" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">客厅</span></td>						    	
+							    	<td id="td-66" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">卧室</span></td>						    	
+							    	<td id="td-67" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">厨房</span></td>						    	
+							    	<td id="td-68" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">生活照</span></td>						    	
+							    	<td id="td-69" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">GPS定位图</span></td>						    	
+							    	<td id="td-610" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="old-tr">		
+						    		<td style="vertical-align: middle;" rowspan="6"><span class="text-stress">公司信息</span></td>				    		
+							    	<td style="vertical-align: middle;"><span class="text-stress">楼宇外观</span></td>						    	
+							    	<td id="td-611" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="old-tr">		
+							    	<td style="vertical-align: middle;"><span class="text-stress">楼层号</span></td>						    	
+							    	<td id="td-612" style="vertical-align: middle;"></td>
+					    		</tr>				    		
+					    		<tr class="old-tr">		
+							    	<td style="vertical-align: middle;"><span class="text-stress">门牌号</span></td>						    	
+							    	<td id="td-613" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="old-tr">		
+							    	<td style="vertical-align: middle;"><span class="text-stress">前台</span></td>						    	
+							    	<td id="td-614" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="old-tr">		
+							    	<td style="vertical-align: middle;"><span class="text-stress">办公环境</span></td>						    	
+							    	<td id="td-615" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="old-tr">	
+							    	<td style="vertical-align: middle;"><span class="text-stress">GPS定位图</span></td>						    	
+							    	<td id="td-616" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+					    			<td style="vertical-align: middle;" rowspan="16"><span class="text-stress">个人信息</span></td>				    		
+							    	<td style="vertical-align: middle;"><span class="text-stress">身份证</span></td>						    	
+							    	<td id="td-617" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">户口本</span></td>						    	
+							    	<td id="td-618" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">水电小票</span></td>						    	
+							    	<td id="td-619" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">结婚证</span></td>						    	
+							    	<td id="td-620" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">银行卡</span></td>						    	
+							    	<td id="td-621" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">房产证</span></td>						    	
+							    	<td id="td-622" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">购房合同</span></td>						    	
+							    	<td id="td-623" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">按揭合同</span></td>						    	
+							    	<td id="td-624" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">工作证明</span></td>						    	
+							    	<td id="td-625" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">工资卡</span></td>						    	
+							    	<td id="td-626" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">银行流水</span></td>						    	
+							    	<td id="td-627" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">行驶证</span></td>						    	
+							    	<td id="td-628" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">登记证</span></td>						    	
+							    	<td id="td-629" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+                                    <td style="vertical-align: middle;"><span class="text-stress">公积金</span></td>                               
+                                    <td id="td-651" style="vertical-align: middle;"></td>
+                                </tr>
+                                <tr class="new-tr">
+                                    <td style="vertical-align: middle;"><span class="text-stress">社保</span></td>                               
+                                    <td id="td-652" style="vertical-align: middle;"></td>
+                                </tr>
+                                <tr class="new-tr">
+                                    <td style="vertical-align: middle;"><span class="text-stress">征信</span></td>                               
+                                    <td id="td-653" style="vertical-align: middle;"></td>
+                                </tr>
+					    		<tr class="new-tr">
+					    			<td style="vertical-align: middle;" rowspan="2"><span class="text-stress">企业信息</span></td>				    		
+							    	<td style="vertical-align: middle;"><span class="text-stress">营业执照</span></td>						    	
+							    	<td id="td-630" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">租赁合同</span></td>						    	
+							    	<td id="td-631" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+					    			<td style="vertical-align: middle;" rowspan="1"><span class="text-stress">其它</span></td>				    		
+							    	<td style="vertical-align: middle;"><span class="text-stress">其它</span></td>						    	
+							    	<td id="td-632" style="vertical-align: middle;"></td>
+					    		</tr>
+						    </tbody>
+						</table>
+				  	</div>
+				  	<div class='bondsmanInfo bondsmanInfo-5 infos'>
+				  	   <span class="text-muted pictureTitle">担保人信息5</span>
+				  	   <!-- <div class="btn-group">
+						  	<button id="btn-uploadBondsmanInfo-5" type="button" class="btn btn-primary btn-sm dropdown-toggle btn-menu" data-toggle="dropdown">
+						  		<span class="fa fa-folder-open-o"></span> 担保人信息5 <span class="caret"></span>							    	
+						  	</button>
+						  	<ul class="dropdown-menu" role="menu">	
+						  		<li><span class="text-stress" style="margin-left: 8px;">房屋信息</span></li>							  		
+						    	<li><a id="btn-uploadType7-1" href="#">小区大门</a></li>						    	
+						    	<li><a id="btn-uploadType7-2" href="#">单元楼号</a></li>
+						    	<li><a id="btn-uploadType7-3" href="#">门牌号</a></li>
+						    	<li><a id="btn-uploadType7-4" href="#">楼层号</a></li>
+						    	<li><a id="btn-uploadType7-5" href="#">卫生间</a></li>
+						    	<li><a id="btn-uploadType7-6" href="#">客厅</a></li>
+						    	<li><a id="btn-uploadType7-7" href="#">卧室</a></li>
+						    	<li><a id="btn-uploadType7-8" href="#">厨房</a></li>
+						    	<li><a id="btn-uploadType7-9" href="#">生活照</a></li>
+						    	<li><a id="btn-uploadType7-10" href="#">GPS定位图</a></li>
+						    	
+						    	<li><span class="text-stress" style="margin-left: 8px;">公司信息</span></li>							  		
+						    	<li class="old-li"><a id="btn-uploadType7-11" href="#">楼宇外观</a></li>
+						    	<li class="old-li"><a id="btn-uploadType7-12" href="#">楼层号</a></li>
+						    	<li class="old-li"><a id="btn-uploadType7-13" href="#">门牌号 </a></li>
+						    	<li class="old-li"><a id="btn-uploadType7-14" href="#">前台</a></li>
+						    	<li class="old-li"><a id="btn-uploadType7-15" href="#">办公环境 </a></li>
+						    	<li class="old-li"><a id="btn-uploadType7-16" href="#">GPS定位图</a></li>
+						    	
+						    	<li><span class="text-stress" style="margin-left: 8px;">个人信息</span></li>							  		
+						    	<li class="old-li"><a id="btn-uploadType7-17" href="#">身份证</a></li>
+						    	<li class="old-li"><a id="btn-uploadType7-18" href="#">户口本</a></li>
+						    	<li class="old-li"><a id="btn-uploadType7-19" href="#">水电小票 </a></li>
+						    	<li class="old-li"><a id="btn-uploadType7-20" href="#">结婚证</a></li>
+						    	<li class="old-li"><a id="btn-uploadType7-21" href="#">银行卡 </a></li>
+						    	<li class="old-li"><a id="btn-uploadType7-22" href="#">房产证</a></li>
+						    	<li class="old-li"><a id="btn-uploadType7-23" href="#">购房合同</a></li>
+						    	<li class="old-li"><a id="btn-uploadType7-24" href="#">按揭合同</a></li>
+						    	<li class="old-li"><a id="btn-uploadType7-25" href="#">工作证明</a></li>
+						    	<li class="old-li"><a id="btn-uploadType7-26" href="#">工资卡</a></li>
+						    	<li class="old-li"><a id="btn-uploadType7-27" href="#">银行流水</a></li>
+						    	<li class="old-li"><a id="btn-uploadType7-28" href="#">行驶证</a></li>
+						    	<li class="old-li"><a id="btn-uploadType7-29" href="#">登记证</a></li>
+						    	
+						    	<li><span class="text-stress" style="margin-left: 8px;">企业信息</span></li>							  		
+						    	<li class="old-li"><a id="btn-uploadType7-30" href="#">营业执照</a></li>
+						    	<li class="old-li"><a id="btn-uploadType7-31" href="#">租赁合同</a></li>
+						  	</ul>
+						</div> -->
+						<table id="viewerEight" class="table table-bordered">
+						    <tbody>
+						    	<tr>		
+						    		<td style="width: 15%; vertical-align: middle;" rowspan="10"><span class="text-stress">房屋信息</span></td>				    		
+							    	<td style="width: 15%; vertical-align: middle;"><span class="text-stress">小区大门</span></td>						    	
+							    	<td id="td-71" style="width: 70%; vertical-align: middle;"><div></div></td>
+					    		</tr>
+					    		<tr>	
+							    	<td style="vertical-align: middle;"><span class="text-stress">单元楼号</span></td>						    	
+							    	<td id="td-72" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>	
+							    	<td style="vertical-align: middle;"><span class="text-stress">门牌号</span></td>						    	
+							    	<td id="td-73" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>	
+							    	<td style="vertical-align: middle;"><span class="text-stress">楼层号</span></td>						    	
+							    	<td id="td-74" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">卫生间</span></td>						    	
+							    	<td id="td-75" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">客厅</span></td>						    	
+							    	<td id="td-76" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">卧室</span></td>						    	
+							    	<td id="td-77" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">厨房</span></td>						    	
+							    	<td id="td-78" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">生活照</span></td>						    	
+							    	<td id="td-79" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr>			
+							    	<td style="vertical-align: middle;"><span class="text-stress">GPS定位图</span></td>						    	
+							    	<td id="td-710" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="old-tr">		
+						    		<td style="vertical-align: middle;" rowspan="6"><span class="text-stress">公司信息</span></td>				    		
+							    	<td style="vertical-align: middle;"><span class="text-stress">楼宇外观</span></td>						    	
+							    	<td id="td-711" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="old-tr">		
+							    	<td style="vertical-align: middle;"><span class="text-stress">楼层号</span></td>						    	
+							    	<td id="td-712" style="vertical-align: middle;"></td>
+					    		</tr>				    		
+					    		<tr class="old-tr">		
+							    	<td style="vertical-align: middle;"><span class="text-stress">门牌号</span></td>						    	
+							    	<td id="td-713" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="old-tr">		
+							    	<td style="vertical-align: middle;"><span class="text-stress">前台</span></td>						    	
+							    	<td id="td-714" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="old-tr">		
+							    	<td style="vertical-align: middle;"><span class="text-stress">办公环境</span></td>						    	
+							    	<td id="td-715" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="old-tr">	
+							    	<td style="vertical-align: middle;"><span class="text-stress">GPS定位图</span></td>						    	
+							    	<td id="td-716" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+					    			<td style="vertical-align: middle;" rowspan="16"><span class="text-stress">个人信息</span></td>				    		
+							    	<td style="vertical-align: middle;"><span class="text-stress">身份证</span></td>						    	
+							    	<td id="td-717" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">户口本</span></td>						    	
+							    	<td id="td-718" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">水电小票</span></td>						    	
+							    	<td id="td-719" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">结婚证</span></td>						    	
+							    	<td id="td-720" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">银行卡</span></td>						    	
+							    	<td id="td-721" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">房产证</span></td>						    	
+							    	<td id="td-722" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">购房合同</span></td>						    	
+							    	<td id="td-723" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">按揭合同</span></td>						    	
+							    	<td id="td-724" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">工作证明</span></td>						    	
+							    	<td id="td-725" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">工资卡</span></td>						    	
+							    	<td id="td-726" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">银行流水</span></td>						    	
+							    	<td id="td-727" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">行驶证</span></td>						    	
+							    	<td id="td-728" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">登记证</span></td>						    	
+							    	<td id="td-729" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+                                    <td style="vertical-align: middle;"><span class="text-stress">公积金</span></td>                               
+                                    <td id="td-751" style="vertical-align: middle;"></td>
+                                </tr>
+                                <tr class="new-tr">
+                                    <td style="vertical-align: middle;"><span class="text-stress">社保</span></td>                               
+                                    <td id="td-752" style="vertical-align: middle;"></td>
+                                </tr>
+                                <tr class="new-tr">
+                                    <td style="vertical-align: middle;"><span class="text-stress">征信</span></td>                               
+                                    <td id="td-753" style="vertical-align: middle;"></td>
+                                </tr>
+					    		<tr class="new-tr">
+					    			<td style="vertical-align: middle;" rowspan="2"><span class="text-stress">企业信息</span></td>				    		
+							    	<td style="vertical-align: middle;"><span class="text-stress">营业执照</span></td>						    	
+							    	<td id="td-730" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+							    	<td style="vertical-align: middle;"><span class="text-stress">租赁合同</span></td>						    	
+							    	<td id="td-731" style="vertical-align: middle;"></td>
+					    		</tr>
+					    		<tr class="new-tr">
+					    			<td style="vertical-align: middle;" rowspan="1"><span class="text-stress">其它</span></td>				    		
+							    	<td style="vertical-align: middle;"><span class="text-stress">其它</span></td>						    	
+							    	<td id="td-732" style="vertical-align: middle;"></td>
+					    		</tr>
+						    </tbody>
+						</table>
+				  	</div>
+				  	<li class="list-group-item">
+						<div class="row">			
+							<div class="col-md-1 text-right"><span class="text-stress">额度建议</span></div>
+							<div class="col-md-6">
+							   <textarea class='form-control' id='limitAdvise' readonly></textarea>
+							</div>
+						</div>
+					</li>
+					<li class="list-group-item">
+						<div class="row">			
+							<div class="col-md-1 text-right"><span class="text-stress">备注</span></div>
+							<div class="col-md-6">
+							   <textarea class='form-control' id='remark' readonly></textarea>
+							</div>
+						</div>
+					</li>
+				</div>			
+			</div>
+			<div role="tabpanel" class="tab-pane fade" id="project-tab">
+			     <div class="panel panel-default">
+					<ul class="list-group">
+				    	<li class="list-group-item" style="border-bottom: 1px solid #fff;">
+							<div class="row">		
+							    <div class="col-md-1 text-right"><span class="text-stress">信贷类型</span></div>
+								<div class="col-md-2"><span class="text-muted creditType"></span></div>
+								<div class="col-md-1 text-right"><span class="text-stress">是否共借人</span></div>
+								<div class="col-md-2"><span id="borrow" class="text-muted"></span></div>
+								<div class="col-md-1 text-right"><span class="text-stress">共借人姓名</span></div>
+								<div class="col-md-2"><span id="borrowName" class="text-muted"></span></div>
+							</div>
+						</li>
+					</ul>
+					<table class="table table-bordered" id='loanTable' style='width:60%;border:1px solid #ddd;margin:20px 0 20px 20px'>
+					    <tbody>
+					    	<tr>		
+					    		<td><span class="text-stress">信贷类型</span></td>				    		
+						    	<td><span class="text-stress">借款金额</span></td>						    	
+				    		</tr>
+				    	</tbody>
+					</table>
+				</div>
+			</div>
+			<div role="tabpanel" class="tab-pane fade" id="risk-tab">
+			     <div class="panel panel-default">
+					<ul class="list-group">
+				    	<li class="list-group-item list-group-blank">风控报告明细</li>
+						<li class="list-group-item riskReports">
+						    
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>	
+
+	<form id="uploadForm">
+		<input id="file" class="hidden" type="file" name="qqfile" multiple />
+	</form>
+
+	<div id="approve-win" class="modal fade" role="dialog" aria-labelledby="approve-win-label" aria-describedby="">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="approve-win-label">审批</h5>
+				</div>
+				<div class="modal-form">
+					<form id="approveForm" class="form-horizontal">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">审批结果</label>
+							<div class="col-sm-4">
+								<select class="form-control" disabled>
+									<option value="1" selected>通过</option>
+									<option value="2">退回</option>
+									<option value="0">拒绝</option>
+								</select> 
+								<input type="text" class="hidden" value="1" name="approveStatus">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">审批意见</label>
+							<div class="col-sm-8">
+								<textarea name="approveOpinion" class="form-control" rows="3" placeholder="请输入审批意见"></textarea>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button id="btn-approve-save" type="button"	class="btn btn-success btn-sm">提交</button>
+					<button id="btn-approve-close" type="button" class="btn btn-default btn-sm">关闭</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	</body>
+</html>

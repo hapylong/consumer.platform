@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>蒲公英个人客户信息查询</title>
+        <meta charset="UTF-8" />
+        <meta name="Author" content="" />
+        <meta name="Keywords" content="" />
+        <meta name="Description" content="" /> 
+        <!-- 样式库 -->
+	    <link rel="stylesheet" href="../../../js/bootstrap/themes/default/bootstrap.css" />
+	    <link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+	    <link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+	    <link rel="stylesheet" href="../../../css/jquery.select2.css" />
+	    <link rel="stylesheet" href="../../../css/jquery.select2-bootstrap.css" />
+	    <link rel="stylesheet" href="../../../js/bootstrap/themes/default/jquery.mCustomScrollbar.css" />
+	    
+	    <!-- 插件库 -->
+	    <script src="../../../js/common/package.js"></script>
+		<script src="../../../js/common/url.js"></script>
+		<script src="../../../js/common/json2.js"></script>	
+		<script src="../../../js/common/jquery-1.11.3.min.js"></script>		
+		<script src="../../../js/bootstrap/bootstrap.js"></script>
+		<script src="../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+		<script src="../../../js/bootstrap/plugins/jquery.mCustomScrollbar.js"></script>
+		<script src="../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+		<script src="../../../js/ztree/js/jquery.ztree.all.min.js"></script>
+		<script src="../../../js/common/jquery.select2.js"></script>
+		
+		<!-- 业务库 -->
+		<script src="../../../js/common/base.js"></script>
+		<script src="../../../js/common/datagrid2.js"></script>
+		<script src="../../../js/common/tree.js"></script>
+		<script src="../../../js/common/formatter.js"></script>	    
+	    <script src="../../../js/each/crm/customer/dandelionCusInfoManage.js"></script>
+		
+		<!-- 页面样式 -->
+		<style type="text/css">
+			body {
+				font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif !important;
+				background:#eee url("../../../img/back.png") repeat;
+			}
+			.container-fluid {
+				padding:5px;
+			}
+			.left-part {
+				height:800px;
+			}
+			.modal-form {
+				margin:8px;
+			}
+		</style>
+    </head>
+    <body>  
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-info">
+                    <div class="panel-heading">
+                    	<h3 class="panel-title">客户信息查询栏</h3>
+                    </div>
+                        <div class="panel-body">    
+                            <form id="searchForm" class="form-horizontal">                               
+                                <div class="form-group">
+                                    <label class="control-label col-lg-1 col-md-1 col-sm-1">姓名:</label>
+                                    <div class="col-lg-2 col-md-2 col-sm-2">
+                                        <input name="realName" type="text" class="form-control" placeholder="请输入姓名">
+                                    </div>
+                                    <label class="control-label col-lg-1 col-md-1 col-sm-1">手机号:</label>
+                                    <div class="col-lg-2 col-md-2 col-sm-2">
+                                        <input name="regId" type="text" class="form-control" placeholder="请输入手机号">
+	                                </div>
+	                                <div class="col-lg-3 col-md-3 col-sm-3">
+	                                    <button id="btn-search" type="button" class="btn btn-default btn-sm">查询</button>
+	                                    <button id="btn-reset" type="button" class="btn btn-default btn-sm">重置</button>
+                                    </div>
+                                </div>
+                            </form>                                                         
+                        </div>
+					</div>		
+					<div class="panel panel-info">	
+                        <div class="panel-heading">
+                            <h3 class="panel-title">客户信息</h3>
+                        </div>
+                        <div class="panel-body">
+                            <form id="listForm">                                
+                                <button id="btn-check" type="button" class="btn btn-info btn-sm">查看</button>
+                            </form>
+                        </div>
+                        <table id="datagrid" class="table table-bordered table-hover" style="text-align:center">
+                            <thead>
+                                <tr>
+                                    <th field="ck"></th>
+									<th field="rn" style="text-align:center">序号</th>
+									<th field="realName" style="text-align:center">姓名</th>
+									<th field="regId" idField="true" style="text-align:center">手机号</th>
+									<th field="idCard" style="text-align:center">身份证号</th>
+									<th field="bankCard" style="text-align:center">银行卡</th>
+									<th field="relation1" style="text-align:center">与借款人关系1</th>
+									<th field="rName1" style="text-align:center">姓名1</th>
+									<th field="phone1" style="text-align:center">手机号1</th>
+									<th field="relation2" style="text-align:center">与借款人关系2</th>
+									<th field="rName2" style="text-align:center">姓名2</th>
+									<th field="phone2" style="text-align:center">手机号2</th>
+									<th field="address" style="text-align:center">常驻地址</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                        <div class="panel-footer">
+                            <div id="paginator">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>          
+        </div>
+        <div id="update-win" class="modal fade" role="dialog" aria-labelledby="update-win-label" aria-describedby="企业客户信息">
+			<div class="modal-dialog modal-lg" role="document">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<h5 class="modal-title" id="update-win-label">客户信息</h5>
+		      		</div>
+		      		<div class="modal-form">
+		       			<form id="updateForm" class="form-horizontal">
+				  			<div class="form-group">
+				    			<label class="col-md-2 control-label">公司名称</label>
+				    			<div class="col-md-4">
+				      				<input id="companyName" name="companyName" type="text" class="form-control input-sm easyui-validatebox" placeholder="公司名称"  data-options="required:true"/>
+				    			</div>
+				    			<label class="col-md-2 control-label">公司地址</label>
+				    			<div class="col-md-4">
+				      				<input id="companyAddress" name="companyAddress" type="text" class="form-control input-sm easyui-validatebox" placeholder="公司地址" data-options="required:true" />
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				  			    <label class="col-md-2 control-label">公司电话</label>
+				    			<div class="col-md-4">
+				      				<input id="companyPhone" name="companyPhone" type="text" class="form-control input-sm easyui-validatebox" placeholder="公司电话"  data-options="required:true"/>
+				    			</div>
+				  			</div>
+				  			<div class="form-group">
+				    			<label class="col-md-2 control-label">同事姓名1</label>
+				    			<div class="col-md-4">
+				      				<input id="colleagues1" name="colleagues1" type="text" class="form-control input-sm easyui-validatebox" placeholder="同事姓名1"  data-options="required:true"/>
+				    			</div>
+				    			<label class="col-md-2 control-label">手机号1</label>
+				    			<div class="col-md-4">
+				      				<input id="tel1" name="tel1" type="text" class="form-control input-sm easyui-validatebox" placeholder="手机号1" data-options="required:true" />
+				    			</div>
+				  			</div>
+				  			<div class="form-group">
+				  			    <label class="col-md-2 control-label">同事姓名2</label>
+				    			<div class="col-md-4">
+				      				<input id="colleagues2" name="colleagues2" type="text" class="form-control input-sm easyui-validatebox" placeholder="同事姓名2"  data-options="required:true"/>
+				    			</div>
+				    			<label class="col-md-2 control-label">手机号2</label>
+				    			<div class="col-md-4">
+				      				<input id="tel2" name="tel2" type="text" class="form-control input-sm easyui-validatebox" placeholder="手机号2" data-options="required:true" />
+				    			</div>
+				  			</div>
+				  			<div class="form-group">
+				    			<label class="col-md-2 control-label">与借款人关系1</label>
+				    			<div class="col-md-4">
+				      				<input id="relation1" name="relation1" type="text" class="form-control input-sm easyui-validatebox" placeholder="与借款人关系1"  data-options="required:true"/>
+				    			</div>
+				    			<label class="col-md-2 control-label">姓名1</label>
+				    			<div class="col-md-4">
+				      				<input id="rName1" name="rName1" type="text" class="form-control input-sm easyui-validatebox" placeholder="姓名1" data-options="required:true" />
+				    			</div>
+				  			</div>
+				  			<div class="form-group">
+				  			    <label class="col-md-2 control-label">性别1</label>
+				    			<div class="col-md-4">
+				      				<input id="sex1" name="sex1" type="text" class="form-control input-sm easyui-validatebox" placeholder="性别1"  data-options="required:true"/>
+				    			</div>
+				    			<label class="col-md-2 control-label">手机号1</label>
+				    			<div class="col-md-4">
+				      				<input id="phone1" name="phone1" type="text" class="form-control input-sm easyui-validatebox" placeholder="手机号1" data-options="required:true" />
+				    			</div>
+				  			</div>
+				  			<div class="form-group">
+				    			<label class="col-md-2 control-label">与借款人关系2</label>
+				    			<div class="col-md-4">
+				      				<input id="relation2" name="relation2" type="text" class="form-control input-sm easyui-validatebox" placeholder="与借款人关系2"  data-options="required:true"/>
+				    			</div>
+				    			<label class="col-md-2 control-label">姓名2</label>
+				    			<div class="col-md-4">
+				      				<input id="rName2" name="rName2" type="text" class="form-control input-sm easyui-validatebox" placeholder="姓名2" data-options="required:true" />
+				    			</div>
+				  			</div>
+				  			<div class="form-group">
+				  			    <label class="col-md-2 control-label">性别2</label>
+				    			<div class="col-md-4">
+				      				<input id="sex2" name="sex2" type="text" class="form-control input-sm easyui-validatebox" placeholder="性别2"  data-options="required:true"/>
+				    			</div>
+				    			<label class="col-md-2 control-label">手机号2</label>
+				    			<div class="col-md-4">
+				      				<input id="phone2" name="phone2" type="text" class="form-control input-sm easyui-validatebox" placeholder="手机号2" data-options="required:true" />
+				    			</div>
+				  			</div>
+				  			<div class="form-group">
+				    			<label class="col-md-2 control-label">与借款人关系3</label>
+				    			<div class="col-md-4">
+				      				<input id="relation3" name="relation3" type="text" class="form-control input-sm easyui-validatebox" placeholder="与借款人关系3"  data-options="required:true"/>
+				    			</div>
+				    			<label class="col-md-2 control-label">姓名3</label>
+				    			<div class="col-md-4">
+				      				<input id="rName3" name="rName3" type="text" class="form-control input-sm easyui-validatebox" placeholder="姓名3" data-options="required:true" />
+				    			</div>
+				  			</div>
+				  			<div class="form-group">
+				  			    <label class="col-md-2 control-label">性别3</label>
+				    			<div class="col-md-4">
+				      				<input id="sex3" name="sex3" type="text" class="form-control input-sm easyui-validatebox" placeholder="性别3"  data-options="required:true"/>
+				    			</div>
+				    			<label class="col-md-2 control-label">手机号3</label>
+				    			<div class="col-md-4">
+				      				<input id="phone3" name="phone3" type="text" class="form-control input-sm easyui-validatebox" placeholder="手机号3" data-options="required:true" />
+				    			</div>
+				  			</div>
+		  			</form>
+		      		</div>
+		      		<div class="modal-footer">
+				        <button id="btn-save" type="button" class="btn btn-success btn-sm">保存</button>
+				        <!-- <button id="btn-save" type="button" class="btn btn-success btn-sm">保存并提交</button> --> 
+				        <button id="btn-close" type="button" class="btn btn-default btn-sm">关闭</button>		        
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+    </body>
+</html>

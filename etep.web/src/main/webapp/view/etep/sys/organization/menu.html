@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	    <title>部门</title>
+	    <meta charset="UTF-8" />
+	    <meta name="Author" content="" />
+	    <meta name="Keywords" content="" />
+	    <meta name="Description" content="" />
+	    
+	    <!-- 基础CSS库 -->
+	    <link rel="stylesheet" href="../../../../js/bootstrap/themes/default/bootstrap.css" />
+	    <link rel="stylesheet" href="../../../../js/ztree/css/zTreeStyle/zTreeStyle.css"/>
+	    
+	    <!-- 基础CSS库 -->
+	    <link rel="stylesheet" href="../../../../css/common/base.css" />
+	    <link rel="stylesheet" href="../../../../css/common/scrollbar.css" />
+	    
+	    <!-- 基础JS库 -->
+	    <script src="../../../../js/common/package.js"></script>
+		<script src="../../../../js/common/url.js"></script>
+		<script src="../../../../js/common/json2.js"></script>	
+		<script src="../../../../js/common/jquery-1.11.3.min.js"></script>		
+		<script src="../../../../js/bootstrap/bootstrap.js"></script>
+		<script src="../../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+		<script src="../../../../js/ztree/js/jquery.ztree.all.min.js"></script>
+		
+		<!-- 业务JS库 -->
+		<script src="../../../../js/common/base.js"></script>
+		<script src="../../../../js/common/datagrid.js"></script>
+		<script src="../../../../js/common/tree.js"></script>
+		<script src="../../../../js/common/formatter.js"></script>	    
+	    <script src="../../../../js/each/etep/sys/organization/menu.js"></script>
+		
+		<!-- 页面样式 -->
+		<style type="text/css">
+			.container-fluid {
+				padding-top: 4px;
+			}
+			.left-panel {
+				height: calc(100% - 3px);
+			}
+			.right-panel {
+				height: calc(100% - 3px);
+			}
+			.left-panel-body {
+				height: calc(100% - 39px);
+			}
+			.right-panel-body {
+				height: calc(100% - 80px);
+			}
+			.scroll-div {
+				overflow: scroll;
+			}
+		</style>
+	    
+	</head>
+	<body>
+	
+		<div class="container-fluid height-fill-100">
+			<div class="row height-fill-100">
+				<div class="col-md-2 height-fill-100">
+					<div class="panel panel-success left-panel">
+						<div class="panel-heading">
+							<h3 class="panel-title">组织机构树</h3>
+					  	</div>
+					  	<div class="panel-body left-panel-body scroll-div">
+					    	<ul id="organizationTree" class="ztree"></ul>
+					  	</div>
+					</div>
+				</div>
+				<div class="col-md-10 height-fill-100">
+					<div class="panel panel-info right-panel">
+						<div class="panel-heading">
+							<h3 class="panel-title">菜单树</h3>
+					  	</div>
+					  	<div class="panel-body right-panel-body scroll-div">				  		
+					  		<button id="btn-expand" type="button" class="btn btn-warning btn-sm hidden">全部展开</button>		
+					  		<button id="btn-shrink" type="button" class="btn btn-warning btn-sm hidden">全部收起</button>							  							  		
+					  		<button id="btn-check" type="button" class="btn btn-info btn-sm hidden">全部勾选</button>	
+					  		<button id="btn-cancelAll" type="button" class="btn btn-info btn-sm hidden">全部取消</button>						  					  					  			
+					    	<ul id="menuTree" class="ztree"></ul>				    	
+					  	</div>
+					  	<div id="update-win" class="panel-footer">
+					    	<button id="btn-save" type="button" class="btn btn-success btn-sm">保存</button>				        		
+					  	</div>
+					</div>
+				</div>
+			</div>		 	
+		</div>
+		
+		
+	</body>
+</html>

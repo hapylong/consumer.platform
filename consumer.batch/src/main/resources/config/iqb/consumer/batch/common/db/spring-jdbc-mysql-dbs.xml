@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+       
+   <!--主库1 -->
+      <bean id="common_platform_iqb_master001" class="com.alibaba.druid.pool.DruidDataSource" init-method="init"
+          destroy-method="close">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver " />
+        <property name="url" value="${common_platform_mysql_master001.url}"/>
+        <property name="username" value="${common_platform_mysql_master001.username}"/>
+        <property name="password" value="${common_platform_mysql_master001.password}"/>
+<!--         <property name="filters" value="${common_onigiri_mysql_master001.filters}"/> -->
+<!--         <property name="maxActive" value="${common_onigiri_mysql_master001.maxActive}"/> -->
+<!--         <property name="initialSize" value="${common_onigiri_mysql_master001.initialSize}"/> -->
+<!--         <property name="maxWait" value="${common_onigiri_mysql_master001.maxWait}"/> -->
+<!--         <property name="minIdle" value="${common_onigiri_mysql_master001.minIdle}"/> -->
+<!--         <property name="timeBetweenEvictionRunsMillis" value="${common_onigiri_mysql_master001.timeBetweenEvictionRunsMillis}"/> -->
+<!--         <property name="minEvictableIdleTimeMillis" value="${common_onigiri_mysql_master001.minEvictableIdleTimeMillis}"/> -->
+<!--         <property name="validationQuery" value="${common_onigiri_mysql_master001.validationQuery}"/> -->
+<!--         <property name="testWhileIdle" value="${common_onigiri_mysql_master001.testWhileIdle}"/> -->
+<!--         <property name="testOnBorrow" value="${common_onigiri_mysql_master001.testOnBorrow}"/> -->
+<!--         <property name="testOnReturn" value="${common_onigiri_mysql_master001.testOnReturn}"/> -->
+<!--         <property name="poolPreparedStatements" value="${common_onigiri_mysql_master001.poolPreparedStatements}"/> -->
+<!--         <property name="maxPoolPreparedStatementPerConnectionSize" value="${common_onigiri_mysql_master001.maxPoolPreparedStatementPerConnectionSize}"/> -->
+     </bean> 
+    <!--从库1-1 -->
+     <bean id="common_platform_iqb_master001_slave001" class="com.alibaba.druid.pool.DruidDataSource" init-method="init"
+          destroy-method="close">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver " />
+        <property name="url" value="${common_platform_mysql_master001_slave001.url}"/>
+        <property name="username" value="${common_platform_mysql_master001_slave001.username}"/>
+        <property name="password" value="${common_platform_mysql_master001_slave001.password}"/>
+<!--         <property name="filters" value="${common_onigiri_mysql_master001_slave001.filters}"/> -->
+<!--         <property name="maxActive" value="${common_onigiri_mysql_master001_slave001.maxActive}"/> -->
+<!--         <property name="initialSize" value="${common_onigiri_mysql_master001_slave001.initialSize}"/> -->
+<!--         <property name="maxWait" value="${common_onigiri_mysql_master001_slave001.maxWait}"/> -->
+<!--         <property name="minIdle" value="${common_onigiri_mysql_master001_slave001.minIdle}"/> -->
+<!--         <property name="timeBetweenEvictionRunsMillis" value="${common_onigiri_mysql_master001_slave001.timeBetweenEvictionRunsMillis}"/> -->
+<!--         <property name="minEvictableIdleTimeMillis" value="${common_onigiri_mysql_master001_slave001.minEvictableIdleTimeMillis}"/> -->
+<!--         <property name="validationQuery" value="${common_onigiri_mysql_master001_slave001.validationQuery}"/> -->
+<!--         <property name="testWhileIdle" value="${common_onigiri_mysql_master001_slave001.testWhileIdle}"/> -->
+<!--         <property name="testOnBorrow" value="${common_onigiri_mysql_master001_slave001.testOnBorrow}"/> -->
+<!--         <property name="testOnReturn" value="${common_onigiri_mysql_master001_slave001.testOnReturn}"/> -->
+<!--         <property name="poolPreparedStatements" value="${common_onigiri_mysql_master001_slave001.poolPreparedStatements}"/> -->
+<!--         <property name="maxPoolPreparedStatementPerConnectionSize" value="${common_onigiri_mysql_master001_slave001.maxPoolPreparedStatementPerConnectionSize}"/> -->
+    </bean> 
+    <!--从库1-2 -->
+    <bean id="common_platform_iqb_master001_slave002" class="com.alibaba.druid.pool.DruidDataSource" init-method="init"
+          destroy-method="close">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver " />
+        <property name="url" value="${common_platform_mysql_master001_slave002.url}"/>
+        <property name="username" value="${common_platform_mysql_master001_slave002.username}"/>
+        <property name="password" value="${common_platform_mysql_master001_slave002.password}"/>
+<!--         <property name="filters" value="${common_onigiri_mysql_master001_slave002.filters}"/> -->
+<!--         <property name="maxActive" value="${common_onigiri_mysql_master001_slave002.maxActive}"/> -->
+<!--         <property name="initialSize" value="${common_onigiri_mysql_master001_slave002.initialSize}"/> -->
+<!--         <property name="maxWait" value="${common_onigiri_mysql_master001_slave002.maxWait}"/> -->
+<!--         <property name="minIdle" value="${common_onigiri_mysql_master001_slave002.minIdle}"/> -->
+<!--         <property name="timeBetweenEvictionRunsMillis" value="${common_onigiri_mysql_master001_slave002.timeBetweenEvictionRunsMillis}"/> -->
+<!--         <property name="minEvictableIdleTimeMillis" value="${common_onigiri_mysql_master001_slave002.minEvictableIdleTimeMillis}"/> -->
+<!--         <property name="validationQuery" value="${common_onigiri_mysql_master001_slave002.validationQuery}"/> -->
+<!--         <property name="testWhileIdle" value="${common_onigiri_mysql_master001_slave002.testWhileIdle}"/> -->
+<!--         <property name="testOnBorrow" value="${common_onigiri_mysql_master001_slave002.testOnBorrow}"/> -->
+<!--         <property name="testOnReturn" value="${common_onigiri_mysql_master001_slave002.testOnReturn}"/> -->
+<!--         <property name="poolPreparedStatements" value="${common_onigiri_mysql_master001_slave002.poolPreparedStatements}"/> -->
+<!--         <property name="maxPoolPreparedStatementPerConnectionSize" value="${common_onigiri_mysql_master001_slave002.maxPoolPreparedStatementPerConnectionSize}"/> -->
+    </bean> 
+</beans>

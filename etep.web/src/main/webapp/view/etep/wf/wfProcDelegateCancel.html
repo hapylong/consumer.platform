@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>流程委托查询</title>
+<meta charset="UTF-8" />
+<meta name="Author" content="" />
+<meta name="Keywords" content="" />
+<meta name="Description" content="" />
+<link rel="stylesheet" href="../../../js/bootstrap/themes/default/bootstrap.css" />
+<link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+<link rel="stylesheet" href="../../../css/jquery.datetimepicker.css" />
+<link rel="stylesheet" href="../../../css/jquery.select2.css" />
+<link rel="stylesheet" href="../../../css/jquery.select2-bootstrap.css" />
+<script src="../../../js/common/package.js"></script>
+<script src="../../../js/common/url.js"></script>
+<script src="../../../js/common/jquery-1.11.3.min.js"></script>
+<script src="../../../js/bootstrap/bootstrap.js"></script>
+<script src="../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+<script src="../../../js/common/jquery.datetimepicker.js"></script>
+<script src="../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+<script src="../../../js/common/json2.js"></script>
+<script src="../../../js/common/base.js"></script>
+<script src="../../../js/common/jquery.select2.js"></script>
+<script src="../../../js/common/datagrid2.js"></script>
+<script src="../../../js/common/formatter.js"></script>
+<script src="../../../js/each/etep/wf/wfProcDelegateCancel.js"></script>
+<script src="../../../js/common/wflow.js"></script>
+<style type="text/css">
+body {
+	background: #eee url("../../../img/back.png") repeat;
+}
+
+.container-fluid {
+	padding: 5px;
+}
+</style>
+</head>
+<body>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="panel panel-info">
+					<div class="panel-heading">
+						<h3 class="panel-title">流程委托列表</h3>
+					</div>
+					<div class="panel-body">
+						<form id="listForm">
+							<button id="btn-cancelDelegate" type="button" class="btn btn-primary btn-sm">取消委托</button>
+						</form>
+					</div>
+					<table id='datagrid' class="table table-bordered table-hover">
+						<thead>
+							<tr>
+								<th field="ck"></th>
+								<th field="rn" align="text-center" class="text-center">序号</th>
+								<th field="procInstId"  hidden="true">procInstId</th>
+								<th field="procDisplayurl" hidden="true">查看页面</th>
+								<th field="procOrgcode" hidden="true">机构代码</th>
+								<th field="procBiztype" hidden="true">业务类型</th>
+								<th field="procBizId" align="text-center" class="text-center" formatter="IQB.wfProcDelegateCancel.formatterOfSkipPage(val, row, rowIndex)">业务ID</th>
+								<th field="procName" align="text-center" class="text-center">流程名称</th>
+								<th field="procMemo" align="text-center" class="text-center">流程摘要</th>
+								<th field="procCreatetime" align="text-center" class="text-center">流程创建时间</th>
+								<th field="procEndtime" align="text-center" class="text-center">流程完成时间</th>
+								<th field="procLicensor" align="text-center" class="text-center">委托人</th>
+								<th field="procMandatary" align="text-center" class="text-center">受托人</th>
+								<th field="procLicenseTime" align="text-center" class="text-center">受托时间</th>
+								<th field="procStatusName" align="text-center" class="text-center">流程状态</th>
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
+					<div class="panel-footer">
+						<div id="paginator"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

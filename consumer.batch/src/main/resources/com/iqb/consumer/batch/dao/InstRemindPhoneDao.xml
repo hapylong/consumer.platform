@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+    Apache License, Version 2.0 (the "License"); you may not use this file except 
+    in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+    Unless required by applicable law or agreed to in writing, software distributed 
+    under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+    OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+    the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.batch.dao.InstRemindPhoneDao">
+    <!-- 配置映射字段 -->
+    <resultMap type="com.iqb.consumer.batch.data.pojo.InstRemindPhoneBean" id="InstRemindPhoneBeanMap">
+        
+        <result property="orderId"              column="orderId" />
+        <result property="realName"             column="realName" />
+        <result property="regId"                column="regId" />        
+        <result property="merchantNo"           column="merchantNo" />
+        <result property="merchantName"         column="merchantName" />        
+        <result property="curItems"             column="curItems" />
+        <result property="orderItems"           column="orderItems" />       
+        <result property="lastRepayDate"        column="lastRepayDate" />
+        <result property="curRepayAmt"          column="curRepayAmt" />
+        <result property="perOverdueAmt"        column="perOverdueAmt" />        
+        <result property="overdueDays"          column="overdueDays" />
+        <result property="mobileCollection"     column="mobileCollection" />
+        <result property="mobileDealOpinion"    column="mobileDealOpinion" />        
+        <result property="telRecord"            column="telRecord" />
+        <result property="failReason"           column="failReason" />
+        <result property="dealOpinion"          column="dealOpinion" />
+        <result property="billDate"             column="billDate" />
+        <result property="status"               column="status" />
+        <result property="flag"                 column="flag" />
+        <result property="assignedName"         column="assignedName" />
+        <result property="overdueAmt"           column="overdueAmt" />        
+        <result property="version"              column="version" />
+        <result property="createTime"           column="createTime" />
+        <result property="updateTime"           column="updateTime" />
+        
+    </resultMap>
+    
+    <!-- 批量插入电话提醒信息 -->
+    <insert id="insertInstRemindPhoneResult" parameterType="java.util.List">
+        INSERT INTO inst_remind_phone (
+            orderId,
+            realName,
+            regId,
+            merchantNo,
+            curItems,
+            
+            orderItems,
+            lastRepayDate,
+            curRepayAmt,
+            perOverdueAmt,
+            flag,
+            
+            status,
+            billInfoStatus,
+            version,
+            createTime
+        )
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.orderId},#{item.realName},#{item.regId},#{item.merchantNo},#{item.curItems},
+            #{item.orderItems},#{item.lastRepayDate},#{item.curRepayAmt},#{item.perOverdueAmt},#{item.flag},
+            #{item.status},#{item.billInfoStatus},1,NOW())
+        </foreach>
+    </insert>    
+    
+    <!-- 查询完成处理的电话提醒记录列表 -->
+    <select id="selectInstRemindPhoneList" parameterType="java.util.Map" resultMap="InstRemindPhoneBeanMap">
+        SELECT
+            A.orderId,
+            A.realName,
+            A.regId,
+            A.curItems,
+            A.orderItems,
+            A.lastrepaydate,
+            A.curRepayAmt,
+            A.perOverdueAmt,
+            A.`status`,
+            A.version            
+        FROM
+            inst_remind_phone A
+        where   
+            A.flag = 1
+            AND A.status <![CDATA[<]]> 3 
+    </select>
+      <!-- 查询完成处理的电话提醒记录 -->
+    <select id="selectInstRemindPhone" parameterType="java.util.Map" resultMap="InstRemindPhoneBeanMap">
+        SELECT
+            A.orderId,
+            A.realName,
+            A.regId,
+            A.curItems,
+            A.orderItems,
+            A.lastrepaydate,
+            A.curRepayAmt,
+            A.perOverdueAmt,
+            A.`status`,
+            A.version            
+        FROM
+            inst_remind_phone A
+        where   
+            A.flag = 1
+            AND A.orderId = #{orderId}
+            AND A.curItems = #{curItems}
+            limit 1
+    </select>
+    <!-- 后台修改订单 -->
+    <update id="updateInstRemindPhoneResult" parameterType="java.util.Map">
+        update
+        inst_remind_phone a
+        <set>
+            a.version = #{version,jdbcType=INTEGER} + 1,
+            <if test="curRepayAmt != null and curRepayAmt != ''">
+                a.curRepayAmt = #{curRepayAmt},
+            </if>
+            <if test="perOverdueAmt != null and perOverdueAmt != ''">
+                a.perOverdueAmt = #{perOverdueAmt},
+            </if>
+            <if test="billInfoStatus != null">
+                a.billInfoStatus = #{billInfoStatus},
+            </if>
+            <if test="status != null">
+                a.status = #{status},
+            </if>
+            a.updateTime = NOW()
+        </set>
+        where a.orderId = #{orderId} and a.curItems = #{curItems} and a.flag = #{flag} and a.billInfoStatus=1
+    </update>
+    <!-- 根据订单号查询贷后车辆信息表 -->
+    <select id="selectInstManageCarInfo" parameterType="java.lang.String" resultMap="InstRemindPhoneBeanMap">
+        SELECT
+            A.orderId,
+            A.`status`          
+        FROM
+            inst_managecar_info A
+        where   
+            A.processStatus <![CDATA[<>]]> 30
+            and A.orderId = #{orderId}
+            limit 1
+    </select>
+</mapper>

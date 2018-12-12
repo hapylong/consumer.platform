@@ -1,0 +1,32 @@
+.z-index3{z-index: 100}
+.input-sm{border:none;}
+.tableDialogTbody tr td input{border:none;}
+.installPeriods{width: 10%}
+.selectPng{
+    float: right;
+    margin: -10% 2% 0 0;
+    width: 6%;
+    }
+.downPaymentRatio{width: 10%}
+.merchantNo{width: 10%}
+.marginRatio{width: 11%}
+.serviceFeeRatio{width: 11%}
+.feeYear{width: 11%}
+.PlanBox{overflow: hidden;}
+.PlanBox div img{padding: 0 0 3px 0;}
+.PlanBox div p{    
+    float: right;
+    color: #488dcb;
+    padding: 0 0 0 6px;
+}
+.addPlanBox{
+    cursor: pointer;
+    float: right;
+    padding-right: 30px;
+}
+.removePlanBox{
+    cursor: pointer;
+    float: left;
+    padding-left: 15px;
+}
+.modal-footer{text-align: center;}

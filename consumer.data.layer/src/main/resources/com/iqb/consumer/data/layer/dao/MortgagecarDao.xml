@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+	Apache License, Version 2.0 (the "License"); you may not use this file except 
+	in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.MortgagecarDao">
+
+	<sql id="table">inst_orderinfo</sql>
+
+	<!-- 配置映射字段 -->
+	<resultMap type="com.iqb.consumer.data.layer.bean.query.MortgagecarBean" id="MortgagecarBeanResultMap">
+		<result property="orderId" 			column="orderId" />
+		<result property="realName" 		column="realName" />
+		<result property="regId" 			column="regId" />
+		<result property="orderAmt" 		column="orderAmt" />
+		<result property="feeratio" 		column="feeratio" />
+		
+		<result property="monthInterest" 	column="monthInterest" />
+		<result property="gpsTrafficFee" 	column="gpsTrafficFee" />
+		<result property="orderItems" 		column="orderItems" />
+		<result property="serviceCharge"	column="serviceCharge" />
+		<result property="interestDiff" 	column="interestDiff" />
+		
+		<result property="feeTotal" 		column="feeTotal" />
+		<result property="applyTime" 		column="applyTime" />
+		<result property="merchantName" 	column="merchantName" />
+		
+	</resultMap>
+
+	<select id="selectMortgagecatList" parameterType="java.util.Map" resultMap="MortgagecarBeanResultMap">
+		SELECT
+			A.orderId,
+			B.realName,
+			A.regId,
+			A.orderAmt,
+			D.feeratio,
+			
+			A.monthInterest,
+			A.gpsTrafficFee,
+			A.orderItems,
+			<![CDATA[ 
+				CASE
+					WHEN D.FEERATIO < 0.01 THEN A.gpsTrafficFee / 2
+					ELSE A.orderAmt * 0.001 + A.gpsTrafficFee / 2
+				END AS serviceCharge,
+				CASE
+				WHEN (D.FEERATIO - 1)/100 < 0 THEN A.gpsTrafficFee / 2
+				ELSE A.orderAmt * (D.FEERATIO - 1)/100 + A.gpsTrafficFee / 2
+				END AS InterestDiff,
+				 A.orderAmt * (D.FEERATIO - 0.9)/100 + A.gpsTrafficFee AS feeTotal,
+			 ]]>
+		 
+		 F.APPLYTIME AS applyTime,
+		 C.MERCHANTSHORTNAME AS merchantName
+		FROM
+			inst_orderinfo A
+		LEFT JOIN inst_user B ON A.userId = B.id
+		LEFT JOIN inst_merchantinfo C ON A.MERCHANTNO = C.MERCHANTNO
+		LEFT JOIN inst_plan D ON A.planId = D.ID
+		LEFT JOIN cf_requestmoney F ON A.orderId = F.ORDERID
+		<![CDATA[ ORDER BY A.ORDERID ]]>
+	</select>
+	
+
+</mapper>

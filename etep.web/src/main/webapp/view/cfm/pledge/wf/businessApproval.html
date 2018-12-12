@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>门店项目信息维护</title>
+		<meta charset="UTF-8" />
+		<meta name="Author" content="" />
+		<meta name="Keywords" content="" />
+		<meta name="Description" content="" />
+
+		<!-- 基础CSS库 -->
+		<link rel="stylesheet" href="../../../../js/bootstrap/themes/default/bootstrap.css" />
+		<link rel="stylesheet" href="../../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+		<link rel="stylesheet" href="../../../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+		<link rel="stylesheet" href="../../../../css/jquery.select2.css" />
+		<link rel="stylesheet" href="../../../../css/jquery.select2-bootstrap.css" />
+		<link rel="stylesheet" href="../../../../js/viewer/viewer.css" />
+
+		<!-- 业务CSS库 -->
+		<link rel="stylesheet" href="../../../../css/common/base.css"/>
+		<link rel="stylesheet" href="../../../../css/common/scrollbar.css" />
+
+		<!-- 基础JS库 -->
+		<script src="../../../../js/common/package.js"></script>
+		<script src="../../../../js/common/url.js"></script>
+		<script src="../../../../js/common/json2.js"></script>
+		<script src="../../../../js/common/jquery-1.11.3.min.js"></script>
+		<script src="../../../../js/bootstrap/bootstrap.js"></script>
+		<script src="../../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+		<script src="../../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+		<script src="../../../../js/common/jquery.select2.js"></script>
+		<script src="../../../../js/common/jquery.form.js"></script>
+		<script src="../../../../js/viewer/viewer.js"></script>
+
+		<!-- 业务JS库 -->
+		<script src="../../../../js/common/base.js"></script>
+		<script src="../../../../js/common/datagrid2.js"></script>
+		<script src="../../../../js/common/formatter.js"></script>
+		<script src="../../../../js/common/wflow.js"></script>
+		<script src="../../../../js/each/cfm/pledge/wf/businessApproval.js"></script>
+
+		<!-- 页面样式 -->
+		<style type="text/css">
+			.container-fluid {
+				padding-top: 4px;
+			}
+			.text-right {
+				text-align: right;
+			}
+			.text-muted {
+				font-weight: bold;
+			}
+			.text-stress {
+				font-weight: bold;
+			}
+			.list-group-blank {
+				background-color: #f5f5f5;
+			}
+			th {
+				text-align: center;
+			}
+			td {
+				text-align: center;
+			}
+			.modal-form {
+				margin: 15px 0;
+			}
+			.float-left {
+				float: left;
+				margin-right: 8px;
+			}
+			.special-panel {
+				border-top-left-radius: 0 !important;
+			}
+			.nav-tabs {
+				border-bottom: 1px solid #fff;				
+			}
+			.alert {
+				padding: 10px;
+				margin-bottom: 2px;
+			}
+			h5 {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				-o-text-overflow: ellipsis;
+				-webkit-text-overflow: ellipsis;
+				-moz-text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+			.margin{
+			    margin-top:10px; 
+			}
+			.margin span{
+			    display:inline-block;
+			    width:100%;
+			}
+		</style>
+	</head>
+	<body>
+
+	<div class="container-fluid">
+	
+		<ul id="tab" class="nav nav-tabs" role="tablist">
+		  	<li role="presentation" class="active"><a href="#order-tab" role="tab" data-toggle="tab">订单信息</a></li>
+		  	<li role="presentation"><a href="#carInfo-tab" role="tab" data-toggle="tab">车辆资料信息</a></li>
+		  	<li role="presentation"><a href="#contract-tab" role="tab" data-toggle="tab">合同资料信息</a></li>
+		</ul>
+		<div class="tab-content">
+			<div role="tabpanel" class="tab-pane fade in active" id="order-tab">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<button id="btn-approve" type="button" class="btn btn-primary btn-sm">
+							<span class="glyphicon glyphicon-user"></span> 审核
+						</button>
+						<button id="btn-unassign" type="button"	class="btn btn-primary btn-sm">
+							<span class="glyphicon glyphicon-share-alt"></span> 取消签收
+						</button>
+					</div>
+					<form id="updateForm" class="form-horizontal">
+						<ul class="list-group">
+					    	<li class="list-group-item" style="border-bottom: 1px solid #fff;">
+								<div class="row">				
+									<div class="col-md-1 text-right"><span class="text-stress">机构名称</span></div>
+									<div class="col-md-2"><span id="merchName" class="text-muted"></span></div>
+									<div class="col-md-1 text-right"><span class="text-stress">业务类型</span></div>
+									<div class="col-md-2"><span id="groupName" class="text-muted"></span></div>
+									<div class="col-md-1 text-right"><span class="text-stress">姓名</span></div>
+									<div class="col-md-2"><span id="realName" class="text-muted"></span></div>
+									<div class="col-md-1 text-right"><span class="text-stress">手机号</span></div>
+									<div class="col-md-2"><span id="regId" class="text-muted"></span></div>
+								</div>
+							</li>
+							<li class="list-group-item" style="border-top: none;">
+								<div class="row">	
+									<div class="col-md-1 text-right"><span class="text-stress">车牌号</span></div>
+									<div class="col-md-2"><span id="plate" class="text-muted"></span></div>
+									<div class="col-md-1 text-right"><span class="text-stress">订单号</span></div>
+									<div class="col-md-2"><span id="orderId" class="text-muted"></span></div>
+									<div class="col-md-1 text-right"><span class="text-stress">融资总价</span></div>
+									<div class="col-md-2"><span id="applyAmt" class="text-muted"></span></div>
+								</div>
+							</li>
+							<li class="list-group-item" style="border-top: none;">
+								<div class="row">
+									<div class="col-md-1 text-right"><span class="text-stress">产品方案</span></div>
+									<div class="col-md-2"><span id="planFullName" class="text-muted"></span><input type="hidden" name="type" id="type"></div>
+									<div class="col-md-1 text-right"><span class="text-stress">订单状态</span></div>
+									<div class="col-md-2"><span id="riskStatus" class="text-muted"></span></div>
+								</div>
+							</li>
+							<li class="list-group-item list-group-blank"></li>							
+						</ul>					    	
+						<table class="table table-bordered">
+					    	<tr>	
+					    		<td><span class="text-muted">首付款合计</span></td>					    		
+						    	<td><span class="text-muted">首付(元)</span></td>						    	
+						    	<td><span class="text-muted">保证金(元)</span></td>
+						    	<td><span class="text-muted">服务费(元)</span></td>
+						    	<td><span class="text-muted">上收息(元)</span></td>							    	
+						    	<td><span class="text-muted">期数(月)</span></td>
+						    	<td><span class="text-muted">月供(元)</span></td>
+				    		</tr>
+				    		<tr>						    		
+						    	<td><span id="preAmount" class="text-muted"></span></td>
+						    	<td><span id="downPayment" class="text-muted"></span></td>						    	
+						    	<td><span id="margin" class="text-muted"></span></td>
+						    	<td><span id="serviceFee" class="text-muted"></span></td>
+						    	<td><span id="feeAmount" class="text-muted"></span></td>							    	
+						    	<td><span id="orderItems" class="text-muted"></span></td>
+						    	<td><span id="monthInterest" class="text-muted"></span></td>
+					    	</tr>
+						</table>
+					</form>
+					<table id="datagrid" class="table table-hover">
+						<thead>
+							<tr class="warning">
+								<th field="ck" hidden="true"></th>
+								<th field="rn" align="text-center" class="text-center">序号</th>
+								<th field="id" idField="true" hidden="true">ID</th>
+								<th field="procCtaskname" align="text-center" class="text-center">任务名称</th>
+								<th field="procTaskAssignee" align="text-center" class="text-center">处理人</th>
+								<th field="procLicensor" align="text-center" class="text-center">委托人</th>
+								<th field="procTaskCommittime" align="text-center" class="text-center">任务到达时间</th>
+								<th field="procTaskEndtime" align="text-center" class="text-center">任务受理时间</th>
+								<th field="procTaskEndtime" align="text-center" class="text-center">任务完成时间</th>
+								<th field="procTaskApprStatus" align="text-center" class="text-center">审批结论</th>
+								<th field="procTaskApprOpinion" align="text-center" class="text-center" formatter="Formatter.opinion(val)">审批意见</th>
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
+				</div>
+			</div>
+			
+			<div role="tabpanel" class="tab-pane fade" id="carInfo-tab">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+				    	<!-- 新增字段 -->
+				    	<ul class="list-group" style='border-bottom:1px solid #ccc;'>
+					    	<li class="list-group-item" style="border-bottom: 1px solid #fff;">
+								<div class="row">				
+									<div class="col-md-1 text-right"><span class="text-stress">项目名称</span></div>
+									<div class="col-md-2"><span class="text-muted projectName"></span></div>
+									<div class="col-md-1 text-right"><span class="text-stress">担保公司</span></div>
+									<div class="col-md-3"><span class="text-muted guarantee"></span></div>
+									<div class="col-md-1 text-right"><span class="text-stress">担保公司法人</span></div>
+									<div class="col-md-2"><span class="text-muted guaranteeName"></span></div>
+								</div>
+							</li>
+						</ul>
+				    	<button id="btn-updateProjectName" type="button" class="btn btn-primary btn-sm hidden">
+							<span class="glyphicon glyphicon-pencil"></span> 修改
+						</button>	
+				    	<div class="btn-group">
+						  	<button id="btn-upload" type="button" class="btn btn-warning btn-sm dropdown-toggle" data-toggle="dropdown">
+						  		<span class="fa fa-folder-open-o"></span>上传车辆资料<span class="caret"></span>							    	
+						  	</button>
+						  	<ul class="dropdown-menu" role="menu">	
+						  		<li><span class="text-stress" style="margin-left: 8px;">车辆照片（不带车牌）</span></li>							  		
+						    	<li><a id="btn-uploadTypezero" href="#">左前</a></li>						    	
+						    	<li><a id="btn-uploadTypeTwo" href="#">右后</a></li>
+						    	<li><a id="btn-uploadTypeThree" href="#">公里数</a></li>
+						    	<li><a id="btn-uploadTypeFour" href="#">中控</a></li>
+						    	<li><a id="btn-uploadTypeFive" href="#">前排</a></li>
+						    	<li><a id="btn-uploadTypeSix" href="#">后排</a></li>
+						    	<li><a id="btn-uploadTypeTwentyEight" href="#">logo图片</a></li>
+						  	</ul>
+						</div>						
+				  	</div>
+					<table id="viewerOne" class="table table-bordered">
+					    <tbody>
+					    	<tr>		
+					    		<td style="width: 15%; vertical-align: middle;" rowspan="6"><span class="text-stress">车辆照片（不带车牌）</span></td>				    		
+						    	<td style="width: 15%; vertical-align: middle;"><span style="color: red;">*</span><span class="text-stress">左前</span></td>						    	
+						    	<td id="td-0" style="width: 70%; vertical-align: middle;"><div></div></td>
+				    		</tr>
+				    		<tr>	
+						    	<td style="vertical-align: middle;"><span style="color: red;">*</span><span class="text-stress">右后</span></td>						    	
+						    	<td id="td-2" style="vertical-align: middle;"></td>
+				    		</tr>
+				    		<tr>	
+						    	<td style="vertical-align: middle;"><span style="color: red;">*</span><span class="text-stress">公里数</span></td>						    	
+						    	<td id="td-3" style="vertical-align: middle;"></td>
+				    		</tr>
+				    		<tr>	
+						    	<td style="vertical-align: middle;"><span style="color: red;">*</span><span class="text-stress">中控</span></td>						    	
+						    	<td id="td-4" style="vertical-align: middle;"></td>
+				    		</tr>
+				    		<tr>			
+						    	<td style="vertical-align: middle;"><span style="color: red;">*</span><span class="text-stress">前排</span></td>						    	
+						    	<td id="td-5" style="vertical-align: middle;"></td>
+				    		</tr>
+				    		<tr>			
+						    	<td style="vertical-align: middle;"><span style="color: red;">*</span><span class="text-stress">后排</span></td>						    	
+						    	<td id="td-6" style="vertical-align: middle;"></td>
+				    		</tr>
+				    		<tr>			
+						    	<td style="vertical-align: middle;"><span style="color: red;">*</span><span class="text-stress">logo图片</span></td>						    	
+						    	<td id="td-28" style="vertical-align: middle;"></td>
+				    		</tr>
+					    </tbody>
+					</table>
+				</div>			
+			</div>
+			
+			<div role="tabpanel" class="tab-pane fade" id="contract-tab">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+				    	<!-- 新增字段 -->
+				    	<ul class="list-group" style='border-bottom:1px solid #ccc;'>
+					    	<li class="list-group-item" style="border-bottom: 1px solid #fff;">
+								<div class="row">				
+									<div class="col-md-1 text-right"><span class="text-stress">项目名称</span></div>
+									<div class="col-md-2"><span class="text-muted projectName"></span></div>
+									<div class="col-md-1 text-right"><span class="text-stress">担保公司</span></div>
+									<div class="col-md-3"><span id="realName" class="text-muted guarantee"></span></div>
+									<div class="col-md-1 text-right"><span class="text-stress">担保公司法人</span></div>
+									<div class="col-md-2"><span class="text-muted guaranteeName"></span></div>
+								</div>
+							</li>
+							<li class="list-group-item" style="border-bottom: 1px solid #fff;">
+								<div class="row">	
+									<div class="col-md-1 text-right"><span class="text-stress"><span style="color: red;">*</span>是否有贷款</span></div>
+									<div class="col-md-2">
+										<select id="isLoan" name="isLoan" class="form-control easyui-validatebox" required="required">
+											<option value="0">无</option>
+											<option value="1">有</option>
+										</select>
+									</div>
+								</div>
+							</li>	
+						</ul>
+				    	<button id="btn-updateProjectName" type="button" class="btn btn-primary btn-sm hidden">
+							<span class="glyphicon glyphicon-pencil"></span> 修改
+						</button>	
+				    	<div class="btn-group">
+						  	<button id="btn-upload" type="button" class="btn btn-warning btn-sm dropdown-toggle" data-toggle="dropdown">
+						  		<span class="fa fa-folder-open-o"></span>上传合同资料 <span class="caret"></span>							    	
+						  	</button>
+						  	<ul class="dropdown-menu" role="menu">	
+						  		<li><span class="text-stress" style="margin-left: 8px;">个人资料</span></li>							  		
+						    	<li><a id="btn-uploadTypeSeven" href="#">身份证(正反面)</a></li>
+						    	<li><a id="btn-uploadTypeEight" href="#">其他</a></li>
+						    	<li><span class="text-stress" style="margin-left: 8px;">车辆手续资料</span></li>							  		
+						    	<li><a id="btn-uploadTypeNine" href="#">车钥匙 </a></li>
+						    	<li><a id="btn-uploadTypeTen" href="#">手持合同照片</a></li>
+						    	<li><a id="btn-uploadTypeEleven" href="#">合同 </a></li>
+						    	<li><a id="btn-uploadTypeTwelve" href="#">指标转让协议</a></li>
+						    	<li><a id="btn-uploadTypeThirteen" href="#">其他 </a></li>
+						    	<li class="old-li"><span class="text-stress" style="margin-left: 8px;">二手车</span></li>	
+						    	<li class="old-li"><a id="btn-uploadTypeFourteen" href="#">行驶证</a></li>
+						    	<li class="old-li"><a id="btn-uploadTypeFifteen" href="#">左前照片（带车牌号）</a></li>
+						    	<li class="old-li"><a id="btn-uploadTypeSixteen" href="#">车档</a></li>
+						    	<li class="old-li"><a id="btn-uploadTypeSeventeen" href="#">车铭牌</a></li>
+						    	<li class="old-li"><a id="btn-uploadTypeEighteen" href="#">玻璃码</a></li>
+						    	<li class="old-li"><a id="btn-uploadTypeNineteen" href="#">登记证</a></li>
+						    	<li class="old-li"><a id="btn-uploadTypeTwenty" href="#">商险</a></li>
+						    	<li class="old-li"><a id="btn-uploadTypeTwentyOne" href="#">交强险</a></li>
+						    	<li class="old-li"><a id="btn-uploadTypeTwentyTwo" href="#">其他</a></li>
+						    	<li class="new-li"><span class="text-stress" style="margin-left: 8px;">新车</span></li>	
+						    	<li class="new-li"><a id="btn-uploadTypeTwentyThree" href="#">车辆合格证</a></li>
+						    	<li class="new-li"><a id="btn-uploadTypeTwentyFour" href="#">左前照片</a></li>
+						    	<li class="new-li"><a id="btn-uploadTypeTwentyFive" href="#">车铭牌</a></li>
+						    	<li class="new-li"><a id="btn-uploadTypeTwentySix" href="#">玻璃码</a></li>
+						    	<li class="new-li"><a id="btn-uploadTypeTwentySeven" href="#">其他</a></li>
+						  	</ul>
+						</div>						
+				  	</div>
+					<table id="viewerTwo" class="table table-bordered">
+					    <tbody>
+					    	<tr>		
+					    		<td style="width: 15%; vertical-align: middle;" rowspan="2"><span class="text-stress">个人资料</span></td>				    		
+						    	<td style="width: 15%; vertical-align: middle;"><span style="color: red;">*</span><span class="text-stress">身份证(正反面)</span></td>						    	
+						    	<td id="td-7" style="width: 70%; vertical-align: middle;"><div></div></td>
+				    		</tr>
+				    		<tr>	
+						    	<td style="vertical-align: middle;"><span class="text-stress">其他</span></td>						    	
+						    	<td id="td-8" style="vertical-align: middle;"></td>
+				    		</tr>
+				    		<tr>	
+				    			<td style="width: 15%; vertical-align: middle;" rowspan="5"><span class="text-stress">车辆手续资料</span></td>				    				
+						    	<td style="vertical-align: middle;"><span style="color: red;">*</span><span class="text-stress">车钥匙</span></td>						    	
+						    	<td id="td-9" style="vertical-align: middle;"></td>
+				    		</tr>
+				    		<tr>			
+						    	<td style="vertical-align: middle;"><span style="color: red;">*</span><span class="text-stress">手持合同照片</span></td>						    	
+						    	<td id="td-10" style="vertical-align: middle;"></td>
+				    		</tr>
+				    		<tr>		
+						    	<td style="vertical-align: middle;"><span style="color: red;">*</span><span class="text-stress">合同</span></td>						    	
+						    	<td id="td-11" style="vertical-align: middle;"></td>
+				    		</tr>				    		
+				    		<tr>		
+						    	<td style="vertical-align: middle;"><span class="text-stress">指标转让协议</span></td>						    	
+						    	<td id="td-12" style="vertical-align: middle;"></td>
+				    		</tr>
+				    		<tr>		
+						    	<td style="vertical-align: middle;"><span class="text-stress">其他</span></td>						    	
+						    	<td id="td-13" style="vertical-align: middle;"></td>
+				    		</tr>
+				    		<tr class="old-tr">		
+				    			<td style="width: 15%; vertical-align: middle;" rowspan="9"><span class="text-stress">二手车</span></td>		
+						    	<td style="vertical-align: middle;"><span style="color: red;">*</span><span class="text-stress">行驶证</span></td>						    	
+						    	<td id="td-14" style="vertical-align: middle;"></td>
+				    		</tr>
+				    		<tr class="old-tr">	
+						    	<td style="vertical-align: middle;"><span style="color: red;">*</span><span class="text-stress">左前照片（带车牌号）</span></td>						    	
+						    	<td id="td-15" style="vertical-align: middle;"></td>
+				    		</tr>
+				    		<tr class="old-tr">
+						    	<td style="vertical-align: middle;"><span style="color: red;">*</span><span class="text-stress">车档</span></td>						    	
+						    	<td id="td-16" style="vertical-align: middle;"></td>
+				    		</tr>
+				    		<tr class="old-tr">
+						    	<td style="vertical-align: middle;"><span style="color: red;">*</span><span class="text-stress">车铭牌</span></td>						    	
+						    	<td id="td-17" style="vertical-align: middle;"></td>
+				    		</tr>
+				    		<tr class="old-tr">
+						    	<td style="vertical-align: middle;"><span style="color: red;">*</span><span class="text-stress">玻璃码</span></td>						    	
+						    	<td id="td-18" style="vertical-align: middle;"></td>
+				    		</tr>
+				    		<tr class="old-tr">
+						    	<td style="vertical-align: middle;"><span class="text-stress">登记证</span></td>						    	
+						    	<td id="td-19" style="vertical-align: middle;"></td>
+				    		</tr>
+				    		<tr class="old-tr">
+						    	<td style="vertical-align: middle;"><span class="text-stress">商险</span></td>						    	
+						    	<td id="td-20" style="vertical-align: middle;"></td>
+				    		</tr>
+				    		<tr class="old-tr">
+						    	<td style="vertical-align: middle;"><span class="text-stress">交强险</span></td>						    	
+						    	<td id="td-21" style="vertical-align: middle;"></td>
+				    		</tr>
+				    		<tr class="old-tr">
+						    	<td style="vertical-align: middle;"><span class="text-stress">其他</span></td>						    	
+						    	<td id="td-22" style="vertical-align: middle;"></td>
+				    		</tr>
+				    		<tr class="new-tr">
+					    		<td style="width: 15%; vertical-align: middle;" rowspan="5"><span class="text-stress">新车</span></td>		
+						    	<td style="vertical-align: middle;"><span style="color: red;">*</span><span class="text-stress">车辆合格证</span></td>						    	
+						    	<td id="td-23" style="vertical-align: middle;"></td>
+				    		</tr>
+				    		<tr class="new-tr">
+						    	<td style="vertical-align: middle;"><span style="color: red;">*</span><span class="text-stress">左前照片</span></td>						    	
+						    	<td id="td-24" style="vertical-align: middle;"></td>
+				    		</tr>
+				    		<tr class="new-tr">
+						    	<td style="vertical-align: middle;"><span style="color: red;">*</span><span class="text-stress">车铭牌</span></td>						    	
+						    	<td id="td-25" style="vertical-align: middle;"></td>
+				    		</tr>
+				    		<tr class="new-tr">
+						    	<td style="vertical-align: middle;"><span style="color: red;">*</span><span class="text-stress">玻璃码</span></td>						    	
+						    	<td id="td-26" style="vertical-align: middle;"></td>
+				    		</tr>
+				    		<tr class="new-tr">
+						    	<td style="vertical-align: middle;"><span class="text-stress">其他</span></td>						    	
+						    	<td id="td-27" style="vertical-align: middle;"></td>
+				    		</tr>
+					    </tbody>
+					</table>
+				</div>			
+			</div>
+			
+		</div>
+	</div>
+	
+	<form id="uploadForm">
+		<input id="file" class="hidden" type="file" name="qqfile" multiple />
+	</form>
+	<form id="uploadForm2">
+		<input id="file2" class="hidden" type="file" name="qqfile" multiple />
+	</form>
+	<div id="approve-win" class="modal fade" role="dialog" aria-labelledby="approve-win-label" aria-describedby="">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="approve-win-label">审批</h5>
+					</div>
+					<div class="modal-form">
+						<form id="approveForm" class="form-horizontal">
+							<div class="form-group">
+								<label class="col-sm-3 control-label">审批结果</label>
+								<div class="col-sm-4">
+									<select class="form-control" name="approveStatus">
+										<option value="1" selected>通过</option>
+										<!-- <option value="0">拒绝</option> -->
+									</select>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-3 control-label">审批意见</label>
+								<div class="col-sm-8">
+									<textarea name="approveOpinion" class="form-control" rows="3" placeholder="请输入审批意见"></textarea>
+								</div>
+							</div>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button id="btn-approve-save" type="button"	class="btn btn-success btn-sm">提交</button>
+						<button id="btn-approve-close" type="button" class="btn btn-default btn-sm">关闭</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

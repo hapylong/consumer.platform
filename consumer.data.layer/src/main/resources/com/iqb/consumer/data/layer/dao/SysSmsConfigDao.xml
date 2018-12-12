@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iqb.consumer.data.layer.dao.SysSmsConfigDao">
+
+	<sql id="table">inst_smsconfig</sql>
+
+	<resultMap type="com.iqb.consumer.data.layer.bean.conf.SysSmsConfig" id="sysSmsConfig">
+		<result column="id" property="id" />
+		<result column="wechatNo" property="wechatNo" />
+		<result column="wechatRemark" property="wechatRemark" />
+		<result column="smsUrl" property="smsUrl" />
+		<result column="smsNameInfo" property="smsName" />
+		<result column="smsPswdInfo" property="smsPswd" />
+		<result column="smsNeedStatusInfo" property="smsNeedStatus" />
+		<result column="version" property="version" />
+		<result column="createTime" property="createTime" />
+		<result column="updateTime" property="updateTime" />
+	</resultMap>
+	
+	<sql id="cols">
+		wechatNo,wechatRemark,smsUrl,smsNameInfo,smsPswdInfo,smsNeedStatusInfo
+	</sql>
+
+	<!-- 查询商户的短信渠道 -->
+	<select id="getSmsChannelByWechatNo" parameterType="java.lang.String" resultMap="sysSmsConfig">
+		SELECT <include refid="cols"/> FROM <include refid="table"/> WHERE wechatNo = #{wechatNo};
+	</select>
+
+</mapper>

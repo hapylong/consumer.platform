@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>车商管理</title>
+        <meta charset="UTF-8" />
+        <meta name="Author" content="" />
+        <meta name="Keywords" content="" />
+        <meta name="Description" content="" />
+        
+        <!-- 基础CSS库 -->
+        <link rel="stylesheet" href="../../js/bootstrap/themes/default/bootstrap.css" />
+        <link rel="stylesheet" href="../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+        <link rel="stylesheet" href="../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+        <link rel="stylesheet" href="../../css/jquery.select2.css" />
+        <link rel="stylesheet" href="../../css/jquery.select2-bootstrap.css" />
+        
+        <!-- 业务CSS库 -->
+        <link rel="stylesheet" href="../../css/common/base.css" />
+        <link rel="stylesheet" href="../../css/common/scrollbar.css" />
+        
+        <!-- 基础JS库 -->
+        <script src="../../js/common/package.js"></script>
+        <script src="../../js/common/url.js"></script>
+        <script src="../../js/common/json2.js"></script> 
+        <script src="../../js/common/jquery-1.11.3.min.js"></script>     
+        <script src="../../js/bootstrap/bootstrap.js"></script>
+        <script src="../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+        <script src="../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+        <script src="../../js/common/jquery.select2.js"></script>
+        
+        <!-- 业务JS库 -->
+        <script src="../../js/common/base.js"></script>
+        <script src="../../js/common/datagrid2.js"></script>
+        <script src="../../js/common/formatter.js"></script>     
+        <script src="../../js/each/cardealer/cardealer.js"></script>
+        
+        <!-- 页面样式 -->
+        <style type="text/css">
+            .container-fluid {
+                padding-top: 4px;
+            }
+            .modal-form {
+                margin: 15px 0;
+            }
+        </style>
+</head>
+    <body>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">查询栏</h3>
+                    </div>
+                    <div class="panel-body">
+                        <form id="searchForm" class="form-horizontal">
+                            <div class="form-group">
+                                <label class="control-label col-lg-1 col-md-1 col-sm-1">车商名称</label>
+                                <div class="col-lg-2 col-md-2 col-sm-2">
+                                    <input name="sourceCarName" type="text" class="form-control input-sm" placeholder="请输入车商名称">
+                                </div>
+                                <label class="control-label col-lg-1 col-md-1 col-sm-1">联系电话</label>
+                                <div class="col-lg-2 col-md-2 col-sm-2">
+                                    <input name="contactMethod" type="text" class="form-control input-sm" placeholder="请输入联系电话">
+                                </div>
+                                <label class="control-label col-lg-1 col-md-1 col-sm-1">是否黑名单</label>
+	                            <div class="col-lg-2 col-md-2 col-sm-2">
+	                                <select id="status" class="form-control" name="status">
+	                                    <option value="">请选择</option>
+	                                    <option value="1">否</option>
+	                                    <option value="2">是</option>
+	                                </select>
+	                           </div>
+	                           <div class="col-lg-3 col-md-3 col-sm-3">
+	                                <button id="btn-search" type="button" class="btn btn-default btn-sm">查询</button>
+	                                <button id="btn-reset" type="button" class="btn btn-default btn-sm">重置</button>
+	                           </div>     
+                        </form>
+                    </div>
+                </div>
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">信息栏</h3>
+                    </div>
+                    <div class="panel-body">
+                        <form id="listForm">
+                            <button id="add-black" type="button" class="btn btn-primary btn-sm">加入黑名单</button><!-- id="btn-insertGo" -->
+                            <button id="cancel-black" type="button" class="btn btn-warning btn-sm">解除黑名单</button>
+                            <button id="update-info" type="button" class="btn btn-warning btn-sm">修改</button>
+                        </form>
+                    </div>
+                    <table id="datagrid" class="table table-bordered table-hover" style="text-align: center;">
+                        <thead >
+                            <tr>
+                                <th field="ck"></th>
+                                <th field="rn" style="text-align: center;">序号</th>
+                                <th field="id" idField="true" hidden="true" >ID</th>
+                                <th field="orderId" idField="true" hidden="true" >orderId</th>
+                               <!--  <th field="custChannelsName" style="text-align: center;">客户渠道名称</th> -->
+                                <th field="sourceCarName" style="text-align: center;">名称</th>
+                                <!-- <th field="sourceCar" style="text-align: center;">车来源</th> -->
+                                <th field="contactMethod" style="text-align: center;">联系方式</th>
+                                <th field="address" style="text-align: center;">地址</th>
+                                <th field="remark" style="text-align: center;">备注</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                    <div class="panel-footer">
+                        <div id="paginator"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="cardealer-update" class="modal fade" role="dialog" aria-labelledby="cardealer-update-label" aria-describedby="">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="cardealer-update-label">修改车商信息</h5>
+                    </div>
+                    <div class="modal-form">
+                        <div id="cardealer-update-form" class="form-horizontal">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">车来源名称</label>
+                                <div class="col-sm-8">
+                                    <input id="sourceCarName" type="text" class="form-control input-sm easyui-validatebox" placeholder="重录车来源名称" required="required" />
+                                </div>
+                            </div> <div class="form-group">
+                                <label class="col-sm-3 control-label">地址</label>
+                                <div class="col-sm-8">
+                                    <input id="address" type="text" class="form-control input-sm easyui-validatebox" placeholder="重录名地址" required="required" />
+                                </div>
+                            </div> 
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">联系方式</label>
+                                <div class="col-sm-8">
+                                    <input id="contactMethod" type="text" class="form-control input-sm easyui-validatebox" placeholder="重录联系方式" required="required" />
+                                </div>
+                            </div> 
+
+                        </div>                         
+                    </div>                  
+                    <div class="modal-footer">
+                        <button id="btn-cardealer-update-label" type="button" class="btn btn-success btn-sm">保存</button>
+                        <button id="btn-cardealer-update-label-close" type="button" class="btn btn-default btn-sm">关闭</button>             
+                    </div>
+                </div>
+            </div>
+        </div>
+
+</body>
+</html>
+
+
+

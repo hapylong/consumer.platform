@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>申请</title>
+        <meta charset="UTF-8" />
+        <meta name="Author" content="" />
+        <meta name="Keywords" content="" />
+        <meta name="Description" content="" />
+        
+        <!-- 样式库 -->
+        <link rel="stylesheet" href="../../js/ztree/css/zTreeStyle/zTreeStyle.css" />
+        <link rel="stylesheet" href="../../js/bootstrap/themes/default/bootstrap.css" />
+        <link rel="stylesheet" href="../../css/font-awesome/css/font-awesome.min.css" />
+        <link rel="stylesheet" href="../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+        <link rel="stylesheet" href="../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+        <link rel="stylesheet" href="../../css/jquery.select2.css" />
+        <link rel="stylesheet" href="../../css/jquery.select2-bootstrap.css" />
+        <link rel="stylesheet" href="../../css/jquery.datetimepicker.css" />
+        <link rel="stylesheet" href="../../js/bootstrap/themes/default/jquery.mCustomScrollbar.css" />
+        <link rel="stylesheet" href="../../js/viewer/viewer.css" />
+        <link rel="stylesheet" href="../../js/prettyphoto/css/prettyPhoto.css" />
+        
+        <!-- 插件库 -->
+        <script src="../../js/common/package.js"></script>
+        <script src="../../js/common/url.js"></script>
+        <script src="../../js/common/json2.js"></script> 
+        <script src="../../js/common/jquery-1.11.3.min.js"></script>     
+        <script src="../../js/bootstrap/bootstrap.js"></script>
+        <script src="../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+        <script src="../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+        <script src="../../js/ztree/js/jquery.ztree.all.min.js"></script>
+        <script src="../../js/common/jquery.select2.js"></script>
+        <script src="../../js/viewer/viewer.js"></script>
+        <script src="../../js/common/jquery.form.js"></script>
+        <script src="../../js/common/jquery.datetimepicker.js"></script>
+        <script src="../../js/bootstrap/plugins/jquery.mCustomScrollbar.js"></script>
+        <script src="../../js/prettyphoto/js/jquery.prettyPhoto.js"></script> 
+           
+        
+        <!-- 业务库 -->
+        <script src="../../js/common/base.js"></script>
+        <script src="../../js/common/datagrid2.js"></script>
+        <script src="../../js/common/tree.js"></script>
+        <script src="../../js/common/formatter.js"></script>   
+        <script src="../../js/common/wflow.js"></script>  
+        <script src="../../js/each/ownerLoan/orderApply.js"></script>
+        <script src="../../js/each/cfm/merch/merchOwerLoan.js"></script>
+        
+        
+        <!-- 页面样式 -->
+        <style type="text/css">
+            body {
+                font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif !important;
+                background:#eee url("../../img/back.png") repeat;
+            }
+            .container-fluid {
+                padding-top: 5px;
+            }
+            .left-part {
+                height:800px;
+            }
+            .modal-form {
+                margin:5px;
+                height:600px;
+            }
+            .text-left {
+                text-align: left;
+            }
+            .text-center {
+                text-align: center;
+            }
+            .text-right {
+                text-align: right;
+            }
+            .text-muted {
+                font-weight: bold;
+            }
+            .text-stress {
+                font-weight: bold;
+            }
+            .item-title {
+                background-color: #f5f5f5;
+            }
+            .float-left {
+                float: left;
+                margin-left: 5px;
+            }
+        </style>
+        
+    </head>
+    <body>
+        <div class="container-fluid">
+            <div class="row">               
+                <div class="col-md-12">
+				<div class="panel-heading">
+					<button id="btn-save" type="button"	class="btn btn-primary btn-sm">
+						<span class="glyphicon glyphicon-user">保存</span> 
+					</button>
+			    </div>
+				<div class="panel panel-info">
+				    <form id="updateForm">
+                    		<ul class="list-group">
+                    		    <li class="list-group-item list-group-blank">申请人信息</li>
+                    		    <li class="list-group-item" style="border: none;">
+							<div class="row">				
+								<div class="col-md-1 text-right"><span class="text-stress">机构名称</span></div>
+								<div class="col-md-2">
+								    <input id="merchNames" type="text" readonly value="全部商户" name="merchNames" class="form-control merch" onclick="showMenu(); return false;"/>
+								</div>	
+								<div class="col-md-1 text-right"><span class="text-stress">业务类型</span></div>
+								<div class="col-md-2">
+									<select class='form-control input-sm' name='bizType' id='bizType'>
+									  <option value='2400'>车主贷</option>
+									</select>
+								</div>	
+								<div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">姓名</span></div>
+								<div class="col-md-2"><input id="realName" name="realName" type="text" class="form-control input-sm easyui-validatebox" placeholder="姓名"  data-options="required:true, validType:['name','minLength[2]']"/></div>	
+								<div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">手机号</span></div>
+								<div class="col-md-2"><input id="regId" name="regId" type="text" class="form-control input-sm easyui-validatebox" placeholder="手机号"  data-options="required:true, validType:['mobilePhone']"/></div>	
+							</div>
+				         </li>
+				         <li class="list-group-item" style="border: none;">
+							<div class="row">				
+								<div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">证件号码</span></div>
+								<div class="col-md-2"><input id="idNo" name="idNo" type="text" class="form-control input-sm easyui-validatebox" placeholder="证件号码"  data-options="required:true, validType:['idCard']"/></div>	
+								<div class="col-md-1 text-right"><span class="text-stress">性别</span></div>
+								<div class="col-md-2"><span id="sex" class="text-muted"></span></div>
+								<div class="col-md-1 text-right"><span class="text-stress">年龄</span></div>
+								<div class="col-md-2"><span id="age" class="text-muted"></span></div>	
+							</div>
+				         </li>
+				         <li class="list-group-item" style="border: none;">
+							<div class="row">				
+								<div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">申请金额</span></div>
+								<div class="col-md-2"><input id="applyAmt" name="applyAmt" type="text" class="form-control input-sm easyui-validatebox" placeholder="申请金额"  data-options="required:true, validType:['formatterMoney']"/></div>
+								<div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">期限（月）</span></div>
+								<div class="col-md-2"><input id="applyItems" name="applyItems" type="text" class="form-control input-sm easyui-validatebox" placeholder="期限"  data-options="required:true, validType:['int']"/></div>	
+							</div>
+				         </li>
+				         <li class="list-group-item" style="border: none;">
+							<div class="row">				
+								<div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">居住地</span></div>
+								<div class="col-md-5"><input id="address" name="address" type="text" class="form-control input-sm easyui-validatebox" placeholder="居住地"  data-options="required:true, validType:['maxLength[30]']"/></div>
+								<div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">从事工作</span></div>
+								<div class="col-md-5"><input id="job" name="job" type="text" class="form-control input-sm easyui-validatebox" placeholder="从事工作"  data-options="required:true, validType:['maxLength[20]']"/></div>	
+							</div>
+				         </li>
+				         <li class="list-group-item" style="border: none;">
+							<div class="row">				
+								<div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">开户行</span></div>
+								<div class="col-md-5"><input id="bankName" name="bankName" type="text" class="form-control input-sm easyui-validatebox" placeholder="开户行"  data-options="required:true, validType:['maxLength[20]']"/></div>
+								<div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">账号</span></div>
+								<div class="col-md-2"><input id="bankNo" name="bankNo" type="text" class="form-control input-sm easyui-validatebox" placeholder="账号"  data-options="required:true, validType:['bankCard']"/></div>	
+							    <!-- <div class="col-md-2"><input type='hidden' id='authFlag'><button id="btn-auth" type="button" class="btn btn-primary btn-sm">鉴权</button></div> -->
+							</div>
+				         </li>
+				         <li class="list-group-item" style="border: none;">
+							<div class="row">				
+								<div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">姓名1</span></div>
+								<div class="col-md-2"><input id="userName1" name="userName1" type="text" class="form-control input-sm easyui-validatebox" placeholder="姓名"  data-options="required:true, validType:['name','minLength[2]']"/></div>	
+								<div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">手机号1</span></div>
+								<div class="col-md-2"><input id="mobile1" name="mobile1" type="text" class="form-control input-sm easyui-validatebox" placeholder="手机号"  data-options="required:true, validType:['mobilePhone']"/></div>
+							    <div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">与借款人关系1</span></div>
+								<div class="col-md-2"><select class='form-control input-sm easyui-validatebox'  name='relation1' id='relation1' required='required' style='width:100%'></select></div>
+							</div>
+				         </li>
+				         <li class="list-group-item" style="border: none;">
+							<div class="row">				
+								<div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">姓名2</span></div>
+								<div class="col-md-2"><input id="userName2" name="userName2" type="text" class="form-control input-sm easyui-validatebox" placeholder="姓名"  data-options="required:true, validType:['name','minLength[2]']"/></div>	
+								<div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">手机号2</span></div>
+								<div class="col-md-2"><input id="mobile2" name="mobile2" type="text" class="form-control input-sm easyui-validatebox" placeholder="手机号"  data-options="required:true, validType:['mobilePhone']"/></div>
+							    <div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">与借款人关系2</span></div>
+								<div class="col-md-2"><select class='form-control input-sm easyui-validatebox'  name='relation2' id='relation2' required='required' style='width:100%'></select></div>
+							</div>
+				         </li>
+				         <li class="list-group-item" style="border: none;">
+							<div class="row">				
+								<div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">姓名3</span></div>
+								<div class="col-md-2"><input id="userName3" name="userName3" type="text" class="form-control input-sm easyui-validatebox" placeholder="姓名"  data-options="required:true, validType:['name','minLength[2]']"/></div>	
+								<div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">手机号3</span></div>
+								<div class="col-md-2"><input id="mobile3" name="mobile3" type="text" class="form-control input-sm easyui-validatebox" placeholder="手机号"  data-options="required:true, validType:['mobilePhone']"/></div>
+							    <div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">与借款人关系3</span></div>
+								<div class="col-md-2"><select class='form-control input-sm easyui-validatebox'  name='relation3' id='relation3' required='required' style='width:100%'></select></div>
+							</div>
+				         </li>
+				         <li class="list-group-item" style="border: none;">
+							<div class="row">				
+								<div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">姓名4</span></div>
+								<div class="col-md-2"><input id="userName4" name="userName4" type="text" class="form-control input-sm easyui-validatebox" placeholder="姓名"  data-options="required:true, validType:['name','minLength[2]']"/></div>	
+								<div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">手机号4</span></div>
+								<div class="col-md-2"><input id="mobile4" name="mobile4" type="text" class="form-control input-sm easyui-validatebox" placeholder="手机号"  data-options="required:true, validType:['mobilePhone']"/></div>
+							    <div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">与借款人关系4</span></div>
+								<div class="col-md-2"><select class='form-control input-sm easyui-validatebox'  name='relation4' id='relation4' required='required' style='width:100%'></select></div>
+							</div>
+				         </li>
+				         <li class="list-group-item list-group-blank">车辆信息</li>
+				         <li class="list-group-item" style="border: none;">
+							<div class="row">				
+								<div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">车牌号</span></div>
+								<div class="col-md-2"><input id="plate" name="plate" type="text" class="form-control input-sm easyui-validatebox" placeholder="车牌号"  data-options="required:true, validType:['maxLength[20]']"/></div>	
+								<div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">车龄（年）</span></div>
+								<div class="col-md-2"><input id="carAge" name="carAge" type="text" class="form-control input-sm easyui-validatebox" placeholder="车龄"  data-options="required:true, validType:['intz']"/></div>
+							    <div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">车辆品牌</span></div>
+								<div class="col-md-2"><input id="carbrand" name="carbrand" type="text" class="form-control input-sm easyui-validatebox" placeholder="车辆品牌"  data-options="required:true, validType:['maxLength[20]']"/></div>
+								<div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">车辆型号</span></div>
+								<div class="col-md-2"><input id="carDetail" name="carDetail" type="text" class="form-control input-sm easyui-validatebox" placeholder="车辆型号"  data-options="required:true, validType:['maxLength[20]']"/></div>
+							</div>
+				         </li>
+                    	</ul>
+                    	</form>	
+						<ul class="list-group">
+				    		<li class="list-group-item" style="border-bottom: 1px solid #fff;border-top:0;">
+								<div class="row">	
+									<div class="btn-group" style='margin-left:15px;margin-bottom:15px;'>
+								  		<button id="btn-upload" type="button" class="btn btn-warning btn-sm dropdown-toggle" data-toggle="dropdown">
+								  			<span class="fa fa-folder-open-o"></span>上传电子版信息  <span class="caret"></span>							    	
+								  		</button>
+								  		<ul class="dropdown-menu" role="menu">							  		
+								    		<li><span class="text-stress" style="margin-left: 8px;">个人信息</span></li>
+								    		<li><a id="btn-uploadType1" href="javascript:;"><span style='color:red'>*</span>身份证（正反面）</a></li>	
+								    		<li><a id="btn-uploadType2" href="javascript:;"><span style='color:red'>*</span>居住证明（房本或租房合同）</a></li>
+								    		<li><a id="btn-uploadType3" href="javascript:;"><span style='color:red'>*</span>信贷业务申请表</a></li>
+								    		<li><a id="btn-uploadType4" href="javascript:;"><span style='color:red'>*</span>近6个月通话记录</a></li>
+								    		<li><a id="btn-uploadType5" href="javascript:;"><span style='color:red'>*</span>车辆分期借款合同及还款流水</a></li>
+								    		<li><a id="btn-uploadType6" href="javascript:;"><span style='color:red'>*</span>银行借记卡（正反面）</a></li>
+								    		<li><a id="btn-uploadType7" href="javascript:;"><span style='color:red'>*</span>业务申请表</a></li>
+								    		<li><span class="text-stress" style="margin-left: 8px;">车辆资料</span></li>
+								    		<li><a id="btn-uploadType8" href="javascript:;"><span style='color:red'>*</span>登记证</a></li>
+								    		<li><a id="btn-uploadType9" href="javascript:;"><span style='color:red'>*</span>行驶证</a></li>
+								    		<li><a id="btn-uploadType10" href="javascript:;"><span style='color:red'>*</span>车辆保单（交强、商业）</a></li>
+								    		<li><a id="btn-uploadType11" href="javascript:;"><span style='color:red'>*</span>购车发票</a></li>					    	
+								    		<li><a id="btn-uploadType12" href="javascript:;"><span style='color:red'>*</span>车辆备用钥匙等</a></li>
+								    		<li><span class="text-stress" style="margin-left: 8px;">面审资料</span></li>
+								    		<li><a id="btn-uploadType13" href="javascript:;"><span style='color:red'>*</span>面审意见表</a></li>
+								    		<li><a id="btn-uploadType14" href="javascript:;"><span style='color:red'>*</span>面审环节资料</a></li>
+								  		    <li><span class="text-stress" style="margin-left: 8px;">其它</span></li>
+								  		    <li><a id="btn-uploadType15" href="javascript:;">其它</a></li>
+								  		</ul>
+									</div>
+									<table id="viewerOne" class="table table-bordered" style='width:90%;margin:0 auto;'>
+								    <tbody>
+								    	<tr>		
+								    		<td style="width: 15%; vertical-align: middle;" rowspan="7"><span class="text-stress">个人信息</span></td>				    		
+									    	<td style="width: 15%; vertical-align: middle;"><span style="color: red;">*</span><span class="text-stress">身份证（正反面）</span></td>						    	
+									    	<td class='personalInfo' id="td-1" style="width: 70%; vertical-align: middle;"></td>
+							    		</tr>
+							    		<tr>					    		
+									    	<td style="width: 15%; vertical-align: middle;"><span style="color: red;">*</span><span class="text-stress">居住证明（房本或租房合同）</span></td>						    	
+									    	<td class='personalInfo' id="td-2" style="width: 70%; vertical-align: middle;"></td>
+							    		</tr>
+							    		<tr>					
+									    	<td style="width: 15%; vertical-align: middle;"><span style="color: red;">*</span><span class="text-stress">信贷业务申请表</span></td>						    	
+									    	<td class='personalInfo' id="td-3" style="width: 70%; vertical-align: middle;"></td>
+							    		</tr>
+							    		<tr>			
+									    	<td style="width: 15%; vertical-align: middle;"><span style="color: red;">*</span><span class="text-stress">近6个月通话记录</span></td>						    	
+									    	<td class='personalInfo' id="td-4" style="width: 70%; vertical-align: middle;"></td>
+							    		</tr>
+							    		<tr>			
+									    	<td style="width: 15%; vertical-align: middle;"><span style="color: red;">*</span><span class="text-stress">车辆分期借款合同及还款流水</span></td>						    	
+									    	<td class='personalInfo' id="td-5" style="width: 70%; vertical-align: middle;"></td>
+							    		</tr>
+							    		<tr>		
+									    	<td style="width: 15%; vertical-align: middle;"><span style="color: red;">*</span><span class="text-stress">银行借记卡（正反面）</span></td>						    	
+									    	<td class='personalInfo' id="td-6" style="width: 70%; vertical-align: middle;"></td>
+							    		</tr>
+							    		<tr>			
+									    	<td style="width: 15%; vertical-align: middle;"><span style="color: red;">*</span><span class="text-stress">业务申请表</span></td>						    	
+									    	<td class='personalInfo' id="td-7" style="width: 70%; vertical-align: middle;"></td>
+							    		</tr>
+							    		<tr>
+							    	        <td style="width: 15%; vertical-align: middle;" rowspan="5"><span class="text-stress">车辆信息</span></td>	
+									    	<td style="width: 15%; vertical-align: middle;"><span style="color: red;">*</span><span class="text-stress">登记证</span></td>						    	
+									    	<td class='carInfo' id="td-8" style="width: 70%; vertical-align: middle;"></td>
+							    		</tr>
+							    		<tr>		
+									    	<td style="width: 15%; vertical-align: middle;"><span style="color: red;">*</span><span class="text-stress">行驶证</span></td>						    	
+									    	<td class='carInfo' id="td-9" style="width: 70%; vertical-align: middle;"></td>
+							    		</tr>
+							    		<tr>			
+									    	<td style="width: 15%; vertical-align: middle;"><span style="color: red;">*</span><span class="text-stress">车辆保单（交强、商业）</span></td>						    	
+									    	<td class='carInfo' id="td-10" style="width: 70%; vertical-align: middle;"></td>
+							    		</tr>
+							    		<tr>			
+									    	<td style="width: 15%; vertical-align: middle;"><span class="td-11" style="color: red;">*</span><span class="text-stress">购车发票</span></td>						    	
+									    	<td class='carInfo' id="td-11" style="width: 70%; vertical-align: middle;"></td>
+							    		</tr>
+							    		<tr>			
+									    	<td style="width: 15%; vertical-align: middle;"><span style="color: red;">*</span><span class="text-stress">车辆备用钥匙等</span></td>						    	
+									    	<td class='carInfo' id="td-12" style="width: 70%; vertical-align: middle;"></td>
+							    		</tr>
+							    		<tr>		
+								    		<td style="width: 15%; vertical-align: middle;" rowspan="2"><span class="text-stress">面审资料</span></td>				    		
+									    	<td style="width: 15%; vertical-align: middle;"><span style="color: red;">*</span><span class="text-stress">面审意见表</span></td>						    	
+									    	<td class='faceInfo' id="td-13" style="width: 70%; vertical-align: middle;"></td>
+							    		</tr>
+							    		<tr>					    		
+									    	<td style="width: 15%; vertical-align: middle;"><span style="color: red;">*</span><span class="text-stress">面审环节资料</span></td>						    	
+									    	<td class='faceInfo' id="td-14" style="width: 70%; vertical-align: middle;"></td>
+							    		</tr>
+							    		<tr>		
+								    		<td style="width: 15%; vertical-align: middle;" rowspan="1"><span class="text-stress">其它</span></td>				    		
+									    	<td style="width: 15%; vertical-align: middle;"><span class="text-stress">其它</span></td>						    	
+									    	<td id="td-15" style="width: 70%; vertical-align: middle;"></td>
+							    		</tr>
+								    </tbody>
+								</table>
+								</div>
+							</li>
+						</ul>                                             	                                                  
+                   	</div>
+                </div>
+            </div>
+        </div>          
+        <form id="uploadForm">
+			<input id="file" class="hidden" type="file" name="qqfile" multiple />
+		</form>  
+		<div id="menuContent" class="menuContent" style="max-height:500px;overflow:scroll;display:none; position: absolute;background:#fff;border:1px solid #ccc;">
+	        <ul id="treeDemo" class="ztree" style="margin-top:0; width:160px;"></ul>
+        </div>  
+    </body>
+</html>

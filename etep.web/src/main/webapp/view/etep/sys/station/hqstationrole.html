@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>角色</title>
+<meta charset="UTF-8" />
+<meta name="Author" content="" />
+<meta name="Keywords" content="" />
+<meta name="Description" content="" />
+
+ <link rel="stylesheet" href="../../../../js/bootstrap/themes/default/bootstrap.css" />
+ <link rel="stylesheet" href="../../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+ <link rel="stylesheet" href="../../../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css"/>
+ <link rel="stylesheet" href="../../../../js/ztree/css/zTreeStyle/zTreeStyle.css" />
+ <link rel="stylesheet" href="../../../../css/jquery.select2.css" />
+ <link rel="stylesheet" href="../../../../css/jquery.select2-bootstrap.css" />
+ 
+ <link rel="stylesheet" href="../../../../css/common/base.css" />
+	    <link rel="stylesheet" href="../../../../css/common/scrollbar.css" />
+
+<script src="../../../../js/common/package.js"></script>
+<script src="../../../../js/common/formatter.js"></script>
+<script src="../../../../js/common/url.js"></script>
+<script src="../../../../js/common/jquery-1.11.3.min.js"></script>
+<script src="../../../../js/bootstrap/bootstrap.js"></script>
+<script src="../../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+<script src="../../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+<script src="../../../../js/ztree/js/jquery.ztree.all.min.js"></script>
+<script src="../../../../js/common/json2.js"></script>
+<script src="../../../../js/common/base.js"></script>
+<script src="../../../../js/common/jquery.select2.js"></script>
+
+<script src="../../../../js/common/datagrid.js"></script>
+<script src="../../../../js/common/tree.js"></script>
+
+
+
+<script src="../../../../js/each/etep/sys/station/hq_stationrole.js"></script>
+
+		<!-- 页面样式 -->
+		<style type="text/css">
+			.container-fluid {
+				padding-top: 4px;
+			}
+			.modal-form {
+				margin: 15px 30px 15px 30px;
+				
+			}
+		</style>
+
+</head>
+<body>
+
+	<div class="container-fluid">
+		<div class="row">
+		   <div class="col-md-12">
+               <div class="panel panel-info">
+			    	<div class="panel-heading">
+					  <h3 class="panel-title">查询栏</h3>
+					</div>
+					<div class="panel-body">
+						<form id="searchForm" class="form-horizontal" role="form">
+						    <div class="form-group">
+						        <label for="stationRoleName" class="control-label col-lg-1 col-md-1 col-sm-1" name="stationRoleName" >角色名称</label>
+						        <div class="col-lg-2 col-md-2 col-sm-2">
+						           <input name="stationRoleName" type="text" class="form-control" placeholder="请输入角色名称">
+						        </div>
+						        <label for="stationStatus" class="control-label col-lg-1 col-md-1 col-sm-1">状态</label>
+						        <div class="col-lg-2 col-md-2 col-sm-2">
+						            <select id="search-stationStatus" name="stationStatus" class="form-control" style="width: 100%;">
+									    <option value=""> </option>
+										<option value="1">激活</option>
+										<option value="2">非激活</option>
+								    </select>
+						        </div>
+						        <div class="col-lg-3 col-md-3 col-sm-3">
+								    <button id="btn-search" type="button" class="btn btn-default btn-sm">查询</button>
+								    <button id="btn-reset" type="button" class="btn btn-default btn-sm">重置</button>
+							    </div>
+						    </div>
+						</form>
+					</div>
+				</div>
+				<div class="panel panel-info">
+					<div class="panel-heading">
+						<h3 class="panel-title">信息栏</h3>
+					</div>
+					<div class="panel-body">
+						<form id="listForm">
+							<button id="btn-insert" type="button"
+								class="btn btn-primary btn-sm">添加角色</button>
+							<button id="btn-update" type="button"
+								class="btn btn-primary btn-sm">修改角色</button>
+							<button id="btn-remove" type="button"
+								class="btn btn-danger btn-sm">删除角色</button>
+		                	<button id="btn-role-auth" type="button"
+
+								class="btn btn-danger btn-sm">角色授权</button>
+								
+								<button id="btn-organ-auth" type="button"
+
+								class="btn btn-warning btn-sm">指定机构</button>
+						</form>
+					</div>
+					<table class="table table-bordered table-hover datagrid" style="text-align:center">
+						<thead >
+							<tr>
+								<th field="ck"></th>
+								<th field="orgId" hidden="true">机构号</th>
+								<th field="rn" style="text-align:center">序号</th>
+								<th field="id" idField="true" hidden="true" >主键号</th>
+								<th field="stationCode" style="text-align:center">角色编码</th>
+								<th field="stationRoleName" style="text-align:center">角色名称</th>
+								<th field="stationIsSuperadmin" formatter = "Formatter.isSuperadmin(val)" style="text-align:center">是否为管理员</th>
+								<th field="stationStatus"  formatter="Formatter.stationStatus(val)"  style="text-align:center">状态</th>
+								<th field="remark" style="text-align:center">备注</th>
+								
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
+					<div class="panel-footer">
+						<div id="paginator"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<div id="update-win" class="modal fade" tabindex="-1" role="dialog"
+		aria-labelledby="update-win-label" aria-describedby="添加或修改信息对话框">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="update-win-label">信息框</h5>
+				</div>
+				<div class="modal-body">
+					<form id="updateForm" class="form-horizontal">
+						<input name="id" type="text" class="hidden" />
+					    	<div class="form-group">
+							   <label class="col-sm-3 control-label">角色编码</label>
+							  <div class="col-sm-9">
+								<input name="stationCode" type="text" class="form-control easyui-validatebox" required="required"  	 data-options="required:true,validType:['code','length[4,30]']"	placeholder="请输入角色编码"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">角色名称</label>
+							<div class="col-sm-9">
+								<input name="stationRoleName" type="text" class="form-control  easyui-validatebox"  required="required"  data-options="required:true,validType:['codename','maxLength[32]']"
+									placeholder="请输入角色名称"/>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="col-sm-3 control-label">是否为管理员</label>
+							<div class="col-sm-9">
+							  <select id="update-isSuperadmin" name="stationIsSuperadmin">
+									<option value="1">是</option>
+									<option value="0">否	</option>
+								</select>
+							</div>
+							</div>
+					    <div class="form-group">
+							<label class="col-sm-3 control-label">状态</label>
+							<div class="col-sm-9">
+								<select id="update-stationStatus" name="stationStatus">
+									<option value="1">激活</option>
+									<option value="2">非激活</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">备注</label>
+							<div class="col-sm-9">
+								<textarea rows="4" cols="5" class="form-control easyui-validatebox"  name="remark"  validType="maxLength[50]"
+									placeholder="备注"></textarea>
+							</div>
+						</div>
+					  </form>
+					</div>
+				
+				<div class="modal-footer">
+					<button id="btn-save" type="button" class="btn btn-success btn-sm">保存</button>
+					<button id="btn-close" type="button" class="btn btn-default btn-sm">关闭</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	
+	<div id="role-auth-win" class="modal fade" tabindex="-1" role="dialog" saria-labelledby="role-auth-win-label" aria-describedby="角色权限配置">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="update-pwd-win-label">角色授权</h5>
+				</div>
+				<div class="panel-body"  style="height: 300px; overflow-y: scroll">
+					<ul id="menuTree" class="ztree"></ul>
+				</div>
+				<div id="update-win" class="panel-footer">
+					<form id="treeFrom">
+						<input id="roleId" type="text" name="roleId" class="hidden" />
+					</form>
+					<button id="btn-auth-save" type="button" class="btn btn-success btn-sm">保存</button>
+					<button id="btn-auth-close" type="button" class="btn btn-default btn-sm">关闭</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	 <div id="menuContent" class="menuContent" style="display:none; position: absolute;">
+		<ul id="menuTree" class="ztree" style="margin-top:0; width:160px;"></ul>
+	</div>
+	
+	
+	
+<div id="update-organ-win" class="modal fade" role="dialog" saria-labelledby="update-organ-win-label" aria-describedby="...">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="update-organ-win-label">指定机构</h5>
+				</div>
+				<div class="modal-form" style="height: 300px; overflow-y: scroll">
+			      <ul id="organtree" class="ztree"></ul>
+					<form id="treeFrom">
+						<input id="roleId" type="text" name="roleId" class="hidden" />
+					</form>
+				</div>
+				<div class="modal-footer">					
+					<button id="btn-organ-save" type="button" class="btn btn-success btn-sm">保存</button>
+					<button id="btn-organ-close" type="button" class="btn btn-default btn-sm">关闭</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	    <title>待签约订单列表</title>
+	    <meta charset="UTF-8" />
+	    <meta name="Author" content="" />
+	    <meta name="Keywords" content="" />
+	    <meta name="Description" content="" />
+	    
+	<link rel="stylesheet" href="../../../js/bootstrap/themes/default/bootstrap.css" />
+	<link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+	<link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+	<link rel="stylesheet" href="../../../css/jquery.select2.css" />
+	<link rel="stylesheet" href="../../../css/jquery.select2-bootstrap.css" />
+	<link rel="stylesheet" href="../../../css/jquery.datetimepicker.css" />
+	<link rel="stylesheet" href="../../../js/viewer/viewer.css" />
+	<link rel="stylesheet" href="../../../js/ztree/css/zTreeStyle/zTreeStyle.css" />
+	<link rel="stylesheet" href="../../../css/each/main/derate.css" />
+	
+	<!-- 插件库 -->
+	<script src="../../../js/common/package.js"></script>
+	<script src="../../../js/common/url.js"></script>
+	<script src="../../../js/common/jquery-1.11.3.min.js"></script>
+	<script src="../../../js/bootstrap/bootstrap.js"></script>
+	<script src="../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+	<script src="../../../js/common/jquery.datetimepicker.js"></script>
+	<script src="../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+	<script src="../../../js/common/json2.js"></script>
+	<script src="../../../js/common/base.js"></script>
+	<script src="../../../js/common/jquery.select2.js"></script>
+	<script src="../../../js/common/datagrid2.js"></script>
+	<script src="../../../js/common/formatter.js"></script>
+	<script src="../../../js/ztree/js/jquery.ztree.all.min.js"></script>
+	<script src="../../../js/common/tree.js"></script>
+		
+		<!-- 业务库 -->
+		<script src="../../../js/common/base.js"></script>
+		<script src="../../../js/common/datagrid2.js"></script>
+		<script src="../../../js/common/formatter.js"></script>	
+	    <script src="../../../js/each/ec/contractInfo/contractInfoList.js"></script>
+		
+	</head>   
+	<body>
+		<div class="container-fluid">
+			<div class="col-md-12">
+				<div class="panel panel-info" >
+					<div class="panel-heading">
+						<h3 class="panel-title">查询栏</h3>
+					</div>
+					<div class="panel-body">
+						<form id="searchForm" class="form-horizontal" role="form">
+						  <div class="form-group">
+							<label class="control-label col-lg-1 col-md-1 col-sm-1" for="orderId">订单号:</label>
+							<div class="col-lg-2 col-md-2 col-sm-2">
+								<input name="orderId" id="orderId" type="text" class="form-control" placeholder="请输入订单号">
+							</div>
+							<label class="control-label col-lg-1 col-md-1 col-sm-1" for="contractStatus">合同状态:</label>
+							<div class="col-lg-2 col-md-2 col-sm-2">
+								<select class="form-control" id="contractStatus" name="contractStatus" style="width:100%">
+								<option value=""></option>
+								<option value="1">待手工签约</option>
+								<option value="2">手工签约完毕</option>
+								<option value="3">需电子签约</option>
+							</select>
+							</div>
+							<label class="control-label col-lg-1 col-md-1 col-sm-1" for="createDateStart">任务到达时间:</label>
+							<div class="col-lg-1 col-md-1 col-sm-1">
+					      		<input type="text" class="form-control input-sm" id="startDateStart" name="startDateStart" placeholder="请选择开始日期" />
+							</div>
+							<div class="col-lg-0.1 col-md-0.1 col-sm-0.1">
+							    <label style="float: left; class="form-label">-</label>
+							</div>
+							<div class="col-lg-1 col-md-1 col-sm-1">
+							    <input type="text" class="form-control input-sm" id="startDateEnd" name="startDateEnd" placeholder="请选择结束日期" />
+							</div>
+							<div class="col-lg-2 col-md-2 col-sm-2">
+								<button id="btn-search" class="btn btn-primary btn-sm" type="button">查询</button>
+								<button id="btn-reset" class="btn btn-primary btn-sm" type="button">重置</button>
+							</div>
+						  </div>	
+						</form>
+					</div>
+				</div>
+				<div class="panel panel-info">
+					<div class="panel-heading">
+						<h3 class="panel-title">合同信息</h3>
+					</div>
+					<div class="panel-body">
+						<form id="listForm">
+							<button id="btn-contractInfo" type="button" class="btn btn-primary btn-sm" >补录合同信息</button>
+						</form>
+					</div>
+					<table id='datagrid' class="table table-bordered table-hover">
+						<thead>
+							<tr>
+								<th field="ck"></th>
+								<th field="rn" align="text-center" class="text-center">序号</th>
+								<th field="orderId" align="text-center" class="text-center">订单号</th>
+								<th field="orderName" class="text-center">订单名称</th>
+								<th field="realName" class="text-center">姓名</th>
+								<th field="regId" class="text-center">手机号</th>
+								<th field="orderAmt" class="text-center" formatter="Formatter.money(val)">金额</th>
+								<th field="orgCode" hidden="true" ></th>
+								<th field="merchantNo" align="text-center" class="text-center">商户号</th>
+								<th field="bizType" align="text-center" formatter="Formatter.bizType(val)" class="text-center">业务类型</th>
+								<th field="contractStatus" align="text-center" formatter="Formatter.contractStatus(val)" class="text-center">合同状态</th>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+					<div class="panel-footer">
+						<div id="paginator"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

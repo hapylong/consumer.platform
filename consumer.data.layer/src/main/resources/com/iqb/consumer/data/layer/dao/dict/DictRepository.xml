@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iqb.consumer.data.layer.dao.dict.DictRepository" >
+
+    <resultMap type="com.iqb.consumer.data.layer.bean.dict.IqbSysDictItemEntity"
+        id="dictMap">
+        <result column="dict_type_code" property="dictDypeCode" />
+        <result column="dict_name" property="dictName" />
+        <result column="dict_code" property="dictCode" />
+        <result column="dict_value" property="dictValue" />
+        <result column="cascade_code" property="casCadeCode" />
+        <result column="remark" property="remark" />
+        <result column="is_enable" property="isEnable" />
+    </resultMap>
+    
+    <select id="getDictListByDTC" resultMap="dictMap" parameterType="String">
+        SELECT
+	        dict_type_code,dict_name,dict_code,
+	        dict_value,cascade_code,remark,is_enable
+        FROM 
+            iqb_sys_dict_item 
+        WHERE 
+            is_enable = 1 
+        AND
+            dict_type_code=#{dtce};
+    </select>
+    
+    <select id="getDictByDTCAndDC" resultMap="dictMap" parameterType="Map">
+        SELECT
+            dict_type_code,dict_name,dict_code,dict_value,cascade_code,remark,is_enable
+        FROM 
+            iqb_sys_dict_item 
+        WHERE 
+            is_enable = 1 
+        AND
+            dict_type_code=#{dtc} 
+        AND 
+            dict_code=#{dc};
+    </select>
+    
+    <select id="analysis" resultType="java.lang.String" parameterType="com.iqb.consumer.data.layer.biz.dict.DynamicSQL">
+        SELECT 
+            ${target} 
+        FROM iqb_sys_dict_item WHERE 
+            ${where} = #{value} 
+        AND DICT_TYPE_CODE = #{type}
+    </select>
+</mapper>

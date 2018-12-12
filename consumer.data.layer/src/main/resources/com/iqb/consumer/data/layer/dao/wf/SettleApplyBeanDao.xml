@@ -1,0 +1,432 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+	Apache License, Version 2.0 (the "License"); you may not use this file except 
+	in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.wf.SettleApplyBeanDao">
+
+	<!-- 配置映射字段 -->
+	<resultMap type="com.iqb.consumer.data.layer.bean.wf.SettleApplyBean"
+		id="settleApplyBean">
+		<result property="id"                 column="id" />
+		<result property="orderId"            column="orderId" />
+		<result property="userId"             column="userId" />
+		<result property="overdueAmt"         column="overdueAmt" />
+		<result property="cutOverdueAmt"      column="cutOverdueAmt" />
+		<result property="finalOverdueAmt"    column="finalOverdueAmt" />
+		
+		<result property="cutOverdueRemark"   column="cutOverdueRemark" />
+		<result property="payAmt"             column="payAmt" />
+		<result property="payPrincipal"       column="payPrincipal" />
+		<result property="surplusPrincipal"   column="surplusPrincipal" />
+		<result property="margin"             column="margin" />
+		
+		<result property="feeAmount"          column="feeAmount" />
+		<result property="settleStatus"       column="settleStatus" />
+		<result property="refundAmt"          column="refundAmt" />
+		<result property="refundMargin"       column="refundMargin" />
+		<result property="shouldRepayAmt"     column="shouldRepayAmt" />
+		
+		<result property="totalRepayAmt"      column="totalRepayAmt" />
+		<result property="receiveAmt"         column="receiveAmt" />
+		<result property="amtStatus"          column="amtStatus" />
+		<result property="hiddenFee"          column="hiddenFee" />
+		<result property="curItems"           column="curItems" />
+		
+		<result property="reason"             column="reason" />
+		<result property="remark"             column="remark" />
+		<result property="expiryDate"         column="expiryDate" />
+		<result property="procInstId"         column="procInstId" />
+		<result property="payMethod"          column="payMethod" />
+		
+		
+		<result property="totalOverdueInterest"   column="totalOverdueInterest" />
+		<result property="remainInterest"         column="remainInterest" />
+		<result property="realName"           column="realName" />
+		<result property="orderItems"         column="orderItems" />
+		<result property="monthInterest"      column="monthInterest" /><!-- 月供 --> 
+		
+		
+		<result property="cutOverdueFlag"     column="cutOverdueFlag" />
+		<result property="monthPrincipal"     column="monthPrincipal" />
+		<result property="orderAmt"           column="orderAmt" />
+        <result property="merchantName"       column="merchantName" />
+        <result property="recieveDate"        column="recieveDate" />
+        <result property="totalRepayAmtOriginal"        column="totalRepayAmtOriginal" />
+        <result property="needPayAmt"        column="needPayAmt" />
+        
+	</resultMap>
+	
+	<!-- 配置映射字段 -->
+	<resultMap type="com.iqb.consumer.data.layer.bean.wf.SettleApplyOrderPojo"
+		id="settleApplyOrderPojo">
+		<result property="id"       column="id" />
+		<result property="merchantShortName"            column="merchantShortName" />
+		<result property="merchantShortName"            column="merchantShortName" />
+		<result property="orderId"             column="orderId" />
+		<result property="realName"         column="realName" />
+		<result property="regId"      column="regId" />
+		<result property="orderAmt"    column="orderAmt" />
+		<result property="orderItems"   column="orderItems" />
+		<result property="monthInterest"             column="monthInterest" />
+		<result property="settleStatus"       column="settleStatus" />
+		
+	</resultMap>
+	
+	<!--保存提前结清信息  -->
+	<insert id="saveSettleApplyInfo" parameterType="com.iqb.consumer.data.layer.bean.wf.SettleApplyBean" useGeneratedKeys="true"  keyProperty="id">
+    INSERT INTO inst_settleapply (
+        orderId, userId, overdueAmt, cutOverdueAmt, finalOverdueAmt,
+        cutOverdueRemark, payAmt, payPrincipal, surplusPrincipal, margin,
+        feeAmount, settleStatus, refundAmt, refundMargin, shouldRepayAmt,
+        totalRepayAmt, receiveAmt, recieveDate, amtStatus, hiddenFee,
+        curItems, reason, remark, expiryDate, payMethod,
+        procInstId, version, createTime, cutOverdueFlag, totalOverdueInterest,
+        remainInterest, monthPrincipal,totalRepayAmtOriginal,overItems
+    )
+    VALUES
+        (
+           #{orderId}, #{userId}, #{overdueAmt}, #{cutOverdueAmt}, #{finalOverdueAmt},
+	        #{cutOverdueRemark}, #{payAmt}, #{payPrincipal}, #{surplusPrincipal}, #{margin},
+	        #{feeAmount}, #{settleStatus}, #{refundAmt}, #{refundMargin}, #{shouldRepayAmt},
+	        #{totalRepayAmt}, #{receiveAmt}, #{recieveDate}, #{amtStatus}, #{hiddenFee},
+	        #{curItems}, #{reason}, #{remark}, #{expiryDate}, #{payMethod},
+	        #{procInstId}, 1, now(), #{cutOverdueFlag}, #{totalOverdueInterest},
+	        #{remainInterest}, #{monthPrincipal},#{totalRepayAmtOriginal},#{overItems}
+        );
+    </insert>
+    
+    <!-- 根据订单号查询提前结清信息 -->
+	<select id="getSettleBeanByOrderId" parameterType="String" resultMap="settleApplyBean">
+		SELECT
+		    B.id,
+		    A.orderId,
+		    C.realName,
+		    A.orderItems,
+		    B.curItems,
+		    A.monthInterest,
+		    B.monthPrincipal,
+		    B.margin,
+		    B.feeAmount,
+		    B.payPrincipal,
+		    B.surplusPrincipal,
+		    B.overdueAmt,
+		    B.totalOverdueInterest,
+		    B.remainInterest,
+		    B.refundAmt,
+		    B.cutOverdueFlag,
+		    B.cutOverdueAmt,
+		    B.finalOverdueAmt,
+		    B.totalRepayAmt,
+		    B.hiddenFee,
+		    B.cutOverdueRemark,
+		    B.reason,
+		    B.remark,
+		    B.receiveAmt,
+			B.recieveDate,
+			B.payMethod,
+			B.amtStatus,
+			B.totalRepayAmtOriginal,
+			B.overItems
+		FROM
+		    inst_orderinfo A
+		LEFT JOIN inst_settleapply B ON A.orderId = B.orderId
+		LEFT JOIN inst_user C ON A.regId = C.regId
+		WHERE
+		    A.orderId = #{orderId}
+		    ORDER BY A.createTime desc,B.id DESC
+		LIMIT 1 
+	</select>
+
+	<update id="updateSettleBean" parameterType="com.iqb.consumer.data.layer.bean.wf.SettleApplyBean">
+		UPDATE 
+        inst_settleapply
+        <set>
+            VERSION = #{version}+1 ,
+            <if test="overdueAmt != null and overdueAmt != '' ">
+                overdueAmt = #{overdueAmt},
+            </if>
+            <if test="cutOverdueAmt != null and cutOverdueAmt != '' ">
+                cutOverdueAmt = #{cutOverdueAmt},
+            </if>
+              <if test="finalOverdueAmt != null">
+                finalOverdueAmt = #{finalOverdueAmt,jdbcType=DECIMAL},
+            </if>
+            <if test="cutOverdueRemark != null and cutOverdueRemark != '' ">
+                cutOverdueRemark = #{cutOverdueRemark},
+            </if>
+            <if test="payAmt != null and payAmt != '' ">
+                payAmt = #{payAmt},
+            </if>
+            <if test="payPrincipal != null">
+                payPrincipal = #{payPrincipal,jdbcType=DECIMAL},
+            </if>
+            <if test="surplusPrincipal != null and surplusPrincipal != '' ">
+                surplusPrincipal = #{surplusPrincipal},
+            </if>
+            <if test="margin != null ">
+                margin = #{margin,jdbcType=DECIMAL},
+            </if>
+            <if test="feeAmount != null ">
+                feeAmount = #{feeAmount,jdbcType=DECIMAL},
+            </if>
+             <if test="settleStatus != null ">
+                settleStatus = #{settleStatus},
+            </if>
+             <if test="refundAmt != null ">
+                refundAmt = #{refundAmt,jdbcType=DECIMAL},
+            </if>
+            <if test="refundMargin != null">
+                refundMargin = #{refundMargin,jdbcType=DECIMAL},
+            </if>
+             <if test="shouldRepayAmt != null ">
+                shouldRepayAmt = #{shouldRepayAmt,jdbcType=DECIMAL},
+            </if>
+             <if test="totalRepayAmt != null ">
+                totalRepayAmt = #{totalRepayAmt,jdbcType=DECIMAL},
+            </if>
+            <if test="receiveAmt != null">
+                receiveAmt = #{receiveAmt,jdbcType=DECIMAL},
+            </if>
+             <if test="amtStatus != null and amtStatus != '' ">
+                amtStatus = #{amtStatus},
+            </if>
+            <if test="hiddenFee != null and hiddenFee != '' ">
+                hiddenFee = #{hiddenFee},
+            </if>
+            <if test="curItems != null">
+                curItems = #{curItems},
+            </if>
+            <if test="reason != null and reason != '' ">
+                reason = #{reason},
+            </if>
+            <if test="remark != null and remark != '' ">
+                REMARK = #{remark},
+            </if>
+            <if test="expiryDate != null and expiryDate != '' ">
+                expiryDate = #{expiryDate},
+            </if>
+            <if test="procInstId != null and procInstId != '' ">
+                procInstId = #{procInstId},
+            </if>
+            <if test="payMethod != null and payMethod != '' ">
+                payMethod = #{payMethod},
+            </if>
+            <if test="totalOverdueInterest != null ">
+                totalOverdueInterest = #{totalOverdueInterest,jdbcType=DECIMAL},
+            </if>
+            <if test="remainInterest != null and remainInterest != '' ">
+                remainInterest = #{remainInterest},
+            </if>
+            <if test="cutOverdueFlag != null and cutOverdueFlag != '' ">
+                cutOverdueFlag = #{cutOverdueFlag},
+            </if>
+            <if test="monthPrincipal != null and monthPrincipal != '' ">
+                monthPrincipal = #{monthPrincipal},
+            </if>
+            <if test="recieveDate != null and recieveDate != '' ">
+                recieveDate = #{recieveDate},
+            </if>
+            <if test="totalRepayAmtOriginal != null and totalRepayAmtOriginal != '' ">
+                totalRepayAmtOriginal = #{totalRepayAmtOriginal},
+            </if>
+             <if test="overItems != null and overItems != '' ">
+                overItems = #{overItems},
+            </if>
+            
+            UPDATETIME = NOW()
+        </set>
+        <where>
+            orderId = #{orderId}
+            <if test="id != null and id != '' ">
+                and id = #{id}
+            </if>
+            
+        </where>
+	</update>
+	
+	<update id="updateCutInfo" parameterType="com.iqb.consumer.data.layer.bean.wf.SettleApplyBean">
+        UPDATE
+            inst_settleapply 
+        SET 
+            cutOverdueRemark=#{cutOverdueRemark}, cutOverdueAmt=#{cutOverdueAmt} 
+        WHERE 
+            orderId = #{orderId};
+    </update>
+	
+	<update id="updateSettleStatus" parameterType="java.util.Map">
+		UPDATE inst_settleapply SET settleStatus = #{settleStatus} WHERE orderId = #{orderId};
+	</update>
+	
+	<update id="updateSettleApply" parameterType="java.util.Map">
+    	UPDATE inst_settleapply SET version = version+1,amtStatus=#{amtStatus},recieveDate=NOW(),receiveAmt=#{receiveAmt} WHERE id=#{id};
+    </update>
+    
+    <select id="getNeedPayAmt" parameterType="String" resultType="com.iqb.consumer.data.layer.bean.wf.SettleApplyBean">
+    	SELECT totalRepayAmt-IFNULL(receiveAmt,0) as needPayAmt,amtStatus,orderId,totalRepayAmt,receiveAmt,totalOverdueInterest from inst_settleapply WHERE id = #{id};
+    </select>
+    
+    <!-- 根据订单号查询提前结清信息 -->
+    <select id="selectSettleBeanByOrderId" parameterType="String" resultMap="settleApplyBean">
+        SELECT
+            B.id,
+            B.orderId,
+		    B.monthPrincipal,
+            B.margin,
+            B.feeAmount,
+            B.payPrincipal,
+            B.surplusPrincipal,
+            B.overdueAmt,
+            B.totalOverdueInterest,
+            B.remainInterest,
+            B.refundAmt,
+            B.cutOverdueFlag,
+            B.cutOverdueAmt,
+            B.finalOverdueAmt,
+            B.totalRepayAmt,
+            B.hiddenFee,
+            B.cutOverdueRemark,
+            B.reason,
+            B.remark,
+            B.curItems
+		FROM
+		    inst_settleapply B
+		WHERE
+		   B.orderId = #{orderId}
+		ORDER BY B.id desc
+		LIMIT 1
+    </select>
+    <select id="selectSettleOrderList" parameterType="com.alibaba.fastjson.JSONObject" 
+    resultMap="settleApplyOrderPojo">
+			SELECT
+				B.MERCHANTSHORTNAME AS merchantShortName,
+				A.orderId,
+				C.realName,
+				A.regId,
+				A.orderAmt,
+				A.orderItems,
+				A.monthInterest,
+				D.settleStatus,
+				D.id
+				FROM
+				inst_orderinfo A
+				LEFT JOIN inst_merchantinfo B on A.merchantNo = B.MERCHANTNO
+				LEFT JOIN inst_user C on A.userId = C.id
+				LEFT JOIN inst_settleapply D on A.orderId = D.orderId
+				WHERE (A.riskStatus=3 or A.riskStatus=7)
+AND NOT EXISTS(SELECT 1 FROM inst_settleapply E WHERE E.orderId=D.orderId AND E.id>D.id)
+				  <if test="merList != null and merList.size() > 0">
+            		AND B.merchantno in
+	            <foreach item="item" index="index" collection="merList" open="("
+	                separator="," close=")">
+	                #{item}
+	            </foreach>
+	        	</if>
+       			  <if test="orderId !=null and orderId != ''">
+           			 AND A.orderId = #{orderId}
+       			 </if>
+       			  <if test="realName !=null and realName != ''">
+           			 AND C.realName LIKE '%${realName}%'
+       			 </if>
+       			  <if test="regId !=null and regId != ''">
+           			 AND A.regId = #{regId}
+       			 </if>
+       			 <if test="beginTime != null and beginTime != ''">
+					AND DATE_FORMAT(A.stageDate,'%Y-%m-%d') &gt;= #{beginTime}
+				 </if>
+				 <if test="endTime != null and endTime != ''">
+					AND DATE_FORMAT(A.stageDate,'%Y-%m-%d') &lt;= #{endTime}
+				 </if>
+				 <if test="settleStatus != null and settleStatus != ''">
+					AND D.settleStatus = #{settleStatus}
+				 </if>
+				ORDER BY A.createTime DESC
+    </select>
+    <!-- 提前还款代偿分页查询接口 -->
+    <select id="selectPrepaymentList" parameterType="com.alibaba.fastjson.JSONObject"  resultMap="settleApplyBean">
+		 SELECT
+		    A.id,
+		    C.MERCHANTSHORTNAME as merchantName,
+		    B.orderId,
+		    D.realName,
+		    B.regId,
+		    B.orderAmt,
+		    B.orderItems,
+		    A.curItems,
+		    B.monthInterest,
+		    A.totalRepayAmt,
+		    (
+		        IFNULL(A.totalRepayAmt, 0) - IFNULL(A.receiveAmt, 0)
+		    ) AS needPayAmt
+		FROM
+		    inst_settleapply A
+		LEFT JOIN inst_orderinfo B ON A.orderId = B.orderId
+		LEFT JOIN inst_merchantinfo C ON B.merchantNo = C.MERCHANTNO
+		LEFT JOIN inst_user D ON A.userId = D.id
+		WHERE A.amtStatus = 2 and A.payMethod=1
+		and A.settleStatus &lt;= 2 
+         <if test="merList != null and merList.size() > 0">
+		      AND B.MERCHANTNO in
+		      <foreach item="item" index="index" collection="merList" open="("
+		          separator="," close=")">
+		          #{item.merchantNo}
+		      </foreach>
+		   </if>
+          <if test="orderId !=null and orderId != ''">
+             AND A.orderId = #{orderId}
+         </if>
+          <if test="realName !=null and realName != ''">
+             AND D.realName LIKE '%${realName}%'
+         </if>
+          <if test="regId !=null and regId != ''">
+             AND B.regId = #{regId}
+         </if>
+         <if test="beginTime != null and beginTime != ''">
+            AND DATE_FORMAT(A.createTime,'%Y-%m-%d') &gt;= #{beginTime}
+         </if>
+         <if test="endTime != null and endTime != ''">
+            AND DATE_FORMAT(A.createTime,'%Y-%m-%d') &lt;= #{endTime}
+         </if>
+        ORDER BY A.createTime DESC
+    </select>
+    
+    <!-- 根据订单号查询提前结清信息罚息减免校验使用 -->
+    <select id="selectSettleBeanByOrderIdForValidate" parameterType="String" resultMap="settleApplyBean">
+        SELECT
+            B.id,
+            B.monthPrincipal,
+            B.margin,
+            B.feeAmount,
+            B.payPrincipal,
+            B.surplusPrincipal,
+            B.overdueAmt,
+            B.totalOverdueInterest,
+            B.remainInterest,
+            B.refundAmt,
+            B.cutOverdueFlag,
+            B.cutOverdueAmt,
+            B.finalOverdueAmt,
+            B.totalRepayAmt,
+            B.hiddenFee,
+            B.cutOverdueRemark,
+            B.reason,
+            B.remark
+        FROM
+            inst_settleapply B
+        WHERE
+            B.settleStatus = 1
+            and B.orderId = #{orderId}
+        ORDER BY B.id desc
+        LIMIT 1
+    </select>
+    <!-- 更新提前结清减免后的违约金-->
+    <update id="updateSettleAmtForOrderId" parameterType="java.util.Map">
+        UPDATE inst_settleapply SET version = version+1,finalOverdueAmt=#{finalOverdueAmt}  WHERE orderId = #{orderId}
+    </update>
+</mapper>

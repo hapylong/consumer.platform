@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+	Apache License, Version 2.0 (the "License"); you may not use this file except 
+	in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.PaymentLogDao">
+
+	<!-- 配置映射字段 -->
+	<resultMap type="com.iqb.consumer.data.layer.bean.paylog.PaymentLogBean"
+		id="paymentLogBean">
+		<result property="id" column="id" />
+		<result property="regId" column="regId" />
+		<result property="orderId" column="orderId" />
+		<result property="merchantNo" column="merchantNo" />
+		<result property="amount" column="amount" />
+		<result property="bankCardNo" column="bankCardNo" />
+		<result property="bankId" column="bankId" />
+		<result property="bankName" column="bankName" />
+		<result property="orderStatus" column="orderStatus" />
+		<result property="flag" column="flag" />
+		<result property="remark" column="remark" />
+		<result property="tradeNo" column="tradeNo" />
+		<result property="outOrderId" column="outOrderId" />
+		<result property="tranTime" column="tranTime" />
+		<result property="createTime" column="createTime" />
+		<result property="updateTime" column="updateTime" />
+		<!-- 插入前台需要数据 -->
+		<result property="realName" column="realName" />
+		<result property="merchantShortName" column="merchantShortName" />
+	</resultMap>
+
+	<sql id="table">inst_paymentlog</sql>
+	
+	<select id="selSumAmount" parameterType="java.util.Map" resultType="java.lang.Integer">
+		SELECT sum(amount) from inst_paymentlog WHERE orderId=#{orderId} AND repayNo=#{repayNo};
+	</select>
+
+	<insert id="insertPaymentLog" parameterType="java.util.Map"
+		keyProperty="id" useGeneratedKeys="true">
+		INSERT INTO
+		<include refid="table" />
+		(
+		regId, amount, tranTime, bankCardNo, bankId, bankName,
+		orderStatus,
+		createTime, merchantNo, orderId, remark,tradeNo,outOrderId,
+		flag ,subOrderId, repayNo)
+		VALUES (
+		#{regId}, #{amount}, #{tranTime}, #{bankCardNo},
+		#{bankId},#{bankName},
+		#{orderStatus}, NOW(),
+		#{merchantNo},#{orderId},#{remark},#{tradeNo},#{outOrderId},
+		#{flag} ,#{subOrderId}, #{repayNo});
+	</insert>
+
+	<!-- 流水号查询支付日志 -->
+	<select id="getPayLogByTradeNo" parameterType="String"
+		resultMap="paymentLogBean">
+		SELECT * FROM
+		<include refid="table" />
+		WHERE tradeNo = #{tradeNo}
+	</select>
+	<!-- 通过订单号查询支付记录 -->
+	<select id="getPayLogByOrderId" parameterType="String"
+		resultMap="paymentLogBean">
+		SELECT * FROM
+		<include refid="table" />
+		WHERE orderId = #{orderId}
+		<if test="flag !=null and flag !='' ">
+			AND flag = #{flag}
+		</if>
+	</select>
+
+	<!-- 根据商户名称、开始日期、结束日期、订单号、手机号、还款金额 开始、还款金额 结束获取支付日志列表 -->
+	<select id="getMersPaymentLogList" parameterType="java.util.Map"
+		resultMap="paymentLogBean">
+		SELECT
+		distinct(p.id),p.orderId, p.regId, u.realName, p.amount,
+		p.tranTime,
+		p.outOrderId, p.bankCardNo, p.bankName, m.MERCHANTSHORTNAME
+		AS
+		merchantShortName, p.flag
+		FROM
+		inst_paymentlog p
+		LEFT JOIN inst_user u
+		ON u.regId = p.regId
+		LEFT OUTER JOIN inst_merchantinfo m ON
+		m.MERCHANTNO = p.merchantNo
+		WHERE
+		1 =
+		1
+		<!-- 商户名称 -->
+		<if test="merList !=null and merList.size() > 0">
+			AND p.merchantNo in
+			<foreach item="item" index="index" collection="merList" open="("
+				separator="," close=")">
+				#{item.merchantNo}
+			</foreach>
+		</if>
+		<!-- 还款时间开始 -->
+		<if test="startDate !=null and startDate != ''">
+			AND tranTime &gt;= #{startDate}
+		</if>
+		<!-- 还款时间结束 -->
+		<if test="endDate !=null and endDate != ''">
+			AND tranTime &lt;= #{endDate}
+		</if>
+		<!-- 订单号 -->
+		<if test="orderId !=null and orderId != ''">
+			AND orderId = #{orderId}
+		</if>
+		<!-- 手机号 -->
+		<if test="regId !=null and regId != ''">
+			AND p.regId = #{regId}
+		</if>
+		<!-- 还款金额 开始 -->
+		<if test="startAmount !=null and startAmount != ''">
+			AND amount &gt;= #{startAmount}
+		</if>
+		<!-- 还款金额 结束 -->
+		<if test="endAmount !=null and endAmount != ''">
+			AND amount &lt;= #{endAmount}
+		</if>
+		ORDER BY p.merchantNo, p.tranTime
+	</select>
+
+	<!-- 根据商户名称、开始日期、结束日期、订单号、手机号、还款金额 开始、还款金额 结束获取总条数 -->
+	<select id="getMersPaymentLogNum" parameterType="java.util.Map"
+		resultType="Integer">
+		SELECT
+		IF( count(1) IS NULL , 0, count(1))
+		FROM
+		inst_paymentlog p
+		WHERE
+		1
+		=
+		1
+		<!-- 商户名称 -->
+		<if test="merList !=null and merList.size() > 0">
+			AND p.merchantNo in
+			<foreach item="item" index="index" collection="merList" open="("
+				separator="," close=")">
+				#{item.merchantNo}
+			</foreach>
+		</if>
+		<!-- 还款时间开始 -->
+		<if test="startDate !=null and startDate != ''">
+			AND tranTime &gt;= #{startDate}
+		</if>
+		<!-- 还款时间结束 -->
+		<if test="endDate !=null and endDate != ''">
+			AND tranTime &lt;= #{endDate}
+		</if>
+		<!-- 订单号 -->
+		<if test="orderId !=null and orderId != ''">
+			AND orderId = #{orderId}
+		</if>
+		<!-- 手机号 -->
+		<if test="regId !=null and regId != ''">
+			AND regId = #{regId}
+		</if>
+		<!-- 还款金额 开始 -->
+		<if test="startAmount !=null and startAmount != ''">
+			AND amount &gt;= #{startAmount}
+		</if>
+		<!-- 还款金额 结束 -->
+		<if test="endAmount !=null and endAmount != ''">
+			AND amount &lt;= #{endAmount}
+		</if>
+	</select>
+
+	<!-- 根据商户名称、开始日期、结束日期、订单号、手机号、还款金额 开始、还款金额 结束获取总金额 -->
+	<select id="getMersPaymentLogAmt" parameterType="java.util.Map"
+		resultType="long">
+		SELECT
+		IF( sum(p.amount) IS NULL ,0,sum(p.amount))
+		FROM
+		inst_paymentlog p
+		WHERE
+		1
+		= 1
+		<!-- 商户名称 -->
+		<if test="merList !=null and merList.size() > 0">
+			AND p.merchantNo in
+			<foreach item="item" index="index" collection="merList" open="("
+				separator="," close=")">
+				#{item.merchantNo}
+			</foreach>
+		</if>
+		<!-- 还款时间开始 -->
+		<if test="startDate !=null and startDate != ''">
+			AND tranTime &gt;= #{startDate}
+		</if>
+		<!-- 还款时间结束 -->
+		<if test="endDate !=null and endDate != ''">
+			AND tranTime &lt;= #{endDate}
+		</if>
+		<!-- 订单号 -->
+		<if test="orderId !=null and orderId != ''">
+			AND orderId = #{orderId}
+		</if>
+		<!-- 手机号 -->
+		<if test="regId !=null and regId != ''">
+			AND regId = #{regId}
+		</if>
+		<!-- 还款金额 开始 -->
+		<if test="startAmount !=null and startAmount != ''">
+			AND amount &gt;= #{startAmount}
+		</if>
+		<!-- 还款金额 结束 -->
+		<if test="endAmount !=null and endAmount != ''">
+			AND amount &lt;= #{endAmount}
+		</if>
+	</select>
+	
+	<insert id="persistLog" parameterType="com.iqb.consumer.data.layer.bean.paylog.PaymentLogBean">
+        INSERT INTO
+            inst_paymentlog
+        (
+	        regid, amount, trantime, bankcardno, bankid, 
+	        bankname, orderstatus, createtime, merchantno, 
+	        orderid, remark,tradeno,outorderid, flag 
+        )
+        VALUES 
+        (
+	        #{regId}, #{amount}, #{tranTime}, #{bankCardNo}, #{bankId}, 
+	        #{bankName}, #{orderStatus}, NOW(), #{merchantNo},
+	        #{orderId},#{remark},#{tradeNo},#{outOrderId}, #{flag} 
+        );
+    </insert>
+    
+    <select id="getPayLogByTNo" parameterType="String" resultMap="paymentLogBean">
+        SELECT 
+            * 
+        FROM
+            inst_paymentlog
+        WHERE 
+            tradeno = #{tradeNo} 
+        LIMIT 
+            1
+    </select>
+</mapper>

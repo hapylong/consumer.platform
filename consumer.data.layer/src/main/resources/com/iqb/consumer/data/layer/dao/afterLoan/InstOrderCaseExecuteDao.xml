@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+    Apache License, Version 2.0 (the "License"); you may not use this file except 
+    in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+    Unless required by applicable law or agreed to in writing, software distributed 
+    under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+    OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+    the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.afterLoan.InstOrderCaseExecuteDao">
+     
+     <insert id="saveInstOrderCaseExecute" parameterType="com.iqb.consumer.data.layer.bean.afterLoan.InstOrderCaseExecuteBean" keyProperty="id"
+        useGeneratedKeys="true">
+        INSERT INTO 
+            inst_order_case_execute
+            (
+                <if test="caseId != null and caseId != ''">
+                    caseId,
+                </if>
+                <if test="orderId != null and orderId != ''">
+                    orderId,
+                </if>
+                <if test="executeResult != null and executeResult > 0">
+                    executeResult,
+                </if>
+                <if test="executeRemark != null and executeRemark != ''">
+                    executeRemark,
+                </if>
+                <if test="operatorRegId != null and operatorRegId != ''">
+                    operatorRegId,
+                </if>
+                version,createTime
+            )
+        VALUES
+            (
+                <if test="caseId != null and caseId != ''">
+                    #{caseId},
+                </if>
+                 <if test="orderId != null and orderId != ''">
+                    #{orderId},
+                </if>
+                <if test="executeResult != null and executeResult > 0">
+                    #{executeResult},
+                </if>
+                <if test="executeRemark != null and executeRemark != ''">
+                    #{executeRemark},
+                </if>
+                <if test="operatorRegId != null and operatorRegId != ''">
+                    #{operatorRegId},
+                </if>
+                1, NOW()
+           )
+    </insert>
+    
+    <update id="updateInstOrderCaseExecute" parameterType="com.iqb.consumer.data.layer.bean.afterLoan.InstOrderCaseExecuteBean">
+        update
+        inst_order_case_execute
+        <set>
+                <if test="executeResult != null and executeResult > 0">
+                    executeResult = #{executeResult},
+                </if>
+                <if test="executeRemark != null and executeRemark != ''">
+                    executeRemark = #{executeRemark},
+                </if>
+                <if test="operatorRegId != null and operatorRegId != ''">
+                    operatorRegId = #{operatorRegId},
+                </if>
+        </set>
+        where orderId = #{orderId} 
+        <if test="id != null">
+           and id = #{id}
+        </if>
+    </update>
+    
+    <select id="getInstOrderCaseExecuteByOrderId" resultType="com.iqb.consumer.data.layer.bean.afterLoan.InstOrderCaseExecuteBean">
+        select ce.*,ur.realName,DATE_FORMAT(ce.createTime, '%Y-%m-%d %H:%i:%S') as createTimeFormat
+         from inst_order_case_execute ce LEFT JOIN inst_user ur ON ce.operatorRegId = ur.regId
+          where orderId = #{orderId} order by createTime limit 1 
+    </select>
+    
+    <select id="selectInstOrderCaseExecuteByCaseId" resultType="com.iqb.consumer.data.layer.bean.afterLoan.InstOrderCaseExecuteBean">
+        SELECT
+		    ce.executeResult,
+		    ce.executeRemark,
+		    ur.realName,
+		    DATE_FORMAT(
+		        ce.createTime,
+		        '%Y-%m-%d'
+		    ) AS createTimeFormat
+		FROM
+		    inst_order_case_execute ce
+		LEFT JOIN inst_user ur ON ce.operatorRegId = ur.regId
+		WHERE
+		    ce.caseId = #{caseId}
+		 order by ce.createTime DESC
+    </select>
+</mapper>

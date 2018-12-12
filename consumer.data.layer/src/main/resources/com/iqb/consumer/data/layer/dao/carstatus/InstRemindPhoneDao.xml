@@ -1,0 +1,480 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+    Apache License, Version 2.0 (the "License"); you may not use this file except 
+    in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+    Unless required by applicable law or agreed to in writing, software distributed 
+    under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+    OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+    the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.carstatus.InstRemindPhoneDao">
+    <!-- 配置映射字段 -->
+    <resultMap type="com.iqb.consumer.data.layer.bean.carstatus.pojo.InstRemindPhoneBean" id="InstRemindPhoneBeanMap">
+        
+        <result property="orderId"              column="orderId" />
+        <result property="realName"             column="realName" />
+        <result property="regId"                column="regId" />        
+        <result property="merchantNo"           column="merchantNo" />
+        <result property="merchantName"         column="merchantName" />        
+        <result property="curItems"             column="curItems" />
+        <result property="orderItems"           column="orderItems" />       
+        <result property="lastRepayDate"        column="lastRepayDate" />
+        <result property="curRepayAmt"          column="curRepayAmt" />
+        <result property="perOverdueAmt"        column="perOverdueAmt" />        
+        <result property="overdueDays"          column="overdueDays" />
+        <result property="mobileCollection"     column="mobileCollection" />
+        <result property="mobileDealOpinion"    column="mobileDealOpinion" />        
+        <result property="telRecord"            column="telRecord" />
+        <result property="failReason"           column="failReason" />
+        <result property="dealOpinion"          column="dealOpinion" />
+        <result property="billDate"             column="billDate" />
+        <result property="status"               column="status" />
+        <result property="flag"                 column="flag" />
+        <result property="assignedName"         column="assignedName" />
+        <result property="overdueAmt"           column="overdueAmt" />        
+        <result property="version"              column="version" />
+        <result property="createTime"           column="createTime" />
+        <result property="updateTime"           column="updateTime" />
+        <result property="remark"               column="remark" />
+        <result property="billInfoStatus"       column="billInfoStatus" />
+        <result property="processTime"          column="processTime" />
+    </resultMap>
+    <!-- 查询电话提醒记录列表 -->
+    <select id="selectInstRemindPhoneList" parameterType="java.util.Map" resultMap="InstRemindPhoneBeanMap">
+        SELECT
+		    A.orderId,
+		    A.realName,
+		    A.regId,
+		    B.MERCHANTSHORTNAME AS merchantName,
+		    A.curItems,
+		    A.orderItems,
+		    A.lastrepaydate,
+		    A.curRepayAmt,
+		    A.perOverdueAmt,
+		    A.overdueAmt,
+		    A.overdueDays,
+		    A.billInfoStatus,
+            A.updateTime,
+            CC.remark,
+		    (SELECT DICT_NAME from iqb_sys_dict_item WHERE DICT_TYPE_CODE='call_result' and DICT_VALUE = CC.telRecord) as telRecord,
+            (SELECT DICT_NAME from iqb_sys_dict_item WHERE DICT_TYPE_CODE='failure_reason' and DICT_VALUE = CC.failReason) as failReason,
+            (SELECT DICT_NAME from iqb_sys_dict_item WHERE DICT_TYPE_CODE='treatment_suggestion' and DICT_VALUE = CC.dealReason) as dealOpinion,
+            (SELECT DICT_NAME from iqb_sys_dict_item WHERE DICT_TYPE_CODE='telephone_urging' and DICT_VALUE = CC.mobileCollection) as mobileCollection,
+            (SELECT DICT_NAME from iqb_sys_dict_item WHERE DICT_TYPE_CODE='treatment_suggestion' and DICT_VALUE = CC.mobileDealOpinion) as mobileDealOpinion,
+		     CASE A.`status` 
+                    when 1 then '未处理'
+                    when 2 then '处理中'
+                    when 3 then '已处理'
+                END `status`
+		FROM
+		    inst_remind_phone A
+		LEFT JOIN inst_merchantinfo B ON A.merchantNo = B.MERCHANTNO
+		LEFT JOIN inst_remind_record CC ON A.orderId = CC.orderId
+		AND A.curItems = CC.curItems	
+        <where>
+            A.flag = #{flag}
+            AND A.status <![CDATA[<]]> 3 
+            <if test="merList != null and merList.size() > 0">
+                AND a.merchantno in
+                <foreach item="item" index="index" collection="merList" open="("
+                    separator="," close=")">
+                    #{item.merchantNo}
+                </foreach>
+            </if>
+            <if test="orderId != null and orderId != ''">
+                AND A.orderid = #{orderId}
+            </if>
+            <if test="realName != null and realName != ''">
+                AND A.realname = #{realName}
+            </if>
+            <if test="regId != null and regId != ''">
+                AND A.regid = #{regId}
+            </if>
+            <if test="telRecord != null and telRecord != ''">
+                AND CC.telRecord = #{telRecord}
+            </if>
+            <if test="failReason != null and failReason != ''">
+                AND CC.failReason = #{failReason}
+            </if>
+            <if test="dealReason != null and dealReason != ''">
+                AND CC.dealReason = #{dealReason}
+            </if>
+            <if test="overdueDays != null and overdueDays != ''">
+                AND A.overdueDays = #{overdueDays}
+            </if>
+            <if test="mobileCollection != null and mobileCollection != ''">
+                AND CC.mobileCollection = #{mobileCollection}
+            </if>
+            <if test="mobileDealOpinion != null and mobileDealOpinion != ''">
+                AND CC.mobileDealOpinion = #{mobileDealOpinion}
+            </if>
+            <if test="startDate != null and startDate != ''">
+                AND DATE_FORMAT(A.lastRepayDate,'%Y-%m-%d') &gt;= #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND DATE_FORMAT(A.lastRepayDate,'%Y-%m-%d') &lt;= #{endDate}
+            </if>            
+            <if test="billInfoStatus != null and billInfoStatus != ''">
+                AND A.billInfoStatus = #{billInfoStatus}
+            </if>
+            <if test="processStartDate != null and processStartDate != ''">
+                AND DATE_FORMAT(A.updateTime,'%Y-%m-%d') &gt;= #{processStartDate}
+            </if>
+            <if test="processEndDate != null and processEndDate != ''">
+                AND DATE_FORMAT(A.updateTime,'%Y-%m-%d') &lt;= #{processEndDate}
+            </if>            
+            <choose>
+                <when test="flag == 1">
+                        AND A.billInfoStatus IN (1,2)
+                    <if test="(startDate == null or startDate=='') and (endDate == null or endDate =='')">
+                        AND DATE_FORMAT(A.lastRepayDate,'%Y-%m-%d') =  DATE_FORMAT(NOW(),'%Y-%m-%d')
+                    </if>
+                </when>
+                <otherwise>
+                    and IFNULL(A.overdueDays,0) <![CDATA[<=]]> 5
+                </otherwise>
+            </choose>
+        </where>
+         AND NOT EXISTS(SELECT 1 FROM inst_remind_record g WHERE g.orderId=cc.orderId  and g.curItems = CC.curItems AND g.id>cc.id)
+        ORDER BY A.createTime DESC,A.orderId,A.curItems
+    </select>
+    <update id="updateInstRemindPhoneBean" parameterType="com.iqb.consumer.data.layer.bean.carstatus.pojo.InstRemindPhoneBean">
+    	update inst_remind_phone
+    	<set>  
+    	   updateTime = NOW(),
+			<if test="orderId != null and orderId != ''">
+				orderId = #{orderId},
+			</if>
+			<if test="status != null and status != ''">
+				status = #{status},
+			</if>
+			<if test="curItems != null and curItems != ''">
+				curItems = #{curItems},
+			</if>
+			<if test="lastRepayDate != null and lastRepayDate != ''">
+				lastRepayDate = #{lastRepayDate},
+			</if>
+			<if test="curRepayAmt != null and curRepayAmt != ''">
+				curRepayAmt = #{curRepayAmt},
+			</if>
+			<if test="perOverdueAmt != null and perOverdueAmt != ''">
+				perOverdueAmt = #{perOverdueAmt},
+			</if>
+			<if test="overdueDays != null and overdueDays != ''">
+				overdueDays = #{overdueDays},
+			</if>
+			<if test="mobileCollection != null and mobileCollection != ''">
+				mobileCollection = #{mobileCollection},
+			</if>
+			<if test="mobileDealOpinion != null and mobileDealOpinion != ''">
+				mobileDealOpinion = #{mobileDealOpinion},
+			</if>
+			<if test="telRecord != null and telRecord != ''">
+				telRecord = #{telRecord},
+			</if>
+			<if test="failReason != null and failReason != ''">
+				failReason = #{failReason},
+			</if>
+			<if test="dealOpinion != null and dealOpinion != ''">
+				dealOpinion = #{dealOpinion},
+			</if>
+			<if test="billDate != null and billDate != ''">
+				billDate = #{billDate},
+			</if>
+			<if test="overdueAmt != null and overdueAmt != ''">
+				overdueAmt = #{overdueAmt},
+			</if>
+		</set>
+		where orderId = #{orderId} and curItems = #{curItems} and flag=#{flag}
+    </update>
+    
+    <select id="selectInstRemindPhoneOne" parameterType="com.iqb.consumer.data.layer.bean.carstatus.pojo.InstRemindRecordBean" resultType="com.iqb.consumer.data.layer.bean.carstatus.pojo.InstRemindPhoneBean">
+    	select * from inst_remind_phone where orderId = #{orderId} and curItems = #{curItems} and flag = #{flag}
+    </select>
+    <select id="afterLoanList" parameterType="java.util.Map" resultType="com.iqb.consumer.data.layer.bean.carstatus.pojo.CgetCarStatusInfoResponseMessage">
+		select * from (
+		              SELECT
+						a.id AS id,
+						a.orderid AS orderId,
+						a. STATUS AS STATUS,
+						a.into_garage_date AS intogaragedate,
+						a.trailer_reason AS trailerreason,
+						a.into_garage_remark AS intogarageremark,
+						a.lost_contact_reason AS lostcontactreason,
+						b.regid regId,
+						b.orderamt AS orderAmt,
+						b.orderitems AS orderItems,
+						b.monthinterest AS monthInterest,
+						b.ordername AS orderName,
+						b.createtime AS createTime,
+						c.realname AS realName,
+						d.carno AS carNo,
+						d.plate AS plate,
+						e.merchantshortname AS merchantShortName,
+						e.id AS merchantId,
+						e.merchantno AS merchantno,
+						a.after_loan_date AS afterLoanDate
+					FROM
+						inst_managecar_info a
+					LEFT JOIN inst_orderinfo b ON a.orderid = b.orderid
+					LEFT JOIN inst_user c ON b.regid = c.regid
+					LEFT JOIN inst_authoritycard d ON a.orderid = d.orderid
+					LEFT JOIN inst_merchantinfo e ON b.merchantno = e.merchantno
+					where a.processStatus = 5  	
+			) t
+		      LEFT JOIN (SELECT * from (SELECT * from inst_gpsinfo  ORDER BY id DESC) GPS GROUP BY GPS.orderId) p ON t.orderId = p.orderId
+			<where>
+			     1=1
+		    <if test="gpsStatus != null and gpsStatus != '' and gpsStatus == '0'.toString()">
+                AND (p.gpsStatus = #{gpsStatus} or p.gpsStatus IS NULL)
+            </if>
+            <if test="gpsStatus != null and gpsStatus != '' and gpsStatus != '0'.toString()">
+                AND p.gpsStatus = #{gpsStatus} 
+            </if>
+		    <if test="orderId != null and orderId != ''">
+                AND t.orderId = #{orderId}
+            </if>
+            <if test="realName != null and realName != ''">
+                AND t.realName = #{realName}
+            </if>
+            <if test="regId != null and regId != ''">
+                AND t.regId = #{regId}
+            </if>
+            <if test="startDate != null and startDate != ''">
+                AND DATE_FORMAT(t.afterLoanDate,'%Y-%m-%d') &gt;= #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND DATE_FORMAT(t.afterLoanDate,'%Y-%m-%d') &lt;= #{endDate}
+            </if>
+            <if test="plate != null and plate != ''">
+                AND t.plate = #{plate}
+            </if>
+            <if test="carNo != null and carNo != ''">
+                AND t.carNo = #{carNo}
+            </if>
+	        <if test="merList != null and merList.size() > 0">
+	            AND t.merchantno in
+	            <foreach item="item" index="index" collection="merList" open="("
+	                separator="," close=")">
+	                #{item.merchantNo}
+	            </foreach>
+	        </if>
+        </where>
+        ORDER BY t.createTime DESC
+	</select>
+	
+	<select id="queryOrderInfoByOrderId" parameterType="java.util.Map" resultType="com.iqb.consumer.data.layer.bean.order.OrderBean">
+		select *,b.realName as realName from inst_orderinfo a
+		LEFT JOIN inst_user b on a.userId = b.id 
+		where a.orderId = #{orderId}
+	</select>
+	<!-- 保存车辆贷后信息 -->
+	<insert id="saveManageCarInfo" parameterType="java.util.Map" keyProperty="id"
+        useGeneratedKeys="true">
+       INSERT INTO inst_managecar_info (
+        orderId, after_loan_date,status,
+        <if test="processMethod != null">
+            processMethod,
+        </if>
+        <if test="processStatus != null">
+            processStatus,
+        </if>
+        createTime,updateTime
+	    )
+	    VALUES
+        (
+           #{orderId}, NOW(),#{status},
+           <if test="processMethod != null">
+	            #{processMethod,jdbcType=BIGINT},
+	        </if>
+	        <if test="processStatus != null">
+	            #{processStatus,jdbcType=BIGINT},
+	        </if>
+           NOW(),NOW()
+        )
+    </insert>
+    
+    <update id="updateManagerCarInfo" parameterType="java.util.Map">
+    	update inst_managecar_info
+    	<set>
+    	   updateTime = now(),
+			<if test="afterLoanOpinion != null and afterLoanOpinion != ''">
+				afterLoanOpinion = #{afterLoanOpinion},
+			</if>
+			<if test="status != null and status != ''">
+				status = #{status},
+			</if>
+			<if test="repaymentFlag != null">
+                repaymentFlag = #{repaymentFlag,jdbcType=TINYINT},
+            </if>
+			<if test="processMethod != null and processMethod != ''">
+                processMethod = #{processMethod},
+            </if>
+            <if test="processStatus != null and processStatus != ''">
+                processStatus = #{processStatus},
+            </if>
+            <if test="lawTime != null and lawTime != ''">
+                lawTime = #{lawTime},
+            </if>
+		</set>
+		where orderId = #{orderId}
+    </update>
+    <select id="queryManagecarInfo" parameterType="java.lang.String" resultType="com.iqb.consumer.data.layer.bean.carstatus.pojo.ManageCarInfoBean">
+    	select * from inst_managecar_info where orderId = #{orderId}
+    </select>
+    
+       <select id="selectInstRemindPhoneList2" parameterType="java.util.Map" resultMap="InstRemindPhoneBeanMap">
+        SELECT
+		    A.orderId,
+		    A.realName,
+		    A.regId,
+		    B.MERCHANTSHORTNAME AS merchantName,
+		    A.curItems,
+		    A.orderItems,
+		    A.lastrepaydate,
+		    A.curRepayAmt,
+		    A.perOverdueAmt,
+		    A.overdueAmt,
+		    A.overdueDays,
+		    A.billInfoStatus,
+            A.updateTime,
+            CC.remark,
+            DATE_FORMAT(CC.processTime,'%Y-%m-%d %T') processTime,
+		    (SELECT DICT_NAME from iqb_sys_dict_item WHERE DICT_TYPE_CODE='call_result' and DICT_VALUE = CC.telRecord) as telRecord,
+            (SELECT DICT_NAME from iqb_sys_dict_item WHERE DICT_TYPE_CODE='failure_reason' and DICT_VALUE = CC.failReason) as failReason,
+            (SELECT DICT_NAME from iqb_sys_dict_item WHERE DICT_TYPE_CODE='treatment_suggestion' and DICT_VALUE = CC.dealReason) as dealOpinion,
+            (SELECT DICT_NAME from iqb_sys_dict_item WHERE DICT_TYPE_CODE='telephone_urging' and DICT_VALUE = CC.mobileCollection) as mobileCollection,
+            (SELECT DICT_NAME from iqb_sys_dict_item WHERE DICT_TYPE_CODE='treatment_suggestion' and DICT_VALUE = CC.mobileDealOpinion) as mobileDealOpinion,
+		     CASE A.`status` 
+                    when 1 then '未处理'
+                    when 2 then '处理中'
+                    when 3 then '已处理'
+                END `status`
+		FROM
+		    inst_remind_phone A
+		LEFT JOIN inst_merchantinfo B ON A.merchantNo = B.MERCHANTNO
+		LEFT JOIN (SELECT rr.* from ( SELECT * from inst_remind_record WHERE flag = #{flag} ORDER BY id DESC) rr GROUP BY rr.orderid,rr.curItems) CC ON A.orderId = CC.orderId 
+		AND A.curItems = CC.curItems	
+        <where>
+            A.flag = #{flag}
+            <if test="merList != null and merList.size() > 0">
+	            AND a.merchantno in
+	            <foreach item="item" index="index" collection="merList" open="("
+	                separator="," close=")">
+	                #{item.merchantNo}
+	            </foreach>
+	        </if>
+            <if test="orderId != null and orderId != ''">
+                AND A.orderid = #{orderId}
+            </if>
+            <if test="realName != null and realName != ''">
+                AND A.realname = #{realName}
+            </if>
+            <if test="regId != null and regId != ''">
+                AND A.regid = #{regId}
+            </if>
+            <if test="telRecord != null and telRecord != ''">
+                AND CC.telRecord = #{telRecord}
+            </if>
+            <if test="failReason != null and failReason != ''">
+                AND CC.failReason = #{failReason}
+            </if>
+            <if test="dealReason != null and dealReason != ''">
+                AND CC.dealReason = #{dealReason}
+            </if>
+            <if test="overdueDays != null and overdueDays != ''">
+                AND A.overdueDays = #{overdueDays}
+            </if>
+            <if test="mobileCollection != null and mobileCollection != ''">
+                AND CC.mobileCollection = #{mobileCollection}
+            </if>
+            <if test="mobileDealOpinion != null and mobileDealOpinion != ''">
+                AND CC.mobileDealOpinion = #{mobileDealOpinion}
+            </if>
+            <if test="startDate != null and startDate != ''">
+                AND DATE_FORMAT(A.lastRepayDate,'%Y-%m-%d') &gt;= #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND DATE_FORMAT(A.lastRepayDate,'%Y-%m-%d') &lt;= #{endDate}
+            </if>
+            <if test="billInfoStatus != null and billInfoStatus != ''">
+                AND A.billInfoStatus = #{billInfoStatus}
+            </if>
+            <if test="status != null and status != ''">
+                AND A.status = #{status}
+            </if>
+            <if test="processStartDate != null and processStartDate != ''">
+                AND DATE_FORMAT(CC.processTime,'%Y-%m-%d') &gt;= #{processStartDate}
+            </if>
+            <if test="processEndDate != null and processEndDate != ''">
+                AND DATE_FORMAT(CC.processTime,'%Y-%m-%d') &lt;= #{processEndDate}
+            </if>
+            <choose>
+                <when test="flag == 1">
+                    <if test="(startDate == null or startDate=='') and (endDate == null or endDate =='')">
+		                AND DATE_FORMAT(A.lastRepayDate,'%Y-%m-%d') =  DATE_FORMAT(NOW(),'%Y-%m-%d')
+		            </if>
+                </when>
+            </choose>
+        </where>
+        ORDER BY cc.processTime DESC, A.lastrepaydate  DESC
+    </select>
+    <!-- 根据订单号查询风控信息 -->
+    <select id="getRiskInfoByOrderId" parameterType="java.util.Map" resultType="com.iqb.consumer.data.layer.bean.carstatus.pojo.InstRemindPhoneBean">        
+       SELECT
+            A.orderId,
+            B.regId,
+            c.checkInfo,
+            D.bankMobile as phone,
+            E.smsMobile
+		FROM inst_orderinfo A 
+		LEFT JOIN inst_remind_phone B on A.orderId = B.orderId
+		LEFT JOIN (
+		            SELECT AA.* from (
+		            SELECT * from inst_riskinfo where riskType=3 ORDER BY id DESC
+		        ) AA GROUP BY AA.regId
+		        ) C ON B.regId = C.regId
+		        LEFT JOIN (SELECT BB.* from (SELECT * from inst_bankcard ORDER BY id DESC) BB  GROUP BY BB.userid) D on A.userId= D.userId
+		        LEFT JOIN inst_user E on A.userId = E.id
+		WHERE
+		    B.flag = #{flag}
+		    and A.orderId = #{orderId}
+		    LIMIT 1
+    </select>    
+    <!-- 根据订单号查询电话电催信息 -->
+    <select id="getRemindInfoByOrderId" parameterType="java.util.Map" resultType="com.iqb.consumer.data.layer.bean.carstatus.pojo.InstRemindPhoneBean">        
+       SELECT
+                A.orderId,
+                A.realName,
+                A.regId,
+                B.orderItems,
+                A.curItems,
+                C.MERCHANTSHORTNAME AS merchantName,
+                A.lastrepaydate,
+                A.curRepayAmt,
+                A.perOverdueAmt,
+	            A.overdueAmt,
+	            A.overdueDays,
+                CASE A.billInfoStatus
+                    WHEN 0 THEN
+                        '已逾期'
+                    WHEN 1 THEN
+                        '待还款'
+                    WHEN 2 THEN
+                        '部分还款'
+                    WHEN 3 THEN
+                        '已还款'
+                    END billInfoStatus
+            FROM
+                inst_remind_phone A
+            LEFT JOIN inst_orderinfo B ON A.orderId = B.orderId
+            LEFT JOIN inst_merchantinfo C ON A.merchantNo = C.MERCHANTNO
+            WHERE
+                A.flag = #{flag}
+            AND A.orderId = #{orderId}
+            AND A.curItems = #{curItems}
+            limit 1
+    </select>
+</mapper>

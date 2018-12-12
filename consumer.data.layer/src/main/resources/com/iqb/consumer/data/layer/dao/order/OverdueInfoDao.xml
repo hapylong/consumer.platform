@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the Apache License, Version 2.0 (the "License"); 
+    you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+    Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS 
+    IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language 
+    governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.order.OverdueInfoDao">
+        <!-- 配置映射字段 -->
+    <resultMap type="com.iqb.consumer.data.layer.bean.order.OverdueInfoBean" id="overdueInfoBean">
+        <result property="id"               column="id" />
+        <result property="orderId"          column="orderId" />        
+        <result property="batchId"          column="batchId" />
+        <result property="processId"        column="processId" />
+        <result property="overdueDate"      column="overdueDate" />
+        
+        <result property="overdueRemark"    column="overdueRemark" />
+        <result property="sumMarginAmt"     column="sumMarginAmt" />        
+        <result property="sumSettlement"    column="sumSettlement" />
+        <result property="repayDate"        column="repayDate" />
+        <result property="serialNum"        column="serialNum" />
+        
+        <result property="status"           column="status" />
+        <result property="wfStatus"         column="wfStatus" /> 
+        <result property="settlementDate"   column="settlementDate" />                     
+        <result property="version"          column="version" />
+        <result property="createTime"       column="createTime" />
+        <result property="updateTime"       column="updateTime" />
+        
+        <result property="realName"         column="realName" />
+        <result property="regId"            column="regId" />
+        <result property="planName"         column="planName" />
+        <result property="margin"           column="margin" />
+        <result property="merchantName"     column="merchantName" />
+        <result property="bizType"          column="bizType" />  
+        <result property="settlementAmt"    column="settlementAmt" /> 
+        <result property="totalNum"         column="totalNum" />      
+    </resultMap>
+    
+    <!-- 保存违约订单信息 -->
+    <insert id="insertOverdueInfo" parameterType="com.iqb.consumer.data.layer.bean.order.OverdueInfoBean" useGeneratedKeys="true"  keyProperty="id">
+        INSERT INTO inst_overdueInfo 
+            (orderId, overdueDate, overdueRemark, status,createTime) 
+        VALUES 
+            (#{orderId},#{overdueDate},#{overdueRemark},#{status},Now());
+    </insert>
+    <!-- 根据订单号查询违约信息 -->
+    <select id="selectOverdueInfo" parameterType="com.alibaba.fastjson.JSONObject" resultType="com.iqb.consumer.data.layer.bean.order.OverdueInfoBean">
+        SELECT
+		    A.id,
+		    A.orderId,
+		    A.batchId,
+		    A.processId,
+		    A.overdueDate,
+		    A.overdueRemark,
+		    A.sumMarginAmt,
+		    A.sumSettlement,
+		    A.repayDate,
+		    A.serialNum,
+		    A.status,
+		    A.wfStatus,
+		    A.settlementDate
+		FROM
+		    inst_overdueInfo A
+        WHERE 
+            A.orderId = #{orderId}
+    </select>
+    <!-- 通过订单号查询所有未拒绝的流程 -->
+    <select id="selOrderCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+    	SELECT count(id) from inst_overdueinfo WHERE 
+		<if test="orderIds != null and orderIds.size() > 0">
+			orderId in
+			<foreach item="item" index="index" collection="orderIds" open="("
+				separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+ 		AND wfStatus&lt;&gt;0;
+    </select>
+    <!-- 根据订单号更新违约信息 -->
+    <update id="updateOverdueInfo" parameterType = "com.iqb.consumer.data.layer.bean.order.OverdueInfoBean" >
+        update 
+            inst_overdueInfo
+            <set>
+                version = #{version,jdbcType=INTEGER} + 1,
+                <if test="batchId != null and batchId != ''">
+                    batchId = #{batchId},
+                </if>
+                <if test="processId != null and processId != ''">
+                    processId = #{processId},
+                </if>
+                <if test="overdueDate != null and overdueDate != ''">
+                    overdueDate = #{overdueDate},
+                </if>                
+                <if test="overdueRemark != null and overdueRemark != ''">
+                    overdueRemark = #{overdueRemark},
+                </if>
+                <if test="sumMarginAmt != null and sumMarginAmt != ''">
+                    sumMarginAmt = #{sumMarginAmt},
+                </if>                
+                <if test="sumSettlement != null and sumSettlement != ''">
+                    sumSettlement = #{sumSettlement},
+                </if>
+                <if test="repayDate != null and repayDate != ''">
+                    repayDate = #{repayDate},
+                </if>
+                <if test="serialNum != null and serialNum != ''">
+                    serialNum = #{serialNum},
+                </if>
+                <if test="status != null and status != ''">
+                    status = #{status},
+                </if>
+                <if test="wfStatus != null and wfStatus != ''">
+                    wfStatus = #{wfStatus},
+                </if>
+                <if test="settlementDate != null and settlementDate != ''">
+                    settlementDate = #{settlementDate},
+                </if>
+            </set>
+            where orderId = #{orderId}
+    </update>
+    <!-- 根据订单号更新违约信息 -->
+    <update id="updateOverdueInfoByBatchId" parameterType = "com.iqb.consumer.data.layer.bean.order.OverdueInfoBean" >
+        update 
+            inst_overdueInfo
+            <set>
+                 version = #{version,jdbcType=INTEGER} + 1,
+                <if test="processId != null and processId != ''">
+                    processId = #{processId},
+                </if>
+                <if test="sumMarginAmt != null and sumMarginAmt != ''">
+                    sumMarginAmt = #{sumMarginAmt},
+                </if>                
+                <if test="sumSettlement != null and sumSettlement != ''">
+                    sumSettlement = #{sumSettlement},
+                </if>
+                <if test="repayDate != null and repayDate != ''">
+                    repayDate = #{repayDate},
+                </if>
+                <if test="serialNum != null and serialNum != ''">
+                    serialNum = #{serialNum},
+                </if>
+                <if test="settlementDate != null and settlementDate != ''">
+                    settlementDate = #{settlementDate},
+                </if>
+                  <if test="status != null and status != ''">
+                    status = #{status},
+                </if>
+                <if test="wfStatus != null">
+                    wfStatus = #{wfStatus},
+                </if>
+            </set>
+            where batchId = #{batchId}
+    </update>
+    <!-- 根据条件查询违约信息 -->
+    <select id="selectOverdueInfoSettlementList" parameterType="java.util.Map" resultMap="overdueInfoBean">
+        SELECT
+		    A.orderId,
+		    A.batchId,
+			A.wfStatus,
+			A.status,
+			A.settlementDate,
+			A.serialNum,
+		    C.realName,
+		    B.regId,
+		    B.orderAmt,
+		    D.PLANFULLNAME AS planName,
+		    B.margin,
+		    IFNULL(B.margin, 0) * 0.4 AS settlementAmt,
+		    A.overdueDate,
+		    A.overdueRemark,
+		    (SELECT DICT_NAME from iqb_sys_dict_item WHERE DICT_TYPE_CODE='business_type' and DICT_CODE= B.bizType ) as bizType,
+		    (
+		        SELECT
+		            MERCHANTSHORTNAME
+		        FROM
+		            inst_merchantinfo
+		        WHERE
+		            merchantNo = B.merchantNo
+		    ) AS merchantName
+		FROM
+		    inst_overdueInfo A
+		LEFT JOIN inst_orderinfo B ON A.orderId = B.orderId
+		LEFT JOIN inst_user C ON B.userId = C.id
+		LEFT JOIN inst_plan D ON B.planId = D.ID
+        where 1=1
+         <if test="status != null and status != ''">
+            AND A.status = #{status}
+        </if>
+        <if test="wfStatus != null and wfStatus != ''">
+            AND A.wfStatus = #{wfStatus}
+        </if>
+        <if test="batchId != null and batchId != ''">
+            AND A.batchId = #{batchId}
+        </if>
+        <if test="merList != null and merList.size() > 0">
+            AND B.MERCHANTNO in
+            <foreach item="item" index="index" collection="merList" open="("
+                separator="," close=")">
+                #{item.merchantNo}
+            </foreach>
+        </if>
+        <if test="orderId != null and orderId != ''">
+            AND A.orderId = #{orderId}
+        </if>
+        <if test="regId != null and regId != ''">
+            AND B.regId = #{regId}
+        </if>
+        <if test="realName != null and realName != ''">
+            AND C.realName = #{realName}
+        </if>
+        <if test="bizType != null and bizType != ''">
+            AND B.bizType = #{bizType}
+        </if>
+        <if test="overdueRemark != null and overdueRemark != ''">
+            AND A.overdueRemark LIKE '%${overdueRemark}%'
+        </if>
+        <if test="startTime !=null and startTime != ''">
+            AND A.overdueDate &gt;= #{startTime}
+        </if>
+        <if test="endTime !=null and endTime != ''">
+            AND A.overdueDate &lt;= #{endTime}
+        </if>
+        <if test="startTimeQuery !=null and startTimeQuery != ''">
+            AND A.settlementDate &gt;= #{startTimeQuery}
+        </if>
+        <if test="endTimeQuery !=null and endTimeQuery != ''">
+            AND A.settlementDate &lt;= #{endTimeQuery}
+        </if>
+        <if test="marginRatio != null and marginRatio != ''">
+            AND D.MARGINRATIO = #{marginRatio}
+        </if>
+        <if test="downPaymentRatio != null and downPaymentRatio != ''">
+            AND D.DOWNPAYMENTRATIO = #{downPaymentRatio}
+        </if>
+        <if test="serviceFeeRatio != null and serviceFeeRatio != ''">
+            AND D.SERVICEFEERATIO = #{serviceFeeRatio}
+        </if>
+        <if test="upInterestFee != null and upInterestFee != ''">
+            AND D.UPINTERESTFEE = #{upInterestFee}
+        </if>
+        <if test="takePayment != null and takePayment != ''">
+            AND D.TAKEPAYMENT = #{takePayment}
+        </if>
+        <if test="batchId != null and batchId != ''">
+            AND A.batchId = #{batchId}
+        </if>
+    </select>
+     <!-- 根据批次号查询总结算金额、总保证金、总笔数 -->
+    <select id="getOverdueInfoByBatchId" parameterType="com.alibaba.fastjson.JSONObject" resultType="com.iqb.consumer.data.layer.bean.order.OverdueInfoBean">
+        SELECT
+		    A.batchId,
+		    A.orderId,
+		    SUM(B.margin) AS sumMarginAmt,
+		    SUM(A.sumSettlement) AS sumSettlement,
+		    COUNT(A.id) AS totalNum,
+		    A.settlementDate,
+            A.serialNum,
+            A.repayDate
+		FROM
+		    inst_overdueInfo A,
+		    inst_orderinfo B
+		WHERE
+		    A.orderId = B.orderId
+		AND A.batchId = #{batchId}
+    </select>
+    
+    <!--档案查询-->
+    <select id="queryArchivesList" parameterType="java.util.Map" resultType="com.iqb.consumer.data.layer.bean.order.ArchivesBean">
+        SELECT
+		    A.orderId,
+		    C.realName,
+		    C.regId,
+		    DATE_FORMAT(A.createTime, '%Y-%m-%d %T') orderDate,
+		    A.orderAmt,
+		    A.orderItems,
+		    A.monthInterest,
+		    A.preAmt,
+		    A.bizType,
+		    A.riskStatus,
+		    D.PLANFULLNAME as planName,
+		    B.MERCHANTSHORTNAME as merchantName,
+		    B.ID as orgCode,
+		    E.plate AS licenseNo,
+            E.carNo AS vin,
+            E.engine AS engineNumber
+		FROM
+		    inst_orderinfo A
+			LEFT JOIN inst_merchantinfo B ON A.merchantNo = B.MERCHANTNO
+			LEFT JOIN inst_user C ON A.userId = C.id
+			LEFT JOIN inst_plan D ON A.planId = D.ID
+			LEFT JOIN inst_authoritycard E on A.orderId = E.orderId
+		where  
+		    A.bizType IN ('2001', '2002')
+            AND A.`status` <![CDATA[<>]]> 2
+        <if test="merList != null and merList.size() > 0">
+            AND B.MERCHANTNO in
+            <foreach item="item" index="index" collection="merList" open="("
+                separator="," close=")">
+                #{item.merchantNo}
+            </foreach>
+        </if>
+        <if test="orderId != null and orderId != ''">
+            AND A.orderId = #{orderId}
+        </if>
+        <if test="regId != null and regId != ''">
+            AND c.regId = #{regId}
+        </if>
+        <if test="realName != null and realName != ''">
+            AND C.realName = #{realName}
+        </if>
+        <if test="riskStatus != null and riskStatus != ''">
+            AND A.riskStatus = #{riskStatus}
+        </if>
+		<if test="startTime !=null and startTime != ''">
+            AND DATE_FORMAT(A.createTime, '%Y-%m-%d') &gt;= #{startTime}
+        </if>
+        <if test="endTime !=null and endTime != ''">
+            AND DATE_FORMAT(A.createTime, '%Y-%m-%d') &lt;= #{endTime}
+        </if>  	
+        ORDER BY A.createTime DESC
+    </select>
+</mapper>

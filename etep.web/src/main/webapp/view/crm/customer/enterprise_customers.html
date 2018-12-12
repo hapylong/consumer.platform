@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>企业客户信息</title>
+        <meta charset="UTF-8" />
+        <meta name="Author" content="" />
+        <meta name="Keywords" content="" />
+        <meta name="Description" content="" /> 
+        <!-- 样式库 -->
+	    <link rel="stylesheet" href="../../../js/bootstrap/themes/default/bootstrap.css" />
+	    <link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+	    <link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+	    <link rel="stylesheet" href="../../../js/ztree/css/zTreeStyle/zTreeStyle.css" />
+	    <link rel="stylesheet" href="../../../css/jquery.select2.css" />
+	    <link rel="stylesheet" href="../../../css/jquery.select2-bootstrap.css" />
+   	    <link rel="stylesheet" href="../../../js/lightbox2/css/lightbox.css" />
+   	    <link rel="stylesheet" href="../../../js/bootstrap/themes/default/jquery.mCustomScrollbar.css" />
+	    
+	    <!-- 插件库 -->
+	    <script src="../../../js/common/package.js"></script>
+		<script src="../../../js/common/url.js"></script>
+		<script src="../../../js/common/json2.js"></script>	
+		<script src="../../../js/common/jquery-1.11.3.min.js"></script>	
+		<script src="../../../js/common/jquery.form.js"></script>		
+		<script src="../../../js/bootstrap/bootstrap.js"></script>
+		<script src="../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+		<script src="../../../js/bootstrap/plugins/jquery.mCustomScrollbar.js"></script>
+		<script src="../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+		<script src="../../../js/ztree/js/jquery.ztree.all.min.js"></script>
+		<script src="../../../js/common/jquery.select2.js"></script>
+		
+		<!-- 图片上传  -->
+		<link href="../../../js/uploadplugin/fine-uploader-gallery.css" rel="stylesheet" type="text/css" />
+		<link href="../../../js/uploadplugin/fine-uploader-new.css" rel="stylesheet" type="text/css" />
+		<link href="../../../js/uploadplugin/styles.css" rel="stylesheet" type="text/css" />
+		<script src="../../../js/uploadplugin/all.fine-uploader.js"></script>
+		<script src="../../../js/uploadplugin/pica.js"></script>
+		
+		<!-- 业务库 -->
+		<script src="../../../js/common/base.js"></script>
+		<script src="../../../js/common/datagrid2.js"></script>
+		<script src="../../../js/common/tree.js"></script>
+		<script src="../../../js/common/formatter.js"></script>	  
+        <script src="../../../js/each/crm/customer/enterprisecustomers.js"></script>
+        <style type="text/css">
+            body {background:#eee url("../../../img/back.png") repeat;}
+            .container-fluid{
+                padding:5px;
+            }
+            .left-part {
+				height: 800px;
+			}
+			.modal-form {
+				margin: 15px 30px 15px 30px;
+				
+			}
+        </style>
+    </head>
+    <body>  
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-info">
+                    <div class="panel-heading">
+                    	<h3 class="panel-title">企业客户信息查询栏</h3>
+                    </div>
+                        <div class="panel-body">    
+                            <form id="searchForm" class="form-horizontal">                               
+                                <div class="form-group">
+                                    <label class="control-label col-lg-1 col-md-1 col-sm-1">客户名称:</label>
+                                    <div class="col-lg-2 col-md-2 col-sm-2">
+                                        <input name=customerName type="text" class="form-control" placeholder="客户名称">
+                                    </div>
+                                    <label class="control-label col-lg-1 col-md-1 col-sm-1">客户类型:</label>
+                                    <div class="col-lg-2 col-md-2 col-sm-2">
+                                        <select id="query-customerType" name="customerType" class="form-control" style="width:100%"></select>
+                                    </div>
+                                    <label class="control-label col-lg-1 col-md-1 col-sm-1">客户状态:</label>
+	                                <div class="col-lg-2 col-md-2 col-sm-2">
+	                                    <select id="query-customerStatus" name="customerStatus" class="form-control" style="width:100%">
+										</select>
+									</div>
+									<div class="col-lg-3 col-md-3 col-sm-3">
+										<button id="btn-search" type="button" class="btn btn-default btn-sm">查询</button>
+	                                    <button id="btn-reset" type="button" class="btn btn-default btn-sm">重置</button>
+                                    </div>
+                                </div>
+                            </form>                                                         
+                        </div>
+					</div>		
+					<div class="panel panel-info">	
+                        <div class="panel-heading">
+                            <h3 class="panel-title">企业客户信息列表</h3>
+                        </div>
+                        <div class="panel-body">
+                            <form id="listForm">                                
+                                <button id="btn-insert" type="button" class="btn btn-primary btn-sm">新增</button>
+                                <button id="btn-update" type="button" class="btn btn-warning btn-sm">修改</button>
+                                <button id="btn-deletePush" type="button" class="btn btn-danger btn-sm">删除</button>
+                                <button id="btn-check" type="button" class="btn btn-info btn-sm">查看</button>
+                                <!-- <button id="btn-pushToXFJR" type="button" class="btn btn-info btn-sm">推送至消费金融</button> -->
+                            </form>
+                        </div>
+                        <table id="datagrid" class="table table-bordered table-hover" style="text-align:center">
+                            <thead>
+                                <tr>
+                                    <th field="ck"></th>
+                                    <th field="customerCode" idField="true" hidden="true"></th>
+									<th field="rn" style="text-align:center">序号</th>
+									<th field="customerName" style="text-align:center">客户名称</th>
+									<th field="customerCode" style="text-align:center">客户编码</th>
+									<th field="customerType" style="text-align:center" formatter="IQB.enterprisecustomers.parseCustomerType(val, 'CUSTOMER_TYPE');">客户类型</th>
+									<th field="addressDetail" style="text-align:center">详细地址</th>
+									<th field="customerStatus" style="text-align:center" formatter="IQB.enterprisecustomers.parseCustomerStatus(val, 'CUSTOMER_STATUS');">状态</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                        <div class="panel-footer">
+                            <div id="paginator">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>          
+        </div>
+        <div id="update-win" class="modal fade" role="dialog" aria-labelledby="update-win-label" aria-describedby="企业客户信息">
+			<div class="modal-dialog modal-lg" role="document">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<h5 class="modal-title" id="update-win-label">企业客户信息</h5>
+		      		</div>
+		      		<div class="modal-form">
+		       			<form id="updateForm" class="form-horizontal">
+				  			<div class="form-group">
+				    			<label class="col-md-2 control-label">渠道名称</label>
+				    			<div class="col-md-4">
+				      				<input id="customerName" name="customerName" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入渠道名称" required="required" validType="maxLength[50]" />
+				    			</div>
+				    			<label class="col-md-2 control-label">渠道编码</label>
+				    			<div class="col-md-4">
+				      				<input id="customerCode" name="customerCode" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入渠道编码" required="required" validType="maxLength[50]" />
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-md-2 control-label">渠道简称</label>
+				    			<div class="col-md-4">
+				      				<input id="customerShortName" name="customerShortName" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入渠道简称" required="required" validType="maxLength[50]" />
+				    			</div>
+				    			<label class="col-md-2 control-label">渠道全称</label>
+                                <div class="col-md-4">
+                                    <input id="customerFullName" name="customerFullName" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入渠道全称" required="required" validType="maxLength[50]" />
+                                </div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-md-2 control-label">渠道类型</label>
+				    			<div class="col-md-4">
+				      				<select id="select-customerType" multiple="multiple" name="customerType" style="width: 100%"></select>
+				    			</div>
+				    			<label class="col-md-2 control-label">渠道简称编码</label>
+				    			<div class="col-md-4">
+				      				<input id="customerShortNameCode" name="customerShortNameCode" type="text" class="form-control input-sm easyui-validatebox" required="required" placeholder="请输入渠道简称编码" validType="maxLength[15]" />
+				    			</div>
+				  			</div>	
+				  			<!-- 增加业务类型 -- 帮帮手业务  by guoliangdi  2017.3.20 start -->
+				  			<div class="form-group">
+				    			<label class="col-md-2 control-label">所属微信号</label>
+				    			<div class="col-md-4">
+				      				<select id="select-holdWeixin" name="holdWeixin" class="easyui-validatebox" required="required" style="width: 100%"></select>
+				    			</div>
+				    			<label class="col-md-2 control-label">业务类型</label>
+				    			<div class="col-md-4">
+				      				<select id="select-businessType" multiple="multiple" name="businessType" class="easyui-validatebox" required="required" style="width: 100%"></select>
+				    			</div>
+				  			</div>
+				  			<!-- 新增 -->	
+				  			<div class="form-group">
+				    			<label class="col-md-2 control-label">开户银行</label>
+				    			<div class="col-md-4">
+				    			    <input id="customerBankName" name="customerBankName" type="text" class="form-control input-sm easyui-validatebox" required="required" placeholder="请输入开户银行" validType="maxLength[20]" />
+				    			</div>
+				    			<label class="col-md-2 control-label">银行账号</label>
+				    			<div class="col-md-4">
+				    			    <input id="customerBankNo" name="customerBankNo" type="text" class="form-control input-sm easyui-validatebox" required="required" placeholder="请输入银行账号" validType="maxLength[30]" />
+				    			</div>
+				  			</div>
+				  			<!-- 2017.3.20 end -->
+				  			<div class="form-group">
+				    			<label class="col-md-2 control-label">法人姓名</label>
+				    			<div class="col-md-4">
+				      				<input name="corporateName" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入法人姓名" required="required" validType="maxLength[50]" />
+				    			</div>
+				    			<label class="col-md-2 control-label">法人证件号类型</label>
+				    			<div class="col-md-4">
+				      				<select id="select-corporateCertificateType" name="corporateCertificateType" class="easyui-validatebox" required="required" style="width: 100%"></select>
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-md-2 control-label">法人证件号</label>
+				    			<div class="col-md-4">
+				      				<input name="corporateCertificateCode" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入法人证件号" required="required" validType="maxLength[50]" />
+				    			</div>
+				    			<label class="col-md-2 control-label">注册地址</label>
+				    			<div class="col-md-4">
+                                    <input name="regAddress" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入注册地址" required="required" validType="maxLength[50]" />
+                                </div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-md-2 control-label">省</label>
+				    			<div class="col-md-4">
+				      				<select id="select-province" name="province" class="easyui-validatebox" required="required" style="width: 100%"></select>
+				    			</div>
+				    			<label class="col-md-2 control-label">市</label>
+				    			<div class="col-md-4">
+				      				<select id="select-city" name="city" class="easyui-validatebox" required="required" style="width: 100%"></select>
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-md-2 control-label">详细地址</label>
+				    			<div class="col-md-4">
+				      				<input name="addressDetail" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入详细地址" required="required" validType="maxLength[150]" />
+				    			</div>
+				    			<label class="col-md-2 control-label">风控类型</label>
+				    			<div class="col-md-4">
+				      				<select id="select-riskManageType" name="riskManageType" class="easyui-validatebox" required="required" style="width: 100%"></select>
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-md-2 control-label">是否父加盟商</label>
+				    			<div class="col-md-4">
+				      				<select id="select-isFather" name="isFather" class="easyui-validatebox" required="required" style="width: 100%"></select>
+				    			</div>
+				    			<label class="col-md-2 control-label">层级</label>
+				    			<div class="col-md-4">
+				      				<select id="select-layer" name="layer" class="easyui-validatebox" required="required" style="width: 100%"></select>
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-md-2 control-label">分期计划</label>
+				    			<div class="col-md-4">
+				      				<input name="installmentPlan" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入分期计划" required="required" validType="num" />
+				    			</div>
+				    			<label class="col-md-2 control-label">逾期利率</label>
+				    			<div class="col-md-4">
+				      				<input name="overdueInterestRate" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入逾期利率" required="required" validType="num" />
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-md-2 control-label">逾期利率手续费</label>
+				    			<div class="col-md-4">
+				      				<input name="overdueFixedFee" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入逾期利率手续费" required="required" validType="num"></input>
+				    			</div>
+				    			<label class="col-md-2 control-label">逾期利率模式</label>
+				    			<div class="col-md-4">
+				    				<select id="select-overdueInterestModel" name="overdueInterestModel" style="width: 100%"></select>
+				    			</div>
+				  			</div>				 			
+				  			<div class="form-group">
+				    			<label class="col-md-2 control-label">是否为虚商户</label>
+				    			<div class="col-md-4">
+				    				<select id="select-isVirtualMerc" name="isVirtualMerc" class="easyui-validatebox" required="required" style="width: 100%"></select>
+				    			</div>
+				    			<label class="col-md-2 control-label">状态</label>
+				    			<div class="col-md-4">
+				    				<select id="select-customerStatus" name="customerStatus" class="easyui-validatebox" required="required" style="width: 100%"></select>
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-md-2 control-label">服务电话</label>
+				    			<div class="col-md-4">
+                                    <input name="serviceCall" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入服务电话" required="required" validType="phone"></input>
+                                </div>
+                                <label class="col-md-2 control-label">企业邮箱</label>
+                                <div class="col-md-4">
+                                    <input name="enterpriseMailbox" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入企业邮箱" required="required" validType="email"></input>
+                                </div>
+				  			</div>
+				  			
+				  			<div class="form-group">
+                                <label class="col-md-2 control-label">法人电话</label>
+                                <div class="col-md-4">
+                                    <input name="legalPersonPhoneNum" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入法人电话" required="required" validType="phone"></input>
+                                </div>
+                                <label class="col-md-2 control-label">社会信用代码</label>
+                                <div class="col-md-4">
+                                    <input name="socialCreditCode" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入社会信用代码" required="required" validType="maxLength[50]"></input>
+                                </div>
+                            </div>  
+                            
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">工商注册号</label>
+                                <div class="col-md-4">
+                                    <input name="icRegCode" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入工商注册号" required="required" validType="maxLength[50]"></input>
+                                </div>
+                                <label class="col-md-2 control-label">组织机构代码</label>
+                                <div class="col-md-4">
+                                    <input name="organizationCode" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入组织机构代码" required="required" validType="maxLength[50]"></input>
+                                </div>
+                            </div>  
+                            
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">税务登记证号码</label>
+                                <div class="col-md-4">
+                                    <input name="taxCertificateCode" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入税务登记证号码" required="required" validType="maxLength[50]"></input>
+                                </div>
+                                <label class="col-md-2 control-label">联系人姓名</label>
+                                <div class="col-md-4">
+                                    <input name="businessContactName" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入联系人姓名" required="required" validType="maxLength[50]"></input>
+                                </div>
+                            </div> 
+                            
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">联系人身份证号</label>
+                                <div class="col-md-4">
+                                    <input name="businessContactIdcard" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入联系人身份证号" required="required" validType="idCard"></input>
+                                </div>
+                                <label class="col-md-2 control-label">营业执照注册号</label>
+                                <div class="col-md-4">
+                                    <input name="businessLicenseNum" type="text" class="form-control input-sm easyui-validatebox" placeholder="请输入营业执照注册号" required="required" validType="maxLength[50]"></input>
+                                </div>
+                            </div> 	
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">风控系统是否配置商户编码</label>
+                                <div class="col-md-4">
+                                    <select id="riskFlag" name="riskFlag" class="easyui-validatebox" required="required" style="width: 100%"></select>
+                                </div>
+                                <label class="col-md-2 control-label">密钥</label>
+                                <div class="col-md-4">
+                                    <select id="riskCode" name="riskCode" class="easyui-validatebox" required="required" style="width: 100%"></select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">企业简介</label>
+                                <div class="col-md-10">
+                                    <textarea rows="4" cols="5" class="form-control easyui-validatebox validatebox-text validatebox-readonly" name="remark" id="remark" validtype="maxLength[1024]"></textarea>
+                                </div>
+                            </div> 	
+					           
+		  			</form>
+		      		</div>
+		      		<div class="modal-footer">
+				        <button id="btn-save" type="button" class="btn btn-success btn-sm">保存</button>
+				        <button id="btn-close" type="button" class="btn btn-default btn-sm">关闭</button>		        
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+		<form id="uploadForm">
+			<input id="img" class="hidden" type="file" name="qqfile"/>
+			<input id="imgType" type="text" class="hidden" name="imgType"/>
+		</form>
+    </body>
+    <script src="../../../js/lightbox2/js/lightbox.js"></script>
+</html>

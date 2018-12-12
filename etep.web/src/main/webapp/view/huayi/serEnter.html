@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>提交借款申请单</title>
+		<meta charset="UTF-8" />
+		<meta name="Author" content="" />
+		<meta name="Keywords" content="" />
+		<meta name="Description" content="" />
+
+		<!-- 基础CSS库 -->
+		<link rel="stylesheet" href="../../js/ztree/css/zTreeStyle/zTreeStyle.css" />
+		<link rel="stylesheet" href="../../js/bootstrap/themes/default/bootstrap.css" />
+		<link rel="stylesheet" href="../../css/font-awesome/css/font-awesome.min.css" />
+		<link rel="stylesheet" href="../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+		<link rel="stylesheet" href="../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+		<link rel="stylesheet" href="../../css/jquery.select2.css" />
+		<link rel="stylesheet" href="../../css/jquery.select2-bootstrap.css" />
+		<link rel="stylesheet" href="../../js/viewer/viewer.css" />
+		<link rel="stylesheet" href="../../css/jquery.datetimepicker.css" /> 
+        
+		<!-- 业务CSS库 -->
+		<link rel="stylesheet" href="../../css/common/base.css"/>
+		<link rel="stylesheet" href="../../css/common/scrollbar.css" />
+
+		<!-- 基础JS库 -->
+		<script src="../../js/common/package.js"></script>
+		<script src="../../js/common/url.js"></script>
+		<script src="../../js/common/json2.js"></script>
+		<script src="../../js/common/jquery-1.11.3.min.js"></script>
+		<script src="../../js/ztree/js/jquery.ztree.all.min.js"></script>
+		<script src="../../js/common/jquery.form.js"></script>
+		<script src="../../js/bootstrap/bootstrap.js"></script>
+		<script src="../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+		<script src="../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+		<script src="../../js/common/jquery.select2.js"></script>
+		<script src="../../js/viewer/viewer.js"></script>
+		<script src="../../js/common/jquery.datetimepicker.js"></script>
+		
+
+		<!-- 业务JS库 -->
+		<script src="../../js/common/tree.js"></script>
+		<script src="../../js/common/base.js"></script>
+		<script src="../../js/common/datagrid2.js"></script>
+		<script src="../../js/common/formatter.js"></script>
+		<script src="../../js/common/wflow.js"></script>
+		<script src="../../js/each/revolvingCredit/serEnter.js"></script>
+		<script src="../../js/each/cfm/merch/merchOwerLoan.js"></script>
+
+		<!-- 页面样式 -->
+		<style type="text/css">
+			.container-fluid {
+				padding-top: 4px;
+			}
+			.text-right {
+				text-align: right;
+			}
+			.text-muted {
+				font-weight: bold;
+			}
+			.text-stress {
+				font-weight: bold;
+			}
+			.list-group-blank {
+				background-color: #f5f5f5;
+			}
+			th {
+				text-align: center;
+			}
+			td {
+				text-align: center;
+			}
+			.modal-form {
+				margin: 15px 0;
+			}
+			.float-left {
+				float: left;
+				margin-right: 8px;
+			}
+			.special-panel {
+				border-top-left-radius: 0 !important;
+			}
+			.nav-tabs {
+				border-bottom: 1px solid #fff;				
+			}
+			.alert {
+				padding: 10px;
+				margin-bottom: 2px;
+			}
+			h5 {
+				float: left;
+				width: 80%;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				-o-text-overflow: ellipsis;
+				-webkit-text-overflow: ellipsis;
+				-moz-text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+			h6 {
+				float: right;
+				width: 10%;
+			}
+			a :hover {
+				cursor: pointer;
+			}
+			.margin{
+			    margin-top:10px; 
+			}
+			.noSublet{
+			    display:none;
+			    list-style:none;
+			}
+		</style>
+	</head>
+	<body>
+	<div class="container-fluid">
+		<ul id="tab" class="nav nav-tabs" role="tablist">
+		  	<li role="presentation" class="active"><a href="#order-tab" role="tab" data-toggle="tab">基本信息</a></li>
+		</ul>
+		<div class="tab-content">
+			<div role="tabpanel" class="tab-pane fade in active" id="order-tab">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<button id="btn-save" type="button"	class="btn btn-primary btn-sm">
+							<span class="glyphicon glyphicon-user"></span> 审核
+						</button>
+						<!-- <button id="btn-unassign" type="button" class="btn btn-primary btn-sm">
+							<span class="glyphicon glyphicon-share-alt"></span> 取消签收
+						</button> -->
+					</div>
+					<ul class="list-group">
+				    	<form id='updateForm'>
+				    	<li class="list-group-item list-group-blank">基本信息</li>
+				    	<li class="list-group-item" style="border-bottom: 1px solid #fff;">
+							<div class="row">		
+								<div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">机构名称</span></div>
+								<div class="col-md-2">
+								    <input id="merchName" type="text" readonly value="全部商户" name="merchName" class="form-control merch" onclick="showMenu(); return false;"/>
+								</div>	
+								<div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">业务类型</span></div>
+								<div class="col-md-2">
+									<select class='form-control input-sm easyui-validatebox' name='bizType' id='bizType'>
+									</select>
+								</div>	
+								<div class="col-md-1 text-right"><span class="text-stress">产品名称</span></div>
+								<div class="col-md-2"><span id="groupName" class="text-muted">华益周转贷</span></div>
+								<div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">姓名</span></div>
+								<div class="col-md-2"><input type='text' class='input-sm form-control easyui-validatebox' id='realName' data-options="required:true, validType:['name','minLength[2]']"></div>
+							</div>
+						</li>
+						<li class="list-group-item" style="border-top: none;">
+							<div class="row">
+							    <div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">手机号</span></div>
+								<div class="col-md-2"><input type='text' class='input-sm form-control easyui-validatebox' id='regId' data-options="required:true, validType:['mobilePhone']"></div>			
+								<div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">身份证号</span></div>
+								<div class="col-md-2"><input type='text' class='input-sm form-control easyui-validatebox' id='idCard' data-options="required:true, validType:['idCard']"></div>
+								<div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">开户银行</span></div>
+                                <div class="col-md-2"><select id="bankCardName" class="form-control input-sm easyui-validatebox" style='width:100%'></select></div>
+                                <div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">银行卡</span></div>
+                                <div class="col-md-2"><input type='text' class='input-sm form-control easyui-validatebox' id='bankCard' data-options="required:true, validType:['bankCard']" ></div>
+							</div>
+						</li>
+						<li class="list-group-item" style="border-top: none;">
+							<div class="row">
+								<div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">银行预留手机号</span></div>
+								<div class="col-md-2"><input type='text' class='input-sm form-control easyui-validatebox' id='bankMobile' data-options="required:true, validType:['mobilePhone']"></div>
+								<div class="col-md-1 text-right"><span class="text-stress">常驻地址</span></div>
+								<div class="col-md-2"><input type='text' class='input-sm form-control' id='address'></div>
+								<div class="col-md-1 text-right"><span class="text-stress">公司名称</span></div>
+								<div class="col-md-2"><input type='text' class='input-sm form-control' id='firmName'></div>				
+								<div class="col-md-1 text-right"><span class="text-stress">公司地址</span></div>
+								<div class="col-md-2"><input type='text' class='input-sm form-control' id='firmAddress'></div>
+							</div>
+						</li>
+						<li class="list-group-item" style="border-top: none;">
+							<div class="row">		
+							    <div class="col-md-1 text-right"><span class="text-stress">公司电话</span></div>
+								<div class="col-md-2"><input type='text' class='input-sm form-control' id='firmPhone'></div>				
+								<div class="col-md-1 text-right"><span class="text-stress">网查征信账号</span></div>
+								<div class="col-md-2"><input type='text' class='input-sm form-control' id='creditNumber'></div>
+								<div class="col-md-1 text-right"><span class="text-stress">网查征信密码</span></div>
+								<div class="col-md-2"><input type='text' class='input-sm form-control' id='creditPass'></div>
+								<div class="col-md-1 text-right"><span class="text-stress">与网查征信验证码</span></div>
+								<div class="col-md-2"><input type='text' class='input-sm form-control' id='creditCode'></div>
+							</div>
+						</li>
+						<li class="list-group-item list-group-blank">补充基本信息</li>
+                        <li class="list-group-item">
+                            <div class="row">
+                                <div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">申请金额</span></div>
+                                <div class="col-md-2"><input type='number' class='input-sm form-control easyui-validatebox' id='orderAmt' data-options="required:true, validType:['money']"></div>
+                                <div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">期限（月）</span></div>
+                                <div class="col-md-2"><input type='number' class='input-sm form-control easyui-validatebox' id='orderItems' data-options="required:true, validType:['int']"></div>
+                            </div>
+                        </li>
+                        <li class="list-group-item" style="border-top: none;">
+                            <div class="row">
+                                <div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">同事姓名1</span></div>
+                                <div class="col-md-2"><input type='text' class='input-sm form-control easyui-validatebox' id='workmateOne' data-options="required:true, validType:['name','minLength[2]']"></div>
+                                <div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">手机号1</span></div>
+                                <div class="col-md-2"><input type='text' class='input-sm form-control easyui-validatebox' id='workmateOneTel' data-options="required:true, validType:['mobilePhone']"></div>      
+                                <div class="col-md-1 text-right"><span class="text-stress">同事姓名2</span></div>
+                                <div class="col-md-2"><input type='text' class='input-sm form-control' id='workmateTwo' data-options="validType:['name','minLength[2]']"></div>
+                                <div class="col-md-1 text-right"><span class="text-stress">手机号2</span></div>
+                                <div class="col-md-2"><input type='text' class='input-sm form-control' id='workmateTwoTel' data-options="validType:['mobilePhone']"></div>    
+                            </div>
+                        </li>
+                        <li class="list-group-item" style="border-top: none;">
+                            <div class="row">               
+                                <div class="col-md-1 text-right"><span class="text-stress">与借款人关系1</span></div>
+                                <div class="col-md-2"><select id="relationOne" class="form-control input-sm" style='width:100%'></select></div>
+                                <div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">姓名1</span></div>
+                                <div class="col-md-2"><input type='text' class='input-sm form-control easyui-validatebox' id='reNameOne' data-options="required:true, validType:['name','minLength[2]']"></div>
+                                <div class="col-md-1 text-right"><span class="text-stress">性别1</span></div>
+                                <div class="col-md-2"><select id="sexOne" class="form-control input-sm" style='width:100%'></select></div>
+                                <div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">手机号1</span></div>
+                                <div class="col-md-2"><input type='text' class='input-sm form-control easyui-validatebox' id='mobileOne' data-options="required:true, validType:['mobilePhone']"></div>
+                            </div>
+                        </li>
+                        <li class="list-group-item" style="border-top: none;">
+                            <div class="row">               
+                                <div class="col-md-1 text-right"><span class="text-stress">与借款人关系2</span></div>
+                                <div class="col-md-2"><select id="relationTwo" class="form-control input-sm" style='width:100%'></select></div>
+                                <div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">姓名2</span></div>
+                                <div class="col-md-2"><input type='text' class='input-sm form-control easyui-validatebox' id='reNameTwo' data-options="required:true, validType:['name','minLength[2]']"></div>
+                                <div class="col-md-1 text-right"><span class="text-stress">性别2</span></div>
+                                <div class="col-md-2"><select id="sexTwo" class="form-control input-sm" style='width:100%'></select></div>
+                                <div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">手机号2</span></div>
+                                <div class="col-md-2"><input type='text' class='input-sm form-control easyui-validatebox' id='mobileTwo' data-options="required:true, validType:['mobilePhone']"></div>
+                            </div>
+                        </li>
+                        <li class="list-group-item" style="border-top: none;">
+                            <div class="row">               
+                                <div class="col-md-1 text-right"><span class="text-stress">与借款人关系3</span></div>
+                                <div class="col-md-2"><select id="relationThree" class="form-control input-sm" style='width:100%'></select></div>
+                                <div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">姓名3</span></div>
+                                <div class="col-md-2"><input type='text' class='input-sm form-control easyui-validatebox' id='reNameThree' data-options="required:true, validType:['name','minLength[2]']"></div>
+                                <div class="col-md-1 text-right"><span class="text-stress">性别3</span></div>
+                                <div class="col-md-2"><select id="sexThree" class="form-control input-sm" style='width:100%'></select></div>
+                                <div class="col-md-1 text-right"><span style='color:red'>*</span><span class="text-stress">手机号3</span></div>
+                                <div class="col-md-2"><input type='text' class='input-sm form-control easyui-validatebox' id='mobileThree' data-options="required:true, validType:['mobilePhone']"></div>
+                            </div>
+                        </li>
+					</ul>
+					</form>
+					
+					<div style='background:#f5f5f5;padding:10px 0;'>			
+						<div class="btn-group">
+						  	<button id="btn-upload" type="button" class="btn btn-warning btn-sm dropdown-toggle" data-toggle="dropdown">
+						  		<span class="fa fa-folder-open-o"></span> 征信信息截图 <span class="caret"></span>							    	
+						  	</button>
+						  	<ul class="dropdown-menu" role="menu">	
+						    	<li><a id="btn-uploadTypeOne" href="#">社保</a></li>						    	
+						    	<li><a id="btn-uploadTypeTwo" href="#">公积金</a></li>
+						    	<li><a id="btn-uploadTypeThree" href="#">征信</a></li>
+						    	<li><a id="btn-uploadTypeFour" href="#">企业信息查询</a></li>
+						    	<!-- 后续加的图片以10开头 -->
+						    	<li><a id="btn-uploadType101" href="#">第三方数据查询</a></li>
+						    	<li><a id="btn-uploadType102" href="#">其它</a></li>
+						  	</ul>
+						</div>
+					</div>			
+					<table id="viewerOne" class="table table-bordered" style='border-top:1px solid #ddd'>
+					    <tbody>
+				    		<tr class="old-tr">	
+						    	<td style="vertical-align: middle;width:15%"><span class="text-stress">社保</span></td>						    	
+						    	<td id="td-1" style="vertical-align: middle;"></td>
+				    		</tr>
+				    		<tr class="old-tr">
+						    	<td style="vertical-align: middle;width:15%"><span class="text-stress">公积金</span></td>						    	
+						    	<td id="td-2" style="vertical-align: middle;"></td>
+				    		</tr>
+				    		<tr class="old-tr">
+						    	<td style="vertical-align: middle;width:15%"><span class="text-stress">征信</span></td>						    	
+						    	<td id="td-3" style="vertical-align: middle;"></td>
+				    		</tr>
+				    		<tr class="old-tr">
+						    	<td style="vertical-align: middle;width:15%"><span class="text-stress">企业信息查询</span></td>						    	
+						    	<td id="td-4" style="vertical-align: middle;"></td>
+				    		</tr>
+				    		<tr class="old-tr">
+						    	<td style="vertical-align: middle;width:15%"><span class="text-stress">第三方数据查询</span></td>						    	
+						    	<td id="td-101" style="vertical-align: middle;"></td>
+				    		</tr>
+				    		<tr class="old-tr">
+						    	<td style="vertical-align: middle;width:15%"><span class="text-stress">其它</span></td>						    	
+						    	<td id="td-102" style="vertical-align: middle;"></td>
+				    		</tr>
+					    </tbody>
+					</table>
+					<!-- <li class="list-group-item list-group-blank"></li>	
+					<table id="datagrid" class="table table-hover">
+						<thead>
+							<tr class="warning">
+								<th field="ck" hidden="true"></th>
+								<th field="rn" align="text-center" class="text-center">序号</th>
+								<th field="id" idField="true" hidden="true">ID</th>
+								<th field="procCtaskname" align="text-center" class="text-center">任务名称</th>
+								<th field="procTaskAssignee" align="text-center" class="text-center">处理人</th>
+								<th field="procLicensor" align="text-center" class="text-center">委托人</th>
+								<th field="procTaskCommittime" align="text-center" class="text-center">任务到达时间</th>
+								<th field="procTaskEndtime" align="text-center" class="text-center">任务受理时间</th>
+								<th field="procTaskEndtime" align="text-center" class="text-center">任务完成时间</th>
+								<th field="procTaskApprStatus" align="text-center" class="text-center">审批结论</th>
+								<th field="procTaskApprOpinion" align="text-center" class="text-center" formatter="Formatter.opinion(val)">审批意见</th>
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table> -->
+				</div>
+			</div>
+		</div>
+	</div>	
+    <form id="uploadForm">
+		<input id="file" class="hidden" type="file" name="qqfile" multiple />
+	</form>
+	<div id="approve-win" class="modal fade" role="dialog" aria-labelledby="approve-win-label" aria-describedby="">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="approve-win-label">审批</h5>
+				</div>
+				<div class="modal-form">
+					<form id="approveForm" class="form-horizontal">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">审批结果</label>
+							<div class="col-sm-4">
+								<select class="form-control" disabled>
+									<option value="1" selected>通过</option>
+									<option value="2">退回</option>
+									<option value="0">拒绝</option>
+								</select> 
+								<input type="text" class="hidden" value="1" name="approveStatus">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">审批意见</label>
+							<div class="col-sm-8">
+								<textarea name="approveOpinion" class="form-control" rows="3" placeholder="请输入审批意见"></textarea>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button id="btn-approve-save" type="button"	class="btn btn-success btn-sm">提交</button>
+					<button id="btn-approve-close" type="button" class="btn btn-default btn-sm">关闭</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="menuContent" class="menuContent" style="max-height:500px;overflow:scroll;display:none; position: absolute;background:#fff;border:1px solid #ccc;">
+       <ul id="treeDemo" class="ztree" style="margin-top:0; width:160px;"></ul>
+    </div>
+	</body>
+</html>

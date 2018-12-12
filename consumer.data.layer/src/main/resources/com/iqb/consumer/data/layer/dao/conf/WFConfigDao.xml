@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iqb.consumer.data.layer.dao.conf.WFConfigDao">
+
+	<sql id="table">inst_wfconfig</sql>
+
+	<resultMap type="com.iqb.consumer.data.layer.bean.conf.WFConfig" id="wfConfig">
+		<result column="id" property="id" />
+		<result column="bizType" property="bizType" />
+		<result property="wfStatus" column="wfStatus" />
+		<result column="procDefKey" property="procDefKey" />
+		<result column="startWfurl" property="startWfurl" />
+		<result column="tokenUser" property="tokenUser" />
+		<result column="tokenPass" property="tokenPass" />
+		<result column="taskUser" property="taskUser" />
+		<result column="taskRole" property="taskRole" />
+		<result column="procTaskCode" property="procTaskCode" />
+		<result column="riskWfUrl" property="riskWfUrl" />
+		<result column="version" property="version" />
+		<result column="createTime" property="createTime" />
+		<result column="updateTime" property="updateTime" />
+	</resultMap>
+	
+	<sql id="cols">
+		bizType,wfStatus,procDefKey,startWfurl,tokenUser,tokenPass,taskUser,taskRole,procTaskCode,riskWfUrl
+	</sql>
+
+	<!-- 查询工作流配置 -->
+	<select id="getConfigByBizType" parameterType="java.util.Map" resultMap="wfConfig">
+		SELECT <include refid="cols"/> FROM <include refid="table"/> WHERE bizType = #{bizType} and wfStatus = #{wfStatus};
+	</select>
+	
+</mapper>

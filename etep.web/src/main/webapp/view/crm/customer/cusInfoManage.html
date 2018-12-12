@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>企业客户信息</title>
+        <meta charset="UTF-8" />
+        <meta name="Author" content="" />
+        <meta name="Keywords" content="" />
+        <meta name="Description" content="" /> 
+        <!-- 样式库 -->
+	    <link rel="stylesheet" href="../../../js/bootstrap/themes/default/bootstrap.css" />
+	    <link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/validatebox.css" />
+	    <link rel="stylesheet" href="../../../js/jquery-easyui-1.5/themes/bootstrap/tooltip.css" />
+	    <link rel="stylesheet" href="../../../css/jquery.select2.css" />
+	    <link rel="stylesheet" href="../../../css/jquery.select2-bootstrap.css" />
+	    <link rel="stylesheet" href="../../../js/bootstrap/themes/default/jquery.mCustomScrollbar.css" />
+	    
+	    <!-- 插件库 -->
+	    <script src="../../../js/common/package.js"></script>
+		<script src="../../../js/common/url.js"></script>
+		<script src="../../../js/common/json2.js"></script>	
+		<script src="../../../js/common/jquery-1.11.3.min.js"></script>		
+		<script src="../../../js/bootstrap/bootstrap.js"></script>
+		<script src="../../../js/bootstrap/plugins/bootstrap-paginator.js"></script>
+		<script src="../../../js/bootstrap/plugins/jquery.mCustomScrollbar.js"></script>
+		<script src="../../../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+		<script src="../../../js/ztree/js/jquery.ztree.all.min.js"></script>
+		<script src="../../../js/common/jquery.select2.js"></script>
+		
+		<!-- 业务库 -->
+		<script src="../../../js/common/base.js"></script>
+		<script src="../../../js/common/datagrid2.js"></script>
+		<script src="../../../js/common/tree.js"></script>
+		<script src="../../../js/common/formatter.js"></script>	    
+	    <script src="../../../js/each/crm/customer/cusInfoManage.js"></script>
+		
+		<!-- 页面样式 -->
+		<style type="text/css">
+			body {
+				font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif !important;
+				background:#eee url("../../../img/back.png") repeat;
+			}
+			.container-fluid {
+				padding:5px;
+			}
+			.left-part {
+				height:800px;
+			}
+			.modal-form {
+				margin:8px;
+			}
+		</style>
+    </head>
+    <body>  
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-info">
+                    <div class="panel-heading">
+                    	<h3 class="panel-title">客户信息查询栏</h3>
+                    </div>
+                        <div class="panel-body">    
+                            <form id="searchForm" class="form-horizontal">                               
+                                <!-- <div class="form-group">
+                                    <label class="form-label">商户名称:</label>
+                                </div>
+                                <div class="form-group">
+                                    <select id="merchantNo" name="merchantNo" class="form-control" style="width: 200px">
+                                    </select>
+                                </div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -->
+                                <div class="form-group">
+                                    <label class="control-label col-lg-1 col-md-1 col-sm-1">姓名:</label>
+                                    <div class="col-lg-2 col-md-2 col-sm-2">
+                                        <input name="real_name" type="text" class="form-control" placeholder="请输入姓名">
+                                    </div>
+                                    <label class="control-label col-lg-1 col-md-1 col-sm-1">手机号:</label>
+                                    <div class="col-lg-2 col-md-2 col-sm-2">
+                                        <input name="reg_id" type="text" class="form-control" placeholder="请输入手机号">
+	                                </div>
+	                                <div class="col-lg-3 col-md-3 col-sm-3">
+	                                    <button id="btn-search" type="button" class="btn btn-default btn-sm">查询</button>
+	                                    <button id="btn-reset" type="button" class="btn btn-default btn-sm">重置</button>
+                                    </div>
+                                </div>
+                            </form>                                                         
+                        </div>
+					</div>		
+					<div class="panel panel-info">	
+                        <div class="panel-heading">
+                            <h3 class="panel-title">个人客户信息列表</h3>
+                        </div>
+                        <div class="panel-body">
+                            <form id="listForm">                                
+                                <!-- <button id="btn-update" type="button" class="btn btn-warning btn-sm">修改</button> -->
+                                <!-- <button id="btn-remove" type="button" class="btn btn-danger btn-sm">删除</button> -->
+                                <button id="btn-check" type="button" class="btn btn-info btn-sm">查看</button>
+                            </form>
+                        </div>
+                        <table id="datagrid" class="table table-bordered table-hover" style="text-align:center">
+                            <thead>
+                                <tr>
+                                    <th field="ck"></th>
+                                    <th field="user_id" idField="true" hidden="true">用户表Id</th>
+									<th field="rn" style="text-align:center">序号</th>
+									<th field="real_name" style="text-align:center">姓名</th>
+									<th field="reg_id" idField="true" style="text-align:center">手机号</th>
+									<th field="smsMobile"  style="text-align:center">接收短信手机号</th>
+									<th field="id_card" style="text-align:center">身份证</th>
+									<th field="pay_account" style="text-align:center">银行卡</th>
+									<th field="bankName" style="text-align:center">开户银行</th>
+									<th field="bankMobile" style="text-align:center">预留手机号</th>
+									<th field="link_man_first" style="text-align:center">联系人（亲属）</th>
+									<th field="link_man_first_phone" style="text-align:center">手机号</th>
+									<th field="link_man_second" style="text-align:center">联系人（朋友）</th>
+									<th field="link_man_second_phone" style="text-align:center">手机号</th>
+									<th field="matital_status" style="text-align:center" formatter="">婚姻状况</th>
+									<th field="permanent_address" style="text-align:center">常驻地址</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                        <div class="panel-footer">
+                            <div id="paginator">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>          
+        </div>
+        <div id="update-win" class="modal fade" role="dialog" aria-labelledby="update-win-label" aria-describedby="企业客户信息">
+			<div class="modal-dialog modal-lg" role="document">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<h5 class="modal-title" id="update-win-label">客户信息</h5>
+		      		</div>
+		      		<div class="modal-form">
+		       			<form id="updateForm" class="form-horizontal">
+				  			<div class="form-group">
+				    			<label class="col-md-2 control-label">姓名</label>
+				    			<div class="col-md-4">
+				      				<input id="real_name" name="real_name" type="text" class="form-control input-sm easyui-validatebox" placeholder="姓名"  data-options="required:true, validType:['name','minLength[2]']"/>
+				    			</div>
+				    			<label class="col-md-2 control-label">手机号</label>
+				    			<div class="col-md-4">
+				      				<input id="reg_id" name="reg_id" type="text" class="form-control input-sm easyui-validatebox" placeholder="手机号" data-options="required:true, validType:['mobilePhone']" />
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-md-2 control-label">身份证</label>
+				    			<div class="col-md-4">
+				      				<input id="id_card" name="id_card" type="text" style="text-transform:uppercase" class="form-control input-sm easyui-validatebox" placeholder="身份证" data-options="required:true, validType:['idCard']" />
+				    			</div>
+				    			<label class="col-md-2 control-label">银行卡</label>
+				    			<div class="col-md-4">
+				      				<input name="pay_account" type="text" class="form-control input-sm easyui-validatebox" placeholder="银行卡" data-options="required:true, validType:['bankCard','minLength[16]','maxLength[19]']" />
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-md-2 control-label">联系人（亲属）</label>
+				    			<div class="col-md-4">
+				      				<input name="link_man_first" type="text" class="form-control input-sm easyui-validatebox" placeholder="联系人（亲属）" data-options="required:true, validType:['name','minLength[2]']" />
+				    			</div>
+				    			<label class="col-md-2 control-label">手机号</label>
+				    			<div class="col-md-4">
+				      				<input id="link_man_first_phone" name="link_man_first_phone" type="text" class="form-control input-sm easyui-validatebox" placeholder="手机号" data-options="required:true, validType:['mobilePhone']" />
+				    			</div>
+				  			</div>	
+				  			<div class="form-group">
+				    			<label class="col-md-2 control-label">联系人（朋友）</label>
+				    			<div class="col-md-4">
+				      				<input name="link_man_second" type="text" class="form-control input-sm easyui-validatebox" placeholder="联系人（朋友）" data-options="required:true, validType:['name','minLength[2]']" />
+				    			</div>
+				    			<label class="col-md-2 control-label">手机号</label>
+				    			<div class="col-md-4">
+				      				<input id="link_man_second_phone" name="link_man_second_phone" type="text" class="form-control input-sm easyui-validatebox" placeholder="手机号" data-options="required:true, validType:['mobilePhone']" />
+				    			</div>
+				  			</div>
+                            <div class="form-group">
+				    			<label class="col-md-2 control-label">婚姻状况</label>
+				    			<div class="col-md-4">
+				      				<select id="matital_status" name="matital_status" class="form-control">
+				      				    <option value='未婚'>未婚</option>
+				      				    <option value='已婚'>已婚</option>
+                                    </select>
+				    			</div>
+				    			<label class="col-md-2 control-label">常驻地址</label>
+				    			<div class="col-md-4">
+				      				<input id="permanent_address" name="permanent_address" type="text" class="form-control input-sm easyui-validatebox" placeholder="常驻地址"  data-options="required:true, validType:['address']"/>
+				    			</div>
+				  			</div>
+		  			</form>
+		      		</div>
+		      		<div class="modal-footer">
+				        <button id="btn-save" type="button" class="btn btn-success btn-sm">保存</button>
+				        <!-- <button id="btn-save" type="button" class="btn btn-success btn-sm">保存并提交</button> --> 
+				        <button id="btn-close" type="button" class="btn btn-default btn-sm">关闭</button>		        
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+    </body>
+</html>

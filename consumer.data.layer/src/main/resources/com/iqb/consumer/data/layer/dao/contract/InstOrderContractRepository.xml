@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010-2013 the original author or authors. Licensed under the 
+    Apache License, Version 2.0 (the "License"); you may not use this file except 
+    in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+    Unless required by applicable law or agreed to in writing, software distributed 
+    under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+    OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+    the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.iqb.consumer.data.layer.dao.contract.InstOrderContractRepository">
+    <select id="getIOCEByOid" parameterType="String" resultType="com.iqb.consumer.data.layer.bean.contract.InstOrderContractEntity">
+        SELECT 
+          *
+        FROM
+          inst_ordercontract
+        WHERE
+          orderid = #{orderId}
+    </select>
+    
+    <insert id="saveIOCE" parameterType="com.iqb.consumer.data.layer.bean.contract.InstOrderContractEntity">
+        INSERT INTO
+          inst_ordercontract
+            (
+              orderid, loancontractno, guarantycontractno, leasecontractno, 
+              contractdate, contractenddate, version, createtime, updatetime
+            )
+        VALUES
+            (
+              #{orderId},#{loanContractNo},#{guarantyContractNo},#{leaseContractNo},
+              #{contractDate},#{contractEndDate},#{version},#{createTime},#{updateTime}
+             )
+    </insert>
+    
+    <update id="updateIOCE" parameterType="com.iqb.consumer.data.layer.bean.contract.InstOrderContractEntity">
+        UPDATE
+            inst_ordercontract
+        SET
+            loancontractno = #{loanContractNo}, guarantycontractno = #{guarantyContractNo},  
+            leasecontractno = #{leaseContractNo},  contractdate = #{contractDate},  contractenddate = #{contractEndDate},
+            version = #{version}, updatetime = #{updateTime}
+        WHERE 
+            orderid = #{orderId}
+    </update>
+    
+    <select id="checkLoanContractNo" parameterType="String" resultType="com.iqb.consumer.data.layer.bean.contract.InstOrderContractEntity">
+        SELECT 
+          *
+        FROM
+          inst_ordercontract
+        WHERE
+          orderid != #{orderId}
+        AND 
+          loancontractno = #{loanContractNo}
+    </select>
+    
+    <select id="checkGuarantyContractNo" parameterType="String" resultType="com.iqb.consumer.data.layer.bean.contract.InstOrderContractEntity">
+        SELECT 
+          *
+        FROM
+          inst_ordercontract
+        WHERE
+          orderid != #{orderId}
+        AND 
+          guarantycontractno = #{guarantyContractNo}
+    </select>
+    
+    <select id="checkLeaseContractNo" parameterType="String" resultType="com.iqb.consumer.data.layer.bean.contract.InstOrderContractEntity">
+        SELECT 
+          *
+        FROM
+          inst_ordercontract
+        WHERE
+          orderid != #{orderId}
+        AND 
+          leasecontractno = #{leaseContractNo}
+    </select>
+</mapper>
